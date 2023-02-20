@@ -82,7 +82,7 @@ void traverse_expression(exprt &expr, std::ostream &out)
 {
   Forall_operands(it, expr)
   {
-    out << "looking at expression of type: " <<it->pretty() << std::endl;
+    out << "looking at expression: " <<it->pretty() << std::endl;
     if (it->id() == ID_symbol)
     {
       out << "Found symbol: " << it->get(ID_identifier) << std::endl;
