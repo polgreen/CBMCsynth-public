@@ -80,17 +80,16 @@ void print_model(problemt &problem, std::ostream &out)
 
 void traverse_expression(exprt &expr, std::ostream &out)
 {
-  Forall_operands(it, expr)
+  for (auto op : expr.operands())
   {
-    out << "looking at expression: " <<it->pretty() << std::endl;
-    if (it->id() == ID_symbol)
-    {
-      out << "Found symbol: " << it->get(ID_identifier) << std::endl;
-    }
-    traverse_expression(*it, out);
+    out << "looking at expression: " <<op.pretty() << std::endl;
+    if (op.id() == ID_symbol)
+      out << "Found symbol: " << op.get(ID_identifier) << std::endl;
+    traverse_expression(op, out);
   }
-
 }
+
+
 
 // send the problem to an SMT solver and get the result
 decision_proceduret::resultt solve_problem(problemt &problem, namespacet &ns, messaget &log)
