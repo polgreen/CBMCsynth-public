@@ -28,3 +28,7 @@ To run CBMC_smt on a file:
 ~~~
 CBMC_smt file.smt2
 ~~~
+
+### Modifying
+
+All the useful code is in src/CBMC_smt/smt2_frontend.cpp. Start here.
