@@ -1,4 +1,4 @@
-SRC=main.cpp smt2_frontend.cpp parser.cpp
+SRC=main.cpp smt2_frontend.cpp parser.cpp printing_utils.cpp
 
 OBJ+= ../../$(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \
       ../../$(CPROVER_DIR)/src/assembler/assembler$(LIBEXT) \
