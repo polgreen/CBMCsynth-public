@@ -141,7 +141,10 @@ problemt substitute_model_into_problem(const problemt &problem)
   {
     replace_symbolt replace_symbol;
     for (const auto &var : problem.free_var)
-      replace_symbol.insert(var.first, var.second);
+    {
+      if(var.second.is_not_nil())
+        replace_symbol.insert(var.first, var.second);
+    }
 
     exprt new_assertion = a;
     replace_symbol(new_assertion);
