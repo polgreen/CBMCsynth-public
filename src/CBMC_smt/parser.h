@@ -15,6 +15,7 @@ class parsert: public smt2_parsert
     }
 
   exprt::operandst assertions;
+  std::string logic;
   void print_problem();
   using smt2_errort = smt2_tokenizert::smt2_errort;
   void expand_function_applications(exprt &expr);

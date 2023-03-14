@@ -61,5 +61,14 @@ void parsert::setup_commands()
       assertions.push_back(e);
     }
   };
+  commands["set-logic"] = [this]() {
+    
+    if(next_token() != smt2_tokenizert::SYMBOL)
+      throw error("expected a string after set-logic");
+  
+    std::cout<<"Parsing logic"<<std::endl;
+    const auto s = smt2_tokenizer.get_buffer();
+    logic = s;
+  };
 }
 

@@ -9,6 +9,7 @@ class problemt
   public:
     std::vector<exprt> assertions;
     std::map<symbol_exprt, exprt> free_var;
+    std::string logic;
     
 
 };
