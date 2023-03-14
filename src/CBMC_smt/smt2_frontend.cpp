@@ -143,6 +143,11 @@ problemt substitute_model_into_problem(const problemt &problem)
     replace_symbol(new_assertion);
     new_problem.assertions.push_back(new_assertion);
   }
+  new_problem.logic = problem.logic;
+  
+  for(const auto &f : problem.defined_functions)
+    new_problem.defined_functions[f.first] = f.second;
+
   return new_problem;
 }
 
