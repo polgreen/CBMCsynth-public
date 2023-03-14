@@ -7,6 +7,7 @@ Author: Elizabeth Polgreen, epolgreen@gmail.com
 \*******************************************************************/
 
 #include "parser.h"
+#include "printing_utils.h"
 #include "problem.h"
 
 #include <fstream>
@@ -32,64 +33,52 @@ problemt build_problem(parsert &parser)
   for (const auto &a : parser.assertions)
     result.assertions.push_back(a);
 
-  // identify the free variables in the problem and add them to my model
+  // identify the free variables and defined functions in the problem
   for (const auto &id : parser.id_map)
   {
     if (id.second.definition.is_nil() && id.second.kind == smt2_parsert::idt::VARIABLE)
       result.free_var[symbol_exprt(id.first, id.second.type)] = nil_exprt();
+    else
+      result.defined_functions[symbol_exprt(id.first, id.second.type)] = id.second.definition;
   }
   return result;
 }
 
-void print_problem_tree(problemt &problem, std::ostream &out)
+
+void expand_function_applications(exprt &expr, const problemt & problem)
 {
-  out << "Problem tree:" << std::endl;
-  int count = 0;
-  for (const auto &a : problem.assertions)
+  for(exprt &op : expr.operands())
+    expand_function_applications(op, problem);
+
+  if(expr.id()==ID_function_application)
   {
-    out << "Assertion " << count << std::endl;
-    count++;
-    out << a.pretty() << std::endl;
+    auto &app=to_function_application_expr(expr);
+
+    if(app.function().id() == ID_symbol)
+    {
+      // look up the symbol
+      auto func = to_symbol_expr(app.function());
+      auto f_it = problem.defined_functions.find(func);
+
+      if(f_it != problem.defined_functions.end())
+      {        
+        // Does it have a definition? It's otherwise uninterpreted.
+        if(!f_it->second.is_nil())
+        {
+          exprt body = f_it->second;
+
+          if(body.id() == ID_lambda)
+            body = to_lambda_expr(body).application(app.arguments());
+
+          expand_function_applications(body, problem); // rec. call
+          expr = body;
+        }
+      }
+    }
   }
+
 }
 
-// print the expression tree for each assertion
-void print_problem(problemt &problem, std::ostream &out)
-{
-  out <<"Logic: " << problem.logic << std::endl;
-  out << "Problem:" << std::endl;
-  int count = 0;
-  for (const auto &a : problem.assertions)
-  {
-    out << "Assertion " << count << ": ";
-    count++;
-    out << format(a) << std::endl;
-  }
-}
-
-void print_model(problemt &problem, std::ostream &out)
-{
-  out << "Model:" << std::endl;
-  for (const auto &e : problem.free_var)
-  {
-    out << "Free var : " << e.first.get_identifier();
-    if (!e.second.is_nil())
-      out << " = " << format(e.second) << std::endl;
-    else
-      out << "[no assignment]" << std::endl;
-  }
-}
-
-void traverse_expression(exprt &expr, std::ostream &out)
-{
-  for (auto op : expr.operands())
-  {
-    out << "looking at expression: " <<op.pretty() << std::endl;
-    if (op.id() == ID_symbol)
-      out << "Found symbol: " << op.get(ID_identifier) << std::endl;
-    traverse_expression(op, out);
-  }
-}
 
 
 
@@ -103,7 +92,9 @@ decision_proceduret::resultt solve_problem(problemt &problem, namespacet &ns, me
 
   for (const auto &a : problem.assertions)
   {
-    solver.set_to_true(a);
+    exprt copy_of_a = a;
+    expand_function_applications(copy_of_a, problem);
+    solver.set_to_true(copy_of_a);
   }
   decision_proceduret::resultt result = solver();
 
@@ -200,11 +191,14 @@ int smt2_frontend(const cmdlinet &cmdline)
   }
 
   problemt problem = build_problem(parser);
+
   print_problem(problem, message.status());
   message.status() << messaget::eom;
   // solve the problem with an smt solver
+
   decision_proceduret::resultt res = solve_problem(problem, ns, message);
   // print problem and model
+  message.debug()<<"Solving with SMT solver:"<<messaget::eom;
   print_model(problem, message.status());
   message.status() << messaget::eom;
 
@@ -220,9 +214,9 @@ int smt2_frontend(const cmdlinet &cmdline)
     solve_problem(new_problem, ns, message);
   }
 
-  message.status()<<"\n\nRunning traverse_expression"<<messaget::eom;
-  traverse_expression(problem.assertions[0], message.status());
-  message.status() << messaget::eom; // flush
+  // message.status()<<"\n\nRunning traverse_expression"<<messaget::eom;
+  // traverse_expression(problem.assertions[0], message.status());
+  // message.status() << messaget::eom; // flush
 
   return 1;
 }
