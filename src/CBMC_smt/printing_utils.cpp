@@ -15,8 +15,8 @@ void print_problem(problemt &problem, std::ostream &out)
 
   for(const auto &a: problem.defined_functions)
   {
-    out << "Function: " << a.first.get_identifier() << std::endl;
-    out << "Definition: " << a.second.pretty() << std::endl;
+    out << "Function: " << a.first.get_identifier();
+    out << "  " << format(a.second) << std::endl;
   }
 
   for (const auto &a : problem.assertions)
