@@ -30,4 +30,4 @@
 *.exe
 *.out
 *.app
-CBMC_smt
+src/CBMC_smt/CBMC_smt
