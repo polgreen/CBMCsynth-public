@@ -13,21 +13,18 @@ void print_problem(problemt &problem, std::ostream &out)
   out << "Problem:" << std::endl;
   int count = 0;
 
-  for(const auto &a: problem.defined_functions)
-  {
+  for(const auto &a: problem.defined_functions)  {
     out << "Function: " << a.first.get_identifier();
     out << "  " << format(a.second) << std::endl;
   }
 
-  for (const auto &a : problem.assertions)
-  {
+  for (const auto &a : problem.assertions) {
     out << "Assertion " << count << ": ";
     count++;
     out << format(a) << std::endl;
   }
   out <<"Free variables: " << std::endl;
-  for (const auto &e : problem.free_var)
-  {
+  for (const auto &e : problem.free_var)  {
     out << e.first.get_identifier() << std::endl;
   }
 }
@@ -47,13 +44,14 @@ void print_model(problemt &problem, std::ostream &out)
 
 void traverse_expression(exprt &expr, std::ostream &out)
 {
-  for (auto op : expr.operands())
-  {
-    out << "looking at expression: " <<op.pretty() << std::endl;
-    if (op.id() == ID_symbol)
-      out << "Found symbol: " << op.get(ID_identifier) << std::endl;
-    traverse_expression(op, out);
-  }
+    out << expr.id() << std::endl;
+    for (auto op : expr.operands()) {
+        out << "looking at expression: " <<op.pretty() << std::endl;
+        if (op.id() == ID_symbol) {
+            out << "Found symbol: " << op.get(ID_identifier) << std::endl;
+        }
+        traverse_expression(op, out);
+    }
 }
 
 void print_problem_tree(problemt &problem, std::ostream &out)

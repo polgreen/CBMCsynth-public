@@ -4,6 +4,7 @@
 #include <util/cmdline.h>
 
 int smt2_frontend(const cmdlinet &);
+
 int smt2_frontend(const cmdlinet &, std::istream &in);
 
 

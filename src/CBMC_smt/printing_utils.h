@@ -5,8 +5,11 @@
 #include <fstream>
 
 void print_problem(problemt &problem, std::ostream &out);
+
 void print_model(problemt &problem, std::ostream &out);
+
 void traverse_expression(exprt &expr, std::ostream &out);
+
 void print_problem_tree(problemt &problem, std::ostream &out);
 
 #endif
