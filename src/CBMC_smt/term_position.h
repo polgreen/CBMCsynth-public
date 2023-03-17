@@ -5,6 +5,7 @@
 #ifndef SRC_TERM_POSITION_H
 #define SRC_TERM_POSITION_H
 
+#include <iostream>
 #include <vector>
 #include <map>
 #include <tuple>
@@ -25,13 +26,25 @@
 
 #include <sstream>
 
+struct term_position;
+std::string to_string(const term_position& tp);
+
+
 struct term_position {
+
 
     std::deque<int> position;
 
-    term_position() = default;
+    // in which assertion
+    size_t assertion;
 
-    term_position(const term_position& t): position{t.position} { }
+    term_position() = default;
+    term_position(size_t assertion) : assertion(assertion) {}
+
+    term_position(const term_position& t):
+        position{t.position},
+        assertion{t.assertion}
+        { }
 
     bool empty() {return  position.size() == 0;}
 
@@ -49,7 +62,6 @@ struct term_position {
     }
 };
 
-std::string to_string(const term_position& tp);
 
 class term_pos_not_exist : std::exception {
     std::string msg;

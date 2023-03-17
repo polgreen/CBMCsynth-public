@@ -210,7 +210,6 @@ int smt2_frontend(const cmdlinet &cmdline) {
 
     message.status()<<"\n\nPrinting Function Positions"<< messaget::eom;
     std::multimap<irep_idt, term_position> positions = get_function_occurrences(problem);
-
     for (auto x : positions) {
         message.status() << x.first << ": " << to_string(x.second) << messaget::eom;
     }
