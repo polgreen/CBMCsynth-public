@@ -62,7 +62,6 @@ struct term_position {
     }
 };
 
-
 class term_pos_not_exist : std::exception {
     std::string msg;
 public:
@@ -74,6 +73,9 @@ term_position operator+(term_position& first, const term_position& second);
 // collect occuring functions and their respective positions
 std::multimap<irep_idt, term_position> get_function_occurrences(const problemt& problem);
 
-exprt get_sub_term_at_position(term_position pos, exprt& term);
+/*
+ * Return copy of subterm of term at position pos.
+ * */
+exprt get_term_copy_at_position(term_position pos, exprt& term);
 
 #endif //SRC_TERM_POSITION_H
