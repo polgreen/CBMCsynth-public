@@ -13,7 +13,7 @@ exprt compute_lgg(const std::vector<exprt>& terms) {
     auto operand = terms[0].get(ID_identifier);
     for (const exprt& t : terms) {
         if (t.get(ID_identifier) != operand) {
-            return exprt(); // fresh variable
+            return {}; // fresh variable
         }
     }
     // all terms have the same operand
@@ -30,7 +30,6 @@ exprt compute_lgg(const std::vector<exprt>& terms) {
         }
         substs.insert({new_term.operands()[i], compute_lgg(sub_problem)});
     }
-
 
     auto flag = replace_expr(substs, new_term);
     if (not flag) {

@@ -29,9 +29,7 @@
 struct term_position;
 std::string to_string(const term_position& tp);
 
-
 struct term_position {
-
 
     std::deque<int> position;
 
@@ -76,6 +74,12 @@ std::multimap<irep_idt, term_position> get_function_occurrences(const problemt& 
 /*
  * Return copy of subterm of term at position pos.
  * */
-exprt get_term_copy_at_position(term_position pos, exprt& term);
+exprt get_term_copy_at_position(term_position pos, const exprt& term);
+
+/*
+ * Return copy of subterm of term at position pos.
+ * */
+exprt get_term_copy_at_position_in_problem(term_position pos, problemt& term);
+
 
 #endif //SRC_TERM_POSITION_H

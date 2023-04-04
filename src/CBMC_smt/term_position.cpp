@@ -58,7 +58,7 @@ std::multimap<irep_idt, term_position>
     return result_map;
 }
 
-exprt get_sub_term_at_position(term_position pos, exprt& term) {
+exprt get_term_copy_at_position(term_position pos, const exprt& term) {
     if (pos.empty()) {
         return term;
     }
@@ -67,8 +67,13 @@ exprt get_sub_term_at_position(term_position pos, exprt& term) {
     if (first >= term.operands().size()) {
         throw term_pos_not_exist("Position does not exist in term.");
     }
-    return get_sub_term_at_position(pos.pop_front(), term.operands()[first]);
+    return get_term_copy_at_position(pos.pop_front(), term.operands()[first]);
 }
+
+exprt get_term_copy_at_position_in_problem(term_position pos, problemt& prob) {
+    return get_term_copy_at_position(pos, prob.assertions[pos.assertion]);
+}
+
 
 std::string to_string(const term_position& tp) {
     std::string s = "[";

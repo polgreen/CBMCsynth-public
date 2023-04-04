@@ -1,4 +1,4 @@
-SRC=main.cpp smt2_frontend.cpp parser.cpp printing_utils.cpp printing_utils.h term_position.cpp anti_unification.cpp create_training_data.cpp sygus_problem.cpp
+SRC=main.cpp smt2_frontend.cpp parser.cpp printing_utils.cpp printing_utils.h term_position.cpp anti_unification.cpp create_training_data.cpp sygus_problem.cpp problem.cpp
 
 OBJ+= ../../$(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \
       ../../$(CPROVER_DIR)/src/assembler/assembler$(LIBEXT) \
