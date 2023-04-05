@@ -12,6 +12,10 @@
 #include "problem.h"
 #include "term_position.h"
 #include "anti_unification.h"
+#include "unification.h"
+
+#include <replace_symbol.h>
+#include <replace_expr.h>
 /**
  * This method is most important for getting "good" training data. It is worth investigating which
  * hyper-parameters impact the data in what way.
@@ -35,20 +39,43 @@ sygus_problemt create_training_data(const std::string& file) {
     exprt lgg = compute_lgg(terms);
     exprt second_order_var;  // this is a term like :    Foo(t1,...,tn) where n >= number of variables gathered from lgg;
 
+    replace_mapt replace_map;
+
     for (auto& term : terms) {
-        //substitution = unification(term, lgg);
+        std::vector<std::pair<exprt, exprt>> to_unify;
+        to_unify.emplace_back(term, lgg);
+        auto x = unify(to_unify);
+        if (!x) {
+            throw std::exception(); // This should not occur, since they should always be unifiable (by construction of lgg)
+        }
+        replace_symbolt substitution = x.value();
         exprt tmp = second_order_var;
-        exprt t = term;
-        //tmp = substitute(second_order_var, tmp);
+        substitution(tmp);
         // replace term with tmp in smt_problem
+        replace_map.insert({term, tmp});
+    }
+
+
+    sygus_problemt sygus_problem;
+    sygus_problem.logic = smt_problem.logic;
+    sygus_problem.defined_functions = smt_problem.defined_functions;
+
+    for (auto assertion : smt_problem.assertions) {
+        replace_expr(replace_map, assertion);
+        sygus_problem.assertions.push_back(assertion);
     }
 
     // create sygus from smt_problem where lgg is solution
 
-    return {};
+    return sygus_problem;
 }
 
 
 std::vector<sygus_problemt> create_training_data(const std::vector<std::string>& files) {
-    return {};
+    std::vector<sygus_problemt> res;
+    for (auto& x : files) {
+        res.push_back(create_training_data(x));
+    }
+
+    return res;
 }

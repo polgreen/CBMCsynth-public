@@ -16,6 +16,11 @@ FetchContent_Declare(cbmc
         )
 FetchContent_MakeAvailable(cbmc)
 
+FetchContent_Declare(uuid_v4
+        GIT_REPOSITORY git@github.com:crashoz/uuid_v4.git
+        GIT_TAG v1.0.0
+        )
+FetchContent_MakeAvailable(uuid_v4)
 
 
 set(sources
@@ -26,7 +31,7 @@ set(sources
         problem.cpp
         smt2_frontend.cpp
         sygus_problem.cpp
-        term_position.cpp)
+        term_position.cpp unification.cpp unification.h)
 
 set(headers
         create_training_data.h
@@ -37,13 +42,14 @@ set(headers
         smt2_frontend.h
         sygus_problem.h
         term_position.h
-        )
+        unification.cpp unification.h)
 
 add_executable(cbmcsmt main.cpp ${sources} ${headers})
 
 
 target_include_directories(cbmcsmt
         PRIVATE ${cbmc_SOURCE_DIR}/src
+        PRIVATE ${uuid_v4_SOURCE_DIR}
         )
 
 target_link_libraries(cbmcsmt
