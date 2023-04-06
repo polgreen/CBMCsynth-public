@@ -27,13 +27,16 @@ std::optional<replace_symbolt> unify(std::vector<std::pair<exprt, exprt>>& probl
     if (fst == snd) {   // delete rule
         return unify(problem);
     }
-    else if (fst.id() == snd.id()) { // decompose rule
-        for (int i = 0 ; i < fst.operands().size(); ++i) {
-            problem.emplace_back(fst.operands()[i], snd.operands()[i]);
+
+    if (fst.id() == ID_function_application and snd.id() == ID_function_application) {
+        if (fst.get(ID_identifier) == snd.get(ID_identifier)) { // decompose rule
+            for (int i = 0 ; i < fst.operands().size(); ++i) {
+                problem.emplace_back(fst.operands()[i], snd.operands()[i]);
+            }
+            return unify(problem);
+        } else { // conflict   TODO make sure that this is checking root function symbol
+            return std::nullopt;
         }
-        return unify(problem);
-    } else if (fst.id_string() != snd.id_string()) { // conflict   TODO make sure that this is checking root function symbol
-        return std::nullopt;
     } else if (fst.id() == ID_symbol) { // eliminate  TODO make sure that this is checking that it's a variable
         if (occurs_check(fst, snd)) { // failed occurs check
             return std::nullopt;

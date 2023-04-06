@@ -5,6 +5,12 @@
 #include "anti_unification.h"
 #include <util/replace_expr.h>
 
+
+#include "uuid_v4.h"
+UUIDv4::UUIDGenerator<std::mt19937_64> uuidGenerator;
+UUIDv4::UUID uuid = uuidGenerator.getUUID();
+
+
 exprt compute_lgg(const std::vector<exprt>& terms) {
     if (terms.empty()) {
         throw std::exception(); // TODO logging
@@ -13,7 +19,8 @@ exprt compute_lgg(const std::vector<exprt>& terms) {
     auto operand = terms[0].get(ID_identifier);
     for (const exprt& t : terms) {
         if (t.get(ID_identifier) != operand) {
-            return {}; // fresh variable
+            std::string bytes = uuid.bytes();
+            return symbol_exprt("var_" + bytes, t.type()); // return fresh variable
         }
     }
     // all terms have the same operand
