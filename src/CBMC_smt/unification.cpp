@@ -6,6 +6,7 @@
 
 #include "find_symbols.h"
 #include "std_expr.h"
+#include <mathematical_expr.h>
 
 bool occurs_check(const exprt& symbol, const exprt& term) {
     if (symbol.id() != ID_symbol) { // make sure symbol really is a symbol
@@ -29,12 +30,15 @@ std::optional<replace_symbolt> unify(std::vector<std::pair<exprt, exprt>>& probl
     }
 
     if (fst.id() == ID_function_application and snd.id() == ID_function_application) {
-        if (fst.get(ID_identifier) == snd.get(ID_identifier)) { // decompose rule
+        auto &f1 = to_function_application_expr(fst);
+        auto &f2 = to_function_application_expr(snd);
+
+        if (to_symbol_expr(f1.function()).get_identifier() == to_symbol_expr(f2.function()).get_identifier()) { // decompose rule
             for (int i = 0 ; i < fst.operands().size(); ++i) {
-                problem.emplace_back(fst.operands()[i], snd.operands()[i]);
+                problem.emplace_back( f1.arguments()[i], f1.arguments()[i]);
             }
             return unify(problem);
-        } else { // conflict   TODO make sure that this is checking root function symbol
+        } else { // conflict
             return std::nullopt;
         }
     } else if (fst.id() == ID_symbol) { // eliminate  TODO make sure that this is checking that it's a variable
