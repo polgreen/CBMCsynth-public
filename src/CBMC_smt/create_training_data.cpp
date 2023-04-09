@@ -14,8 +14,8 @@
 #include "anti_unification.h"
 #include "unification.h"
 
-#include <replace_symbol.h>
-#include <replace_expr.h>
+#include <util/replace_symbol.h>
+#include <util/replace_expr.h>
 /**
  * This method is most important for getting "good" training data. It is worth investigating which
  * hyper-parameters impact the data in what way.

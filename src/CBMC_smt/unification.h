@@ -5,7 +5,8 @@
 #ifndef CBMCSMT_UNIFICATION_H
 #define CBMCSMT_UNIFICATION_H
 
-#include "replace_symbol.h"
+
+#include <util/replace_symbol.h>
 #include <optional>
 /**
  * Syntactic unificaiton of two terms

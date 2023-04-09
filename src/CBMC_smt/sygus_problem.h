@@ -7,8 +7,9 @@
 
 #include <string>
 #include <vector>
-#include <expr.h>
-#include <symbol.h>
+#include <util/expr.h>
+#include <util/symbol.h>
+#include <util/mathematical_types.h>
 #include <map>
 
 class synth_fun_command {
