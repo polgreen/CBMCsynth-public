@@ -4,7 +4,7 @@ project(CBMCSMT)
 include(FetchContent)
 
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 
 
 #add_subdirectory(lib/cbmc)
@@ -31,7 +31,9 @@ set(sources
         problem.cpp
         smt2_frontend.cpp
         sygus_problem.cpp
-        term_position.cpp unification.cpp unification.h)
+        term_position.cpp
+        unification.cpp
+        expr2sygus.cpp)
 
 set(headers
         create_training_data.h
@@ -42,7 +44,8 @@ set(headers
         smt2_frontend.h
         sygus_problem.h
         term_position.h
-        unification.cpp unification.h)
+        unification.h
+        expr2sygus.h)
 
 add_executable(cbmcsmt main.cpp ${sources} ${headers})
 

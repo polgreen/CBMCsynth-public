@@ -1379,9 +1379,9 @@ std::string convert_plus(const plus_exprt &expr)
       summands.reserve(expr.operands().size());
       for(const auto &op : expr.operands())
         summands.push_back(index_exprt(
-          op, from_integer(size - i - 1, index_type), vector_type.subtype()));
+          op, from_integer(size - i - 1, index_type), vector_type.element_type()));
 
-      plus_exprt tmp(std::move(summands), vector_type.subtype());
+      plus_exprt tmp(std::move(summands), vector_type.element_type());
 
       result +=" ";
       convert_expr(tmp);
@@ -1573,13 +1573,13 @@ std::string convert_minus(const minus_exprt &expr)
     // subtract component-by-component
     for(mp_integer i=0; i!=size; ++i)
     {
-      exprt tmp(ID_minus, vector_type.subtype());
+      exprt tmp(ID_minus, vector_type.element_type());
       forall_operands(it, expr)
         tmp.copy_to_operands(
           index_exprt(
             *it,
             from_integer(size-i-1, index_type),
-            vector_type.subtype()));
+            vector_type.element_type()));
 
       result += " ";
       result += convert_expr(tmp);
@@ -1951,7 +1951,7 @@ std::string convert_type(const typet &type)
     // if(subtype.id()==ID_bool && !use_array_of_bool)
     //   result += "(_ BitVec 1)";
     // else
-    result += convert_type(array_type.subtype());
+    result += convert_type(array_type.element_type());
 
     result += ")";
   }
