@@ -7,6 +7,7 @@
 #include <util/suffix.h>
 
 #include "smt2_frontend.h"
+#include "create_training_data.h"
 
 
 #include <iostream>
@@ -68,7 +69,8 @@ int main(int argc, const char *argv[])
   {
     if(has_suffix(cmdline.args.back(), SMT2_FILE_ENDING))
     {
-      return smt2_frontend(cmdline);
+      //return smt2_frontend(cmdline);
+      return create_synthesis_problem(cmdline);
     }
     else
     {

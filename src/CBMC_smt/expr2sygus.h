@@ -44,4 +44,11 @@ std::string expr2sygus_var_dec(const symbol_exprt &symbol);
   std::string convert_expr(const exprt &);
   std::string convert_type(const typet &);
   std::string flatten2bv(const exprt &expr);
+
+  /*
+   * Printer for SyGuS problems
+   * */
+  std::string build_sygus_query(const sygus_problemt &problem);
+
+
 #endif /* EMU_EXPR2SYGUS*/

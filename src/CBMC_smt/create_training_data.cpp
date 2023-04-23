@@ -42,6 +42,8 @@
 
 #include "smt2_frontend.h"
 
+#include "expr2sygus.h"
+
 /**
  * This method is most important for getting "good" training data. It is worth investigating which
  * hyper-parameters impact the data in what way.
@@ -55,9 +57,9 @@ std::vector<term_position> get_term_positions(const problemt& problem) {
     return {p1,p2};
 }
 
-sygus_problemt create_training_data(const std::string& file) {
 
-    problemt smt_problem = parse_problem(file);
+sygus_problemt create_training_data(const problemt& smt_problem) {
+
     std::vector<term_position> positions = get_term_positions(smt_problem);
 
     std::vector<exprt> terms;
@@ -100,7 +102,7 @@ sygus_problemt create_training_data(const std::string& file) {
     return sygus_problem;
 }
 
-
+/*
 std::vector<sygus_problemt> create_training_data(const std::vector<std::string>& files) {
     std::vector<sygus_problemt> res;
     for (auto& x : files) {
@@ -109,10 +111,10 @@ std::vector<sygus_problemt> create_training_data(const std::vector<std::string>&
 
     return res;
 }
+*/
 
 
-
-int create_synthesis_problems(const cmdlinet &cmdline) {
+int create_synthesis_problem(const cmdlinet &cmdline) {
     // parse input file
     assert(cmdline.args.size() == 1);
     std::ifstream in(cmdline.args.front());
@@ -141,7 +143,7 @@ int create_synthesis_problems(const cmdlinet &cmdline) {
 
     message_handler.set_verbosity(v);
     parsert parser(in);
-    // parse the problem
+    // parse the smt_problem
     try {
         parser.parse();
     } catch (const parsert::smt2_errort &e) {
@@ -150,35 +152,40 @@ int create_synthesis_problems(const cmdlinet &cmdline) {
         return 20;
     }
 
-    problemt problem = build_problem(parser);
-    decision_proceduret::resultt res = solve_problem(problem, ns, message);
-    // print problem and model
-    message.debug() << "Solving with SMT solver:" << messaget::eom;
-    print_model(problem, message.status());
-    message.status() << messaget::eom;
+    problemt smt_problem = build_problem(parser);
+    decision_proceduret::resultt res = solve_problem(smt_problem, ns, message);
+    // print smt_problem and model
+    //message.debug() << "Solving with SMT solver:" << messaget::eom;
+    //print_model(smt_problem, message.status());
+    //message.status() << messaget::eom;
 
+    problemt new_valid_problem;
     if (res == decision_proceduret::resultt::D_SATISFIABLE) {
         // replace the free variables in the assertions with the values from the model
-        problemt new_valid_problem = substitute_model_into_problem(problem);
-        // print the new problem
-        message.status() << "NEW PROBLEM" << messaget::eom;
-        print_problem(new_valid_problem, message.status());
-        message.status() << messaget::eom;
+        new_valid_problem = substitute_model_into_problem(smt_problem);
+        // print the new smt_problem
+        message.status() << "Problem is satisfiable, working with substitution" << messaget::eom;
+        //print_problem(new_valid_problem, message.status());
+        //message.status() << messaget::eom;
 
     } else if (res == decision_proceduret::resultt::D_UNSATISFIABLE) {
-        //problemt new_valid_problem = negate_problem(problem);
-
+        //new_valid_problem = negate_problem(smt_problem);
     }
 
-    message.status()<<"\n\nRunning traverse_expression"<< messaget::eom;
-    traverse_expression(problem.assertions[0], message.status());
+    //message.status()<<"\n\nRunning traverse_expression"<< messaget::eom;
+    //traverse_expression(smt_problem.assertions[0], message.status());
 
+    sygus_problemt sygus_problem = create_training_data(new_valid_problem);
 
-    message.status()<<"\n\nPrinting Function Positions"<< messaget::eom;
-    std::multimap<irep_idt, term_position> positions = get_function_occurrences(problem);
-    for (auto x : positions) {
-        message.status() << x.first << ": " << to_string(x.second) << messaget::eom;
-    }
+    message.status() << "--------------------------------------------------\n" << messaget::eom;
+    message.status() << build_sygus_query(sygus_problem) << messaget::eom;
+    message.status() << "--------------------------------------------------\n" << messaget::eom;
+
+    //message.status()<<"\n\nPrinting Function Positions"<< messaget::eom;
+    //std::multimap<irep_idt, term_position> positions = get_function_occurrences(smt_problem);
+    //for (auto x : positions) {
+    //    message.status() << x.first << ": " << to_string(x.second) << messaget::eom;
+    //}
     message.status() << messaget::eom; // flush
 
     return 1;

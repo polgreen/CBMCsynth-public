@@ -28,8 +28,8 @@ term_position operator+(term_position& first, const term_position& second) {
     return first;
 }
 
-void map_to_string(std::multimap<irep_idt, term_position> mp, std::ostream& message) {
-    for (auto x : mp) {
+void map_to_string(const std::multimap<irep_idt, term_position>& mp, std::ostream& message) {
+    for (const auto& x : mp) {
         message << x.first << ": " << to_string(x.second) << std::endl;
     }
 }
@@ -70,7 +70,7 @@ exprt get_term_copy_at_position(term_position pos, const exprt& term) {
     return get_term_copy_at_position(pos.pop_front(), term.operands()[first]);
 }
 
-exprt get_term_copy_at_position_in_problem(term_position pos, problemt& prob) {
+exprt get_term_copy_at_position_in_problem(const term_position& pos, const problemt& prob) {
     return get_term_copy_at_position(pos, prob.assertions[pos.assertion]);
 }
 

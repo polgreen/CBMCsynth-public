@@ -29,6 +29,12 @@ To run CBMC_smt on a file:
 CBMC_smt file.smt2
 ~~~
 
+
+use/install     
+https://github.com/crashoz/uuid_v4     
+version:  v1.0.0
+
+
 ### Modifying
 
 All the useful code is in src/CBMC_smt/smt2_frontend.cpp. Start here.

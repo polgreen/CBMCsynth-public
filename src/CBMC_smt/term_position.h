@@ -79,7 +79,7 @@ exprt get_term_copy_at_position(term_position pos, const exprt& term);
 /*
  * Return copy of subterm of term at position pos.
  * */
-exprt get_term_copy_at_position_in_problem(term_position pos, problemt& term);
+exprt get_term_copy_at_position_in_problem(const term_position& pos, const problemt& term);
 
 
 #endif //SRC_TERM_POSITION_H

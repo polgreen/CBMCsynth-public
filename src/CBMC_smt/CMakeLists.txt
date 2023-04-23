@@ -12,7 +12,7 @@ set (CMAKE_CXX_FLAGS "-Wno-return-type")
 
 FetchContent_Declare(cbmc
         GIT_REPOSITORY git@github.com:jparsert/cbmc.git
-        GIT_TAG 143f97d0515681efdd4de5bb228e5e6332e22525
+        GIT_TAG develop
         )
 FetchContent_MakeAvailable(cbmc)
 
