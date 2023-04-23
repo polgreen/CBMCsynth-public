@@ -5,14 +5,14 @@ include(FetchContent)
 
 
 set(CMAKE_CXX_STANDARD 17)
-
+set (CMAKE_CXX_FLAGS "-Wno-return-type")
 
 #add_subdirectory(lib/cbmc)
 
 
 FetchContent_Declare(cbmc
         GIT_REPOSITORY git@github.com:jparsert/cbmc.git
-        GIT_TAG develop
+        GIT_TAG 143f97d0515681efdd4de5bb228e5e6332e22525
         )
 FetchContent_MakeAvailable(cbmc)
 

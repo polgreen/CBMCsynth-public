@@ -15,6 +15,8 @@
 #include <solvers/smt2/smt2_dec.h>
 
 #include "problem.h"
+#include "parser.h"
+
 
 int smt2_frontend(const cmdlinet &);
 
@@ -23,5 +25,7 @@ int smt2_frontend(const cmdlinet &, std::istream &in);
 decision_proceduret::resultt solve_problem(problemt &problem, namespacet &ns, messaget &log);
 
 problemt substitute_model_into_problem(const problemt &problem);
+
+problemt build_problem(parsert &parser);
 
 #endif /*_SMT2_FRONTEND_H_*/
