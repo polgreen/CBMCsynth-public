@@ -7,7 +7,7 @@
 
 
 #include "sygus_problem.h"
-#include "cmdline.h"
+#include <util/cmdline.h>
 #include <string>
 #include <vector>
 
