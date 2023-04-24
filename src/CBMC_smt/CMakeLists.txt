@@ -33,7 +33,7 @@ set(sources
         sygus_problem.cpp
         term_position.cpp
         unification.cpp
-        expr2sygus.cpp)
+        expr2sygus.cpp util.cpp)
 
 set(headers
         create_training_data.h
@@ -45,7 +45,7 @@ set(headers
         sygus_problem.h
         term_position.h
         unification.h
-        expr2sygus.h)
+        expr2sygus.h util.h)
 
 add_executable(cbmcsmt main.cpp ${sources} ${headers})
 

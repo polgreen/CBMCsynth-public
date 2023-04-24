@@ -5,6 +5,7 @@
 #include "anti_unification.h"
 #include <util/replace_expr.h>
 
+#include "util.h"
 
 #include "uuid_v4.h"
 UUIDv4::UUIDGenerator<std::mt19937_64> uuidGenerator;
@@ -21,9 +22,13 @@ exprt compute_lgg(const std::vector<exprt>& terms) {
 
     // check if all the terms have the same root symbol
     for (const exprt& t : terms) {
-        if (t.id() != operand) { // Not the same root symbol
+        if (!root_equality(terms[0], t)) { // Not the same root symbol
+            std::cout << "Different root: " << format(t) << "\t:\t" << format(terms[0]) << std::endl;
+
             std::string bytes = std::to_string(uuidGenerator.getUUID().hash());
             return symbol_exprt("var_" + bytes, t.type()); // return fresh variable
+        } else {
+            std::cout << "Same root: " << format(t) << "\t:\t" << format(terms[0]) << std::endl;
         }
     }
 
