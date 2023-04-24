@@ -4,9 +4,9 @@
 
 #include "unification.h"
 
-#include "find_symbols.h"
-#include "std_expr.h"
-#include <mathematical_expr.h>
+#include <util/find_symbols.h>
+#include <util/std_expr.h>
+#include <util/mathematical_expr.h>
 
 bool occurs_check(const exprt& symbol, const exprt& term) {
     if (symbol.id() != ID_symbol) { // make sure symbol really is a symbol
