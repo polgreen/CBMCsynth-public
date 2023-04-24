@@ -69,6 +69,7 @@ sygus_problemt create_training_data(const problemt& smt_problem) {
     }
 
     exprt lgg = compute_lgg(terms);
+    std::cout << "LGG: " << format(lgg) << std::endl;
     exprt second_order_var;  // this is a term like :    Foo(t1,...,tn) where n >= number of variables gathered from lgg;
 
     replace_mapt replace_map;
