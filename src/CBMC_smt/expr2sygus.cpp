@@ -1190,8 +1190,9 @@ std::string synth_fun_dec(const synth_fun_commandt &f)
     {
       result += "(" + clean_id(f.parameters[i]) + " " + type2sygus(func_type.domain()[i]) + ")";
     }
-    result += ")\n " + type2sygus(func_type.codomain()) + "\n";
+    result += ") " + type2sygus(func_type.codomain()) + "\n";
   }
+
   // grammar is empty
   if(f.grammar.nt_ids.size()==0)
     return result += ")\n";
@@ -1202,9 +1203,9 @@ std::string synth_fun_dec(const synth_fun_commandt &f)
   for(std::size_t i=0; i< f.grammar.nt_ids.size(); i++)
   {
     auto &nt = f.grammar.nt_ids[i];
-    auto &rule = f.grammar.production_rules.at(nt);
-    nts += "(" + id2string(nt) + " " + type2sygus(rule[0].type()) + ")";
-    rules +="( " + id2string(nt) + " " + type2sygus(rule[0].type()) + "(";
+    auto &rule = f.grammar.production_rules.at(nt.get_identifier());
+    nts += "(" + expr2sygus(nt) + " " + type2sygus(rule[0].type()) + ")";
+    rules +="(" + expr2sygus(nt) + " " + type2sygus(rule[0].type()) + " (";
     for(const auto &r: rule)
      rules += expr2sygus(r) + " ";
     rules +="))\n";
@@ -2325,10 +2326,21 @@ std::string convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
   return result;
 }
 
-
 std::string build_sygus_query(const sygus_problemt &problem)
 {
-  std::string query = "(set-logic " + problem.logic + ")\n";
+  return build_sygus_query(problem, true);
+}
+
+
+std::string build_sygus_query(const sygus_problemt &problem, bool add_default_grammar)
+{
+  
+
+  std::string query;
+  for(const auto &c: problem.comments)
+    query += "; " + c + "\n";
+
+  query += "(set-logic " + problem.logic + ")\n";
 
   // declare the variables
   for(const auto &v: problem.free_var)
@@ -2336,7 +2348,10 @@ std::string build_sygus_query(const sygus_problemt &problem)
 
   // synthesis function
   // NB: we only support one synthesis function
-  query += synth_fun_dec(problem.synth_fun) + "\n";
+  if(add_default_grammar)
+    query += synth_fun_dec(add_grammar(problem.synth_fun)) + "\n";
+  else
+    query += synth_fun_dec(problem.synth_fun) + "\n";
 
   
   // TODO: either you need to expand the fucntion applications, 

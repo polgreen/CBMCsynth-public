@@ -49,6 +49,7 @@ std::string expr2sygus_var_dec(const symbol_exprt &symbol);
    * Printer for SyGuS problems
    * */
   std::string build_sygus_query(const sygus_problemt &problem);
+  std::string build_sygus_query(const sygus_problemt &problem, bool add_default_grammar);
 
 
 #endif /* EMU_EXPR2SYGUS*/
