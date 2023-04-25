@@ -44,24 +44,53 @@
 #include "smt2_frontend.h"
 
 #include "expr2sygus.h"
+#include "expr_iterator.h"
 
 /**
  * This method is most important for getting "good" training data. It is worth investigating which
  * hyper-parameters impact the data in what way.
  * suggestions : sub-tree similarity
  **/
-std::vector<term_position> get_term_positions(const problemt& problem) {
-    term_position p1;
-    p1.assertion = 0;
-    term_position p2;
-    p2.assertion = 1;
-    return {p1,p2};
+std::vector<term_positiont> get_term_positions(const problemt& problem) {
+
+    std::set<exprt> all_subterms;
+    for (const exprt& assertion : problem.assertions) {
+        for(auto it = assertion.depth_begin() , itend = assertion.depth_end(); it != itend; ++it) {
+            all_subterms.emplace(*it);
+        }
+    }
+
+    std::size_t height = 0;
+    exprt fst;
+    exprt snd;
+
+    for (const auto& x : all_subterms) {
+        for (const auto& y : all_subterms) {
+            auto lgg = compute_lgg({{x,y}});
+            if (expr_height(lgg.first) > height and x != y) {
+                fst = x;
+                snd = y;
+                height = expr_height(lgg.first);
+            }
+        }
+    }
+    std::vector<term_positiont> res;
+
+    for (auto i = 0 ; i < problem.assertions.size(); ++i) {
+        concat(res,get_pos_of_all_occurrences(fst, problem.assertions[i], term_positiont(i)));
+        concat(res,get_pos_of_all_occurrences(snd, problem.assertions[i], term_positiont(i)));
+
+    }
+
+    // TODO remove overlaps in res (might not be necessary as subst in create_training_data might take care of it)
+
+    return res;
 }
 
 
 sygus_problemt create_training_data(const problemt& smt_problem) {
 
-    std::vector<term_position> positions = get_term_positions(smt_problem);
+    std::vector<term_positiont> positions = get_term_positions(smt_problem);
 
     std::vector<exprt> terms;
     terms.reserve(positions.size());

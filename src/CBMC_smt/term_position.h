@@ -6,6 +6,7 @@
 #define SRC_TERM_POSITION_H
 
 #include <iostream>
+#include <utility>
 #include <vector>
 #include <map>
 #include <tuple>
@@ -26,35 +27,32 @@
 
 #include <sstream>
 
-struct term_position;
-std::string to_string(const term_position& tp);
+struct term_positiont;
+std::string to_string(const term_positiont& tp);
 
-struct term_position {
+struct term_positiont {
 
     std::deque<int> position;
 
     // in which assertion
     size_t assertion;
 
-    term_position() = default;
-    term_position(size_t assertion) : assertion(assertion) {}
+    //term_positiont() = default;
+    explicit term_positiont(size_t assertion) : assertion(assertion) {}
 
-    term_position(const term_position& t):
-        position{t.position},
-        assertion{t.assertion}
-        { }
+    term_positiont(const term_positiont& t) = default;
 
-    bool empty() {return  position.size() == 0;}
+    [[nodiscard]] bool empty() const {return  position.empty();}
 
     int front() {return *position.begin();}
 
-    term_position pop_front() {
+    term_positiont pop_front() {
         position.pop_front();
         return *this;
     }
 
-    term_position append_node(int i) const {
-        term_position t(*this);
+    [[nodiscard]] term_positiont append_node(int i) const {
+        term_positiont t(*this);
         t.position.push_back(i);
         return t;
     }
@@ -63,23 +61,26 @@ struct term_position {
 class term_pos_not_exist : std::exception {
     std::string msg;
 public:
-    term_pos_not_exist(std::string msg): msg{msg} {}
+    explicit term_pos_not_exist(std::string msg): msg{std::move(msg)} {}
 };
 
-term_position operator+(term_position& first, const term_position& second);
+term_positiont operator+(term_positiont& first, const term_positiont& second);
 
 // collect occuring functions and their respective positions
-std::multimap<irep_idt, term_position> get_function_occurrences(const problemt& problem);
+std::multimap<irep_idt, term_positiont> get_function_occurrences(const problemt& problem);
 
 /*
  * Return copy of subterm of term at position pos.
  * */
-exprt get_term_copy_at_position(term_position pos, const exprt& term);
+exprt get_term_copy_at_position(term_positiont pos, const exprt& term);
 
 /*
  * Return copy of subterm of term at position pos.
  * */
-exprt get_term_copy_at_position_in_problem(const term_position& pos, const problemt& term);
+exprt get_term_copy_at_position_in_problem(const term_positiont& pos, const problemt& term);
+
+
+std::vector<term_positiont> get_pos_of_all_occurrences(const exprt& what, const exprt& in, const term_positiont& pos);
 
 
 #endif //SRC_TERM_POSITION_H

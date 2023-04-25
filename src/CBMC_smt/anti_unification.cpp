@@ -25,6 +25,8 @@ std::pair<exprt, std::vector<symbol_exprt>>  compute_lgg(const std::vector<exprt
         if (!root_equality(terms[0], t)) { // Not the same root symbol
             std::string bytes = std::to_string(uuidGenerator.getUUID().hash());
             auto new_var = symbol_exprt("var_" + bytes, t.type()); // return fresh variable
+            std::cout << format(t) << " : " << t.type().id_string() << "\t" << format(new_var) << std::endl;
+
             return {new_var, {new_var}};
         }
     }
@@ -43,6 +45,9 @@ std::pair<exprt, std::vector<symbol_exprt>>  compute_lgg(const std::vector<exprt
         std::pair<exprt, std::vector<symbol_exprt>> res = compute_lgg(sub_problem);
         concat(new_vars, res.second);
         substs.insert({op, res.first});
+    }
+    for (auto x : substs) {
+        std::cout << format(x.first) << " : " << x.first.type().id_string() << "\t" << format(x.second) << " : "  << x.second.type().id_string() << std::endl;
     }
 
     replace_expr(substs, new_sub_lgg);

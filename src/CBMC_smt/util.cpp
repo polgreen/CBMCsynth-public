@@ -37,7 +37,7 @@ bool root_equality(const exprt& a, const exprt& b)
     return false;
 }
 
-function_application_exprt create_func_app(irep_idt function_name, std::vector<exprt> operands, typet codomain)
+function_application_exprt create_func_app(irep_idt function_name, const std::vector<exprt>& operands, const typet& codomain)
 {
     // create function type
     std::vector<typet> domain;
@@ -45,5 +45,18 @@ function_application_exprt create_func_app(irep_idt function_name, std::vector<e
         domain.push_back(op.type());
     }
     mathematical_function_typet function_type(domain, codomain);
-    return function_application_exprt(symbol_exprt(function_name, function_type), operands);
+    return function_application_exprt{symbol_exprt(function_name, function_type), operands};
+}
+
+std::size_t expr_height(const exprt& expr) {
+    if (! expr.has_operands()) {
+        return 1;
+    } else {
+        size_t max = 0;
+        for (const auto& op : expr.operands()) {
+            size_t op_depth = expr_height(op);
+            max = op_depth > max ? op_depth : max;
+        }
+        return max + 1;
+    }
 }
