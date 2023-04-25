@@ -103,6 +103,10 @@ sygus_problemt create_training_data(const problemt& smt_problem) {
     synth_fun.id = second_order_var.id();
     synth_fun.type = second_order_var.type();
     // synth_fun.parameters = irep_args;
+    for (const auto& x: anti_uni.second){
+        synth_fun.parameters.push_back(x.get_identifier());
+    }
+
     sygus_problem.synth_fun = synth_fun;
 
     sygus_problem.logic = smt_problem.logic;
