@@ -988,7 +988,7 @@ std::string convert_expr(const exprt &expr)
   else if(expr.id()==ID_constraint_select_one)
   {
     UNEXPECTEDCASE(
-      "smt2_convt::convert_expr: '" + expr.id_string() +
+      "expr2sygus::convert_expr: '" + expr.id_string() +
       "' is not yet supported");
   }
   else if(expr.id() == ID_bswap)
@@ -1080,7 +1080,7 @@ std::string convert_expr(const exprt &expr)
   {
     INVARIANT_WITH_DIAGNOSTICS(
       false,
-      "smt2_convt::convert_expr should not be applied to unsupported type",
+      "expr2sygus::convert_expr should not be applied to unsupported type",
       expr.pretty());
   }
   return result;
