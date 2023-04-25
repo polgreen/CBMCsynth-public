@@ -28,9 +28,9 @@
 
 
 /**
- * We compute the least general generalization (lgg) of a set of terms.
+ * We compute the least general generalization (lgg) of a set of terms, and also return the newly created variables
  * */
-exprt compute_lgg(const std::vector<exprt>& terms);
+std::pair<exprt, std::vector<symbol_exprt>> compute_lgg(const std::vector<exprt>& terms);
 
 
 

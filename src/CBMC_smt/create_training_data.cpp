@@ -67,16 +67,21 @@ sygus_problemt create_training_data(const problemt& smt_problem) {
     for (auto& pos : positions) {
         terms.push_back(get_term_copy_at_position_in_problem(pos, smt_problem));
     }
+    std::pair<exprt, std::vector<symbol_exprt>> anti_uni = compute_lgg(terms);
+    exprt lgg = anti_uni.first;
+    std::vector<exprt> new_vars;
+    for (const auto& x : anti_uni.second) {
+        new_vars.emplace_back(x);
+    }
 
-    exprt lgg = compute_lgg(terms);
-    std::cout << "LGG: " << format(lgg) << std::endl;
-    exprt second_order_var;  // this is a term like :    Foo(t1,...,tn) where n >= number of variables gathered from lgg;
+    exprt second_order_var("synthTarget", lgg.type(), std::vector<exprt>(new_vars));  // this is a term like :    Foo(t1,...,tn) where n >= number of variables gathered from lgg;
 
     replace_mapt replace_map;
 
     for (auto& term : terms) {
         std::vector<std::pair<exprt, exprt>> to_unify;
         to_unify.emplace_back(term, lgg);
+
         auto x = unify(to_unify);
         if (!x) {
             throw std::exception(); // This should not occur, since they should always be unifiable (by construction of lgg)
@@ -88,8 +93,20 @@ sygus_problemt create_training_data(const problemt& smt_problem) {
         replace_map.insert({term, tmp});
     }
 
-
     sygus_problemt sygus_problem;
+    std::stringstream ss;
+    ss << "Solution: " << format(lgg);
+    sygus_problem.comments.push_back(ss.str());
+
+    synth_fun_commandt synth_fun;
+    synth_fun.id = second_order_var.id();
+    synth_fun.type = second_order_var.type();
+
+
+    // synth_fun.parameters = irep_args;
+
+    sygus_problem.synth_fun = synth_fun;
+
     sygus_problem.logic = smt_problem.logic;
     sygus_problem.defined_functions = smt_problem.defined_functions;
 
@@ -98,21 +115,9 @@ sygus_problemt create_training_data(const problemt& smt_problem) {
         sygus_problem.assertions.push_back(assertion);
     }
 
-    // create sygus from smt_problem where lgg is solution
-
     return sygus_problem;
 }
 
-/*
-std::vector<sygus_problemt> create_training_data(const std::vector<std::string>& files) {
-    std::vector<sygus_problemt> res;
-    for (auto& x : files) {
-        res.push_back(create_training_data(x));
-    }
-
-    return res;
-}
-*/
 
 
 int create_synthesis_problem(const cmdlinet &cmdline) {

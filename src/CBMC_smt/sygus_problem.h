@@ -45,7 +45,7 @@ class sygus_problemt {
 
 public:
 
-    std::string comments;
+    std::vector<std::string> comments;
 
     synth_fun_commandt synth_fun;
 
