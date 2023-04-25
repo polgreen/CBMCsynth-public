@@ -77,7 +77,8 @@ sygus_problemt create_training_data(const problemt& smt_problem) {
 
     // this is a term like :    Foo(t1,...,tn) where n >= number of variables gathered from lgg;
    // exprt second_order_var("synthTarget", lgg.type(), std::vector<exprt>(new_vars));
-    exprt second_order_var = create_func_app("synthTarget",std::vector<exprt>(new_vars), lgg.type());
+    function_application_exprt synth_fun_app = 
+        create_func_app("synthTarget",std::vector<exprt>(new_vars), lgg.type());
 
     // generate the replace map
     replace_mapt replace_map;
@@ -90,7 +91,7 @@ sygus_problemt create_training_data(const problemt& smt_problem) {
             throw std::exception(); // This should not occur, since they should always be unifiable (by construction of lgg)
         }
         replace_symbolt substitution = x.value();
-        exprt tmp = second_order_var;
+        exprt tmp = synth_fun_app;
         substitution(tmp);
         // replace term with tmp in smt_problem
         replace_map.insert({term, tmp});
@@ -102,8 +103,8 @@ sygus_problemt create_training_data(const problemt& smt_problem) {
     sygus_problem.comments.push_back(ss.str());
 
     synth_fun_commandt synth_fun;
-    synth_fun.id = second_order_var.id();
-    synth_fun.type = second_order_var.type();
+    synth_fun.id = to_symbol_expr(synth_fun_app.function()).get_identifier();
+    synth_fun.type = synth_fun_app.function_type();
     // synth_fun.parameters = irep_args;
     for (const auto& x: anti_uni.second){
         synth_fun.parameters.push_back(x.get_identifier());
