@@ -4,8 +4,8 @@
 
 #include "util.h"
 #include <iostream>
-#include <format.h>
-#include <mathematical_expr.h>
+#include <util/format.h>
+#include <util/mathematical_expr.h>
 
 /*
  * Check if the root symbols in expr a and b are the same
