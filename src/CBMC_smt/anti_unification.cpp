@@ -18,7 +18,7 @@ std::pair<exprt, std::vector<symbol_exprt>>  compute_lgg(const std::vector<exprt
         throw std::exception(); // TODO logging
     } // if terms.size() == 1 ?
 
-    auto operand = terms[0].id();
+   // auto operand = terms[0].id();
 
     // check if all the terms have the same root symbol
     for (const exprt& t : terms) {
