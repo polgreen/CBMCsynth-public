@@ -1203,9 +1203,9 @@ std::string synth_fun_dec(const synth_fun_commandt &f)
   for(std::size_t i=0; i< f.grammar.nt_ids.size(); i++)
   {
     auto &nt = f.grammar.nt_ids[i];
-    auto &rule = f.grammar.production_rules.at(nt.get_identifier());
-    nts += "(" + expr2sygus(nt) + " " + type2sygus(rule[0].type()) + ")";
-    rules +="(" + expr2sygus(nt) + " " + type2sygus(rule[0].type()) + " (";
+    auto &rule = f.grammar.production_rules.at(nt);
+    nts += "(" + id2string(nt) + " " + type2sygus(rule[0].type()) + ")";
+    rules +="(" + id2string(nt) + " " + type2sygus(rule[0].type()) + " (";
     for(const auto &r: rule)
      rules += expr2sygus(r) + " ";
     rules +="))\n";
@@ -2340,7 +2340,7 @@ std::string build_sygus_query(const sygus_problemt &problem, bool add_default_gr
   for(const auto &c: problem.comments)
     query += "; " + c + "\n";
 
-  query += "(set-logic " + problem.logic + ")\n";
+  query += "\n(set-logic " + problem.logic + ")\n";
 
   // declare the variables
   for(const auto &v: problem.free_var)

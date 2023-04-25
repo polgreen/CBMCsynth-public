@@ -14,7 +14,7 @@
 
 struct syntactic_templatet
 {
-    std::vector<symbol_exprt> nt_ids;
+    std::vector<irep_idt> nt_ids;
     std::map<irep_idt, std::vector<exprt>> production_rules;
 };
 
