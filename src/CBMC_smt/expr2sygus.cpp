@@ -1180,7 +1180,7 @@ std::string synth_fun_dec(const synth_fun_commandt &f)
 
   if(f.type.id()!=ID_mathematical_function)
   {
-    result += "()" + type2sygus(f.type);
+    result += " () " + type2sygus(f.type);
   }
   else
   {
