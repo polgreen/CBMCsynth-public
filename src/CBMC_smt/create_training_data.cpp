@@ -21,6 +21,7 @@
 #include "parser.h"
 #include "printing_utils.h"
 #include "problem.h"
+#include "util.h"
 
 #include <fstream>
 #include <iostream>
@@ -75,7 +76,8 @@ sygus_problemt create_training_data(const problemt& smt_problem) {
     }
 
     // this is a term like :    Foo(t1,...,tn) where n >= number of variables gathered from lgg;
-    exprt second_order_var("synthTarget", lgg.type(), std::vector<exprt>(new_vars));
+   // exprt second_order_var("synthTarget", lgg.type(), std::vector<exprt>(new_vars));
+    exprt second_order_var = create_func_app("synthTarget",std::vector<exprt>(new_vars), lgg.type());
 
     // generate the replace map
     replace_mapt replace_map;

@@ -14,8 +14,10 @@
 #include <util/symbol_table.h>
 #include <util/std_expr.h>
 #include <util/expr.h>
+#include <util/mathematical_expr.h>
 
 bool root_equality(const exprt& a, const exprt& b);
+function_application_exprt create_func_app(irep_idt function_name, std::vector<exprt> operands, typet codomain);
 
 
 

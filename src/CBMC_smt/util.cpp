@@ -5,7 +5,7 @@
 #include "util.h"
 #include <iostream>
 #include <util/format.h>
-#include <util/mathematical_expr.h>
+
 
 /*
  * Check if the root symbols in expr a and b are the same
@@ -35,4 +35,15 @@ bool root_equality(const exprt& a, const exprt& b)
         }
     }
     return false;
+}
+
+function_application_exprt create_func_app(irep_idt function_name, std::vector<exprt> operands, typet codomain)
+{
+    // create function type
+    std::vector<typet> domain;
+    for(const auto &op: operands) {
+        domain.push_back(op.type());
+    }
+    mathematical_function_typet function_type(domain, codomain);
+    return function_application_exprt(symbol_exprt(function_name, function_type), operands);
 }
