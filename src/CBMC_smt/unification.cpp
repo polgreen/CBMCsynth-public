@@ -7,6 +7,7 @@
 #include <util/find_symbols.h>
 #include <util/std_expr.h>
 #include <util/mathematical_expr.h>
+#include "util.h"
 
 bool occurs_check(const exprt& symbol, const exprt& term) {
     if (symbol.id() != ID_symbol) { // make sure symbol really is a symbol
@@ -29,19 +30,7 @@ std::optional<replace_symbolt> unify(std::vector<std::pair<exprt, exprt>>& probl
         return unify(problem);
     }
 
-    if (fst.id() == ID_function_application and snd.id() == ID_function_application) {
-        auto &f1 = to_function_application_expr(fst);
-        auto &f2 = to_function_application_expr(snd);
-
-        if (to_symbol_expr(f1.function()).get_identifier() == to_symbol_expr(f2.function()).get_identifier()) { // decompose rule
-            for (int i = 0 ; i < fst.operands().size(); ++i) {
-                problem.emplace_back( f1.arguments()[i], f1.arguments()[i]);
-            }
-            return unify(problem);
-        } else { // conflict
-            return std::nullopt;
-        }
-    } else if (fst.id() == ID_symbol) { // eliminate  TODO make sure that this is checking that it's a variable
+    if (fst.id() == ID_symbol) { // eliminate
         if (occurs_check(fst, snd)) { // failed occurs check
             return std::nullopt;
         }
@@ -56,7 +45,7 @@ std::optional<replace_symbolt> unify(std::vector<std::pair<exprt, exprt>>& probl
             sol->insert(to_symbol_expr(fst), snd);
         }
         return sol;
-    } else if (snd.id() == ID_symbol) { // eliminate  TODO make sure that this is checking that it's a variable
+    } else if (snd.id() == ID_symbol) { // eliminate
         if (occurs_check(snd, fst)) {
             return std::nullopt;
         }
@@ -71,7 +60,12 @@ std::optional<replace_symbolt> unify(std::vector<std::pair<exprt, exprt>>& probl
             sol->insert(to_symbol_expr(snd), fst);
         }
         return sol;
-    } else {
-        return std::nullopt;
+    } else if (root_equality(fst, snd)) {
+        for (int i = 0; i < fst.operands().size(); ++i) {
+            problem.emplace_back(fst.operands()[i], snd.operands()[i]);
+        }
+        return unify(problem);
     }
+
+    return std::nullopt;
 }
