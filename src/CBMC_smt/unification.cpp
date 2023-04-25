@@ -8,6 +8,7 @@
 #include <util/std_expr.h>
 #include <util/mathematical_expr.h>
 #include "util.h"
+#include <iostream>
 
 bool occurs_check(const exprt& symbol, const exprt& term) {
     if (symbol.id() != ID_symbol) { // make sure symbol really is a symbol
@@ -50,7 +51,12 @@ std::optional<replace_symbolt> unify(std::vector<std::pair<exprt, exprt>>& probl
             return std::nullopt;
         }
         replace_symbolt substitution;
-        substitution.insert(to_symbol_expr(snd), fst);
+        // TODO wrong types int/bool
+        symbol_exprt e = to_symbol_expr(snd);
+        if (e.type().id_string() != fst.type().id_string()) {
+            std::cout << format(e) << ":" << e.type().id_string() <<  "\t" << format(fst) << ":" << fst.type().id_string() << std::endl;
+        }
+        substitution.insert(e, fst);
         for (auto& term : problem) {
             substitution(term.first);
             substitution(term.second);

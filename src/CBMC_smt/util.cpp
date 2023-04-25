@@ -31,6 +31,9 @@ bool root_equality(const exprt& a, const exprt& b)
                 return false;
             }
         } else {
+            if (a.operands().size() != b.operands().size()) {
+                return false;
+            }
             return true;
         }
     }

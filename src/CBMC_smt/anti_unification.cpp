@@ -25,15 +25,12 @@ std::pair<exprt, std::vector<symbol_exprt>>  compute_lgg(const std::vector<exprt
         if (!root_equality(terms[0], t)) { // Not the same root symbol
             std::string bytes = std::to_string(uuidGenerator.getUUID().hash());
             auto new_var = symbol_exprt("var_" + bytes, t.type()); // return fresh variable
-            std::cout << format(t) << " : " << t.type().id_string() << "\t" << format(new_var) << std::endl;
-
             return {new_var, {new_var}};
         }
     }
 
-    replace_mapt substs;
     size_t n_op_args = terms[0].operands().size();
-    exprt new_sub_lgg{terms[0]}; // create lgg with the same root symbol as other terms
+    exprt new_sub_lgg = terms[0]; // create lgg with the same root symbol as other terms
     std::vector<symbol_exprt> new_vars;
     // solve all lgg sub problems (recurse into term)
     for (size_t i = 0; i < n_op_args; ++i) {
@@ -41,16 +38,10 @@ std::pair<exprt, std::vector<symbol_exprt>>  compute_lgg(const std::vector<exprt
         for (const auto& term: terms) {
             sub_problem.emplace_back(term.operands()[i]); // Segmentation fault
         }
-        exprt op = new_sub_lgg.operands()[i];
         std::pair<exprt, std::vector<symbol_exprt>> res = compute_lgg(sub_problem);
+        new_sub_lgg.operands()[i] = res.first;
         concat(new_vars, res.second);
-        substs.insert({op, res.first});
     }
-    for (auto x : substs) {
-        std::cout << format(x.first) << " : " << x.first.type().id_string() << "\t" << format(x.second) << " : "  << x.second.type().id_string() << std::endl;
-    }
-
-    replace_expr(substs, new_sub_lgg);
 
     return {new_sub_lgg, new_vars};
 }
