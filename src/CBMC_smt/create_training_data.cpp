@@ -105,7 +105,6 @@ sygus_problemt create_training_data(const problemt& smt_problem) {
     // synth_fun.parameters = irep_args;
     sygus_problem.synth_fun = synth_fun;
 
-
     sygus_problem.logic = smt_problem.logic;
     sygus_problem.defined_functions = smt_problem.defined_functions;
 
