@@ -2328,7 +2328,7 @@ std::string convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
 
 std::string build_sygus_query(const sygus_problemt &problem)
 {
-  std::string query = "(set-logic" + problem.logic + ")\n";
+  std::string query = "(set-logic " + problem.logic + ")\n";
 
   // declare the variables
   for(const auto &v: problem.free_var)
