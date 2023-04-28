@@ -44,7 +44,7 @@
 #include "smt2_frontend.h"
 
 #include "expr2sygus.h"
-#include "expr_iterator.h"
+#include <util/expr_iterator.h>
 
 /**
  * This method is most important for getting "good" training data. It is worth investigating which
