@@ -210,7 +210,10 @@ int create_synthesis_problem(const cmdlinet &cmdline) {
         //message.status() << messaget::eom;
 
     } else if (res == decision_proceduret::resultt::D_UNSATISFIABLE) {
-        //new_valid_problem = negate_problem(smt_problem);
+        message.status() << "Problem is UNSAT, negation not implemented." << messaget::eom;
+        return -1;
+    } else if (res == decision_proceduret::resultt::D_ERROR) {
+        return -1;
     }
 
     //message.status()<<"\n\nRunning traverse_expression"<< messaget::eom;
