@@ -35,4 +35,10 @@ class problemt
 
 problemt parse_problem(const std::string &filename);
 
+/*
+ * creates conjunction of assertions and negates the term.
+ * Turns an unsatisfiable problem into a valid one
+ * */
+problemt negate_problem(const problemt& problem);
+
 #endif /*_PROBLEM_H_*/

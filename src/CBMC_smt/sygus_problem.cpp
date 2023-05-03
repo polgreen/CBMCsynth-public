@@ -58,8 +58,9 @@ std::map<irep_idt,std::vector<exprt>> production_rules(const synth_fun_commandt 
       integer_rules.push_back(symbol_exprt(f.parameters[i],integer_typet()));
     else if(func_type.domain()[i]==bool_typet())
       bool_rules.push_back(symbol_exprt(f.parameters[i],bool_typet()));
-    else
-      UNEXPECTEDCASE("synthesis function parameter of unexpected type"); 
+    else {
+        UNEXPECTEDCASE("synthesis function parameter of unexpected type");
+    }
   }
   // constants
   integer_rules.push_back(from_integer(0, integer_typet()));

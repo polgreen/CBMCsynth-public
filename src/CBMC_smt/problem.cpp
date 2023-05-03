@@ -75,3 +75,16 @@ problemt parse_problem(const std::string &filename) {
     }
     return result;
 }
+
+problemt negate_problem(const problemt& problem) {
+    problemt new_problem;
+
+    new_problem.logic = problem.logic;
+    new_problem.defined_functions = problem.defined_functions;
+    new_problem.filename = problem.filename;
+    new_problem.free_var = problem.free_var;
+
+    new_problem.assertions.push_back(not_exprt(conjunction(problem.assertions)));
+
+    return new_problem;
+}
