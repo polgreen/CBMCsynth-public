@@ -34,6 +34,13 @@ bool root_equality(const exprt& a, const exprt& b)
             if (a.operands().size() != b.operands().size()) {
                 return false;
             }
+            for( int i = 0; i < a.operands().size(); ++i) { // for functions that are polymorphic
+                if (a.operands()[i].type() != b.operands()[i].type()) {
+                    return false;
+                }
+            }
+
+
             return true;
         }
     }

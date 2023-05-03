@@ -53,9 +53,7 @@ std::optional<replace_symbolt> unify(std::vector<std::pair<exprt, exprt>>& probl
         replace_symbolt substitution;
         // TODO wrong types int/bool
         symbol_exprt e = to_symbol_expr(snd);
-        if (e.type().id_string() != fst.type().id_string()) {
-            std::cout << format(e) << ":" << e.type().id_string() <<  "\t" << format(fst) << ":" << fst.type().id_string() << std::endl;
-        }
+
         substitution.insert(e, fst);
         for (auto& term : problem) {
             substitution(term.first);

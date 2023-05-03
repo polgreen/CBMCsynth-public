@@ -114,7 +114,6 @@ sygus_problemt create_training_data(const problemt& smt_problem) {
     for (auto& term : terms) {
         std::vector<std::pair<exprt, exprt>> to_unify;
         to_unify.emplace_back(term, lgg);
-
         auto x = unify(to_unify);
         if (!x) {
             throw std::exception(); // This should not occur, since they should always be unifiable (by construction of lgg)
