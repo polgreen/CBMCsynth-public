@@ -95,6 +95,7 @@ bool is_binder(const exprt& expr) {
     return false;
 }
 
+
 std::size_t is_binder_free(const exprt& expr) {
     for(auto it = expr.depth_begin() , itend = expr.depth_end(); it != itend; ++it) {
         if (is_binder(*it)) {
@@ -104,12 +105,22 @@ std::size_t is_binder_free(const exprt& expr) {
     return true;
 }
 
-void pring_subterms_and_types(const exprt& expr) {
+
+void print_subterms_and_types(const exprt& expr) {
     for(auto it = expr.depth_begin() , itend = expr.depth_end(); it != itend; ++it) {
         std::cout << format(*it) << " : " << it->type().id_string() << std::endl;
     }
 }
 
+
+bool is_subterm(const exprt& what, const exprt& in) {
+    for(auto it = in.depth_begin() , itend = in.depth_end(); it != itend; ++it) {
+        if (what == *it) {
+            return true;
+        }
+    }
+    return false;
+}
 
 
 void replace_local_var(exprt &expr, const irep_idt &target, exprt &replacement)
@@ -122,6 +133,7 @@ void replace_local_var(exprt &expr, const irep_idt &target, exprt &replacement)
     for (auto &op : expr.operands())
         replace_local_var(op, target, replacement);
 }
+
 
 void expand_let_expressions(exprt &expr)
 {
@@ -140,6 +152,7 @@ void expand_let_expressions(exprt &expr)
     for (auto &op : expr.operands())
         expand_let_expressions(op);
 }
+
 
 std::vector<std::string> files_with_suffix_in_dirs(const std::vector<std::string>& dirs, const std::string& suffix) {
     std::vector<std::string> res;

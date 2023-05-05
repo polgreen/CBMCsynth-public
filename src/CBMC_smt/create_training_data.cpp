@@ -53,6 +53,8 @@
  **/
 std::vector<term_positiont> get_term_positions(const problemt& problem) {
 
+    int lgg_max_height = 100;
+
     std::set<exprt> all_subterms;
     for (const exprt& assertion : problem.assertions) {
         for(auto it = assertion.depth_begin() , itend = assertion.depth_end(); it != itend; ++it) {
@@ -66,11 +68,25 @@ std::vector<term_positiont> get_term_positions(const problemt& problem) {
 
     for (const auto& x : all_subterms) {
         for (const auto& y : all_subterms) {
+            if (x.type() != y.type()) {
+                continue;
+            }
+
+            if (x.type().id()!=ID_integer) {
+                continue;
+            }
+
+            if (is_subterm(x, y) or is_subterm(y, x)) {
+                continue;
+            }
+
+
             auto lgg = compute_lgg({{x,y}});
             if (!is_binder_free(lgg.first)) {
                 continue;
             }
-            if (expr_height(lgg.first) > height and x != y) {
+            auto lgg_height = expr_height(lgg.first);
+            if (lgg_height > height and x != y and lgg_height<= lgg_max_height) {
                 fst = x;
                 snd = y;
                 height = expr_height(lgg.first);
@@ -116,12 +132,8 @@ sygus_problemt create_training_data(const problemt& smt_problem) {
     replace_mapt replace_map;
     for (auto& term : terms) {
         std::vector<std::pair<exprt, exprt>> to_unify;
-        to_unify.emplace_back(term, lgg);
-        auto x = unify(to_unify);
-        if (!x) {
-            throw std::exception(); // This should not occur, since they should always be unifiable (by construction of lgg)
-        }
-        replace_symbolt substitution = x.value();
+        to_unify.emplace_back(lgg, term); // The order of arguments here is important due to the ordering in the if-else-if branches in unify. Note that this should be solved at some point with variable ordering. But until then let's keep it this way.
+        replace_symbolt substitution =  unify(to_unify).value();
         exprt tmp = synth_fun_app;
         substitution(tmp);
         // replace term with tmp in smt_problem
@@ -129,11 +141,12 @@ sygus_problemt create_training_data(const problemt& smt_problem) {
     }
 
     sygus_problemt sygus_problem;
+
+    sygus_problem.comments = smt_problem.comments;
+
     std::stringstream ss;
     ss << "Solution: " << format(lgg);
     sygus_problem.comments.push_back(ss.str());
-
-    std::cout << format(lgg) <<  " : " << lgg.type().id_string() << std::endl;
 
     synth_fun_commandt synth_fun;
     synth_fun.id = to_symbol_expr(synth_fun_app.function()).get_identifier();
@@ -202,8 +215,9 @@ int create_synthesis_problem(const cmdlinet &cmdline) {
     }
 
     problemt smt_problem = build_problem(parser);
-
-    pring_subterms_and_types(smt_problem.assertions[0]);
+    for (auto& x : smt_problem.assertions) {
+        expand_let_expressions(x);
+    }
 
     decision_proceduret::resultt res = solve_problem(smt_problem, ns, message);
     // print smt_problem and model
@@ -235,6 +249,7 @@ int create_synthesis_problem(const cmdlinet &cmdline) {
     message.status() << "--------------------------------------------------\n" << messaget::eom;
     message.status() << build_sygus_query(sygus_problem) << messaget::eom;
     message.status() << "--------------------------------------------------\n" << messaget::eom;
+    
 
     //message.status()<<"\n\nPrinting Function Positions"<< messaget::eom;
     //std::multimap<irep_idt, term_position> positions = get_function_occurrences(smt_problem);

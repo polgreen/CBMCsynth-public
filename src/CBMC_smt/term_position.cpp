@@ -94,6 +94,21 @@ std::string to_string(const term_positiont& tp) {
     return s;
 }
 
+bool is_overlapping(const term_positiont& pos1, const term_positiont& pos2) {
+    if (pos1.assertion != pos2.assertion) {
+        return false;
+    }
+    size_t least_length = std::min(pos1.position.size(), pos2.position.size());
+
+    for (int i = 0; i < least_length; ++i) {
+        if (pos1.position[i] != pos2.position[i]) {
+            return false;
+        }
+    }
+    return true;
+
+}
+
 
 std::vector<term_positiont> get_pos_of_all_occurrences(const exprt& what, const exprt& in, const term_positiont& pos) {
     if (what == in) {

@@ -82,5 +82,9 @@ exprt get_term_copy_at_position_in_problem(const term_positiont& pos, const prob
 
 std::vector<term_positiont> get_pos_of_all_occurrences(const exprt& what, const exprt& in, const term_positiont& pos);
 
+/*
+ * Checks if two positions are overlapping, the same positions are by def. overlapping
+ * */
+bool is_overlapping(const term_positiont& pos1, const term_positiont& pos2);
 
 #endif //SRC_TERM_POSITION_H
