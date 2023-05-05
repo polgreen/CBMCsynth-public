@@ -29,6 +29,7 @@ class problemt
     std::map<symbol_exprt, exprt> free_var;
     std::map<symbol_exprt, exprt> defined_functions;
     std::string logic;
+    std::vector<std::string> comments;
     
 
 };
