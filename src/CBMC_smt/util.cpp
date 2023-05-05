@@ -104,6 +104,14 @@ std::size_t is_binder_free(const exprt& expr) {
     return true;
 }
 
+void pring_subterms_and_types(const exprt& expr) {
+    for(auto it = expr.depth_begin() , itend = expr.depth_end(); it != itend; ++it) {
+        std::cout << format(*it) << " : " << it->type().id_string() << std::endl;
+    }
+}
+
+
+
 void replace_local_var(exprt &expr, const irep_idt &target, exprt &replacement)
 {
     if (expr.id() == ID_symbol)

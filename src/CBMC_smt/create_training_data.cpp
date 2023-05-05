@@ -124,7 +124,6 @@ sygus_problemt create_training_data(const problemt& smt_problem) {
         replace_symbolt substitution = x.value();
         exprt tmp = synth_fun_app;
         substitution(tmp);
-        std::cout << format(tmp) << std::endl;
         // replace term with tmp in smt_problem
         replace_map.insert({term, tmp});
     }
@@ -133,7 +132,8 @@ sygus_problemt create_training_data(const problemt& smt_problem) {
     std::stringstream ss;
     ss << "Solution: " << format(lgg);
     sygus_problem.comments.push_back(ss.str());
-    std::cout << format(lgg) << std::endl;
+
+    std::cout << format(lgg) <<  " : " << lgg.type().id_string() << std::endl;
 
     synth_fun_commandt synth_fun;
     synth_fun.id = to_symbol_expr(synth_fun_app.function()).get_identifier();
@@ -202,6 +202,9 @@ int create_synthesis_problem(const cmdlinet &cmdline) {
     }
 
     problemt smt_problem = build_problem(parser);
+
+    pring_subterms_and_types(smt_problem.assertions[0]);
+
     decision_proceduret::resultt res = solve_problem(smt_problem, ns, message);
     // print smt_problem and model
     //message.debug() << "Solving with SMT solver:" << messaget::eom;

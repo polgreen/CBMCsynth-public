@@ -23,6 +23,8 @@ function_application_exprt create_func_app(irep_idt function_name, const std::ve
 
 void expand_let_expressions(exprt &expr);
 
+void pring_subterms_and_types(const exprt& expr);
+
 template<typename T>
 void concat(std::vector<T>& A, const std::vector<T>& B) {
     A.insert(A.end(), B.begin(), B.end());
