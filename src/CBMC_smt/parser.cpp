@@ -25,5 +25,6 @@ void parsert::setup_commands()
     const auto s = smt2_tokenizer.get_buffer();
     logic = s;
   };
+
 }
 

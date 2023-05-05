@@ -67,6 +67,9 @@ std::vector<term_positiont> get_term_positions(const problemt& problem) {
     for (const auto& x : all_subterms) {
         for (const auto& y : all_subterms) {
             auto lgg = compute_lgg({{x,y}});
+            if (!is_binder_free(lgg.first)) {
+                continue;
+            }
             if (expr_height(lgg.first) > height and x != y) {
                 fst = x;
                 snd = y;
@@ -129,6 +132,7 @@ sygus_problemt create_training_data(const problemt& smt_problem) {
     std::stringstream ss;
     ss << "Solution: " << format(lgg);
     sygus_problem.comments.push_back(ss.str());
+    std::cout << format(lgg) << std::endl;
 
     synth_fun_commandt synth_fun;
     synth_fun.id = to_symbol_expr(synth_fun_app.function()).get_identifier();

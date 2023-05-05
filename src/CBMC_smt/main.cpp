@@ -8,7 +8,7 @@
 
 #include "smt2_frontend.h"
 #include "create_training_data.h"
-
+#include "constants.h"
 
 #include <iostream>
 
@@ -20,7 +20,6 @@
 
 /// File ending of SMT2 files. Used to determine the language frontend that
 /// shall be used.
-#define SMT2_FILE_ENDING ".smt2"
 
 /// File ending of Sygus files. Used to determine the language frontend that
 /// shall be used. 

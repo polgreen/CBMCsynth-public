@@ -16,7 +16,7 @@
 #include <util/expr.h>
 #include <util/mathematical_expr.h>
 
-
+#include "constants.h"
 
 bool root_equality(const exprt& a, const exprt& b);
 function_application_exprt create_func_app(irep_idt function_name, const std::vector<exprt>& operands, const typet& codomain);
@@ -30,5 +30,8 @@ void concat(std::vector<T>& A, const std::vector<T>& B) {
 
 std::size_t expr_height(const exprt& expr);
 
+std::vector<std::string> files_with_suffix_in_dirs(const std::vector<std::string>& dir, const std::string& suffix);
+
+std::size_t is_binder_free(const exprt& expr);
 
 #endif //CBMCSMT_UTIL_H

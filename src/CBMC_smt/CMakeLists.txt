@@ -45,7 +45,8 @@ set(headers
         sygus_problem.h
         term_position.h
         unification.h
-        expr2sygus.h util.h)
+        expr2sygus.h util.h
+        constants.h)
 
 add_executable(cbmcsmt main.cpp ${sources} ${headers})
 
