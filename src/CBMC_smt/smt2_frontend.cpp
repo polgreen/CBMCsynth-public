@@ -31,8 +31,13 @@ Author: Elizabeth Polgreen, epolgreen@gmail.com
 problemt build_problem(parsert &parser) {
     problemt result;
     result.logic = parser.logic;
+    
     for (const auto &a: parser.assertions) {
         result.assertions.push_back(a);
+    }
+    for(const auto &cmd: parser.set_info_cmds)
+    {
+      result.comments.push_back(cmd);
     }
 
     // identify the free variables and defined functions in the problem
