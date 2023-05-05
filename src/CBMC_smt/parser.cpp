@@ -25,6 +25,23 @@ void parsert::setup_commands()
     const auto s = smt2_tokenizer.get_buffer();
     logic = s;
   };
+  commands["set-info"] = [this]() {
+    
+    if(next_token() != smt2_tokenizert::KEYWORD)
+      throw error("expected a keyword after set-logic");
+  
+    std::string info=smt2_tokenizer.get_buffer();
+
+    while(smt2_tokenizer.peek() != smt2_tokenizert::CLOSE)
+    {
+      next_token();
+      const auto s = smt2_tokenizer.get_buffer();
+      info = info + " " + s;
+    }
+   set_info_cmds.push_back(info);
+  };
+
+
 
 }
 
