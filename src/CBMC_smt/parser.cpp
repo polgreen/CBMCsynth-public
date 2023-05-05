@@ -21,7 +21,6 @@ void parsert::setup_commands()
     if(next_token() != smt2_tokenizert::SYMBOL)
       throw error("expected a string after set-logic");
   
-    std::cout<<"Parsing logic"<<std::endl;
     const auto s = smt2_tokenizer.get_buffer();
     logic = s;
   };
@@ -36,7 +35,7 @@ void parsert::setup_commands()
     {
       next_token();
       const auto s = smt2_tokenizer.get_buffer();
-      info = info + " " + s;
+      info += " " + s;
     }
    set_info_cmds.push_back(info);
   };

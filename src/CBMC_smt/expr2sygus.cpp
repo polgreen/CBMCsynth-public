@@ -12,6 +12,8 @@
 #include <util/std_expr.h>
 #include <util/c_types.h>
 
+#include <algorithm>
+#include "util.h"
 
 std::size_t boolbv_width(const typet &expr_type)
 {
@@ -2310,8 +2312,9 @@ std::string build_sygus_query(const sygus_problemt &problem, bool add_default_gr
   
 
   std::string query;
-  for(const auto &c: problem.comments)
-    query += "; " + c + "\n";
+  for(const auto& c: problem.comments) {
+      query += "; " + replace_occurences(c, "\n", "\n;") +"\n";
+  }
 
   query += "\n(set-logic " + problem.logic + ")\n";
 

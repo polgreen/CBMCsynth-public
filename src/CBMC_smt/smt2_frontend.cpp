@@ -137,7 +137,13 @@ problemt substitute_model_into_problem(const problemt &problem) {
         replace_symbol(new_assertion);
         new_problem.assertions.push_back(new_assertion);
     }
+
+    sort(new_problem.assertions.begin(), new_problem.assertions.end());
+    new_problem.assertions.erase(std::unique(new_problem.assertions.begin(),new_problem.assertions.end()), new_problem.assertions.end());
+
     new_problem.logic = problem.logic;
+    new_problem.comments = problem.comments;
+    new_problem.filename = problem.filename;
 
     for (const auto &f: problem.defined_functions) {
         new_problem.defined_functions[f.first] = f.second;

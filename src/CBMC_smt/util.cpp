@@ -164,7 +164,7 @@ std::vector<std::string> files_with_suffix_in_dirs(const std::vector<std::string
             }
             continue;
         }
-        for (const auto &entry: std::filesystem::directory_iterator(dir)) {
+        for (const auto &entry: std::filesystem::recursive_directory_iterator(dir)) {
             if (has_suffix(entry.path().string(), suffix)) {
                 res.push_back(entry.path().string());
             }
@@ -172,4 +172,13 @@ std::vector<std::string> files_with_suffix_in_dirs(const std::vector<std::string
     }
 
     return res;
+}
+
+std::string replace_occurences(std::string str, const std::string& from, const std::string& to) {
+    size_t start_pos = 0;
+    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+    }
+    return str;
 }

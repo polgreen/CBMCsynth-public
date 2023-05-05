@@ -55,4 +55,7 @@ std::size_t is_binder_free(const exprt& expr);
  * */
 bool is_subterm(const exprt& what, const exprt& in);
 
+std::string replace_occurences(std::string str, const std::string& from, const std::string& to);
+
+
 #endif //CBMCSMT_UTIL_H
