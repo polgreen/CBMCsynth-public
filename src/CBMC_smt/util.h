@@ -21,7 +21,7 @@
 bool root_equality(const exprt& a, const exprt& b);
 function_application_exprt create_func_app(irep_idt function_name, const std::vector<exprt>& operands, const typet& codomain);
 
-
+void expand_let_expressions(exprt &expr);
 
 template<typename T>
 void concat(std::vector<T>& A, const std::vector<T>& B) {
