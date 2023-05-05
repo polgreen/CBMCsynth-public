@@ -16,11 +16,9 @@ std::string clean_id(const irep_idt &id);
 void clean_symbols(exprt &expr);
 std::string type2sygus(const typet &type);
 std::string expr2sygus(const exprt &expr);
-std::string expr2sygus_fun_dec(const symbol_exprt &function);
 std::string synth_fun_dec(const synth_fun_commandt &definition);
-std::string expr2sygus_fun_def(const symbol_exprt &function, const exprt&body);
-std::string expr2sygus_fun_def(const symbol_exprt &function, const exprt&body, std::vector<irep_idt> parameters);
-std::string expr2sygus_var_dec(const symbol_exprt &symbol);
+std::string fun_def(const symbol_exprt &function, const exprt&body);
+std::string var_dec(const symbol_exprt &symbol);
 
 
   std::string convert_typecast(const typecast_exprt &expr);

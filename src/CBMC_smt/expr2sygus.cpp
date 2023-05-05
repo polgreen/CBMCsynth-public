@@ -1122,57 +1122,30 @@ void clean_symbols(exprt &expr)
   }
 }
 
-std::string expr2sygus_var_dec(const symbol_exprt &symbol)
+std::string var_dec(const symbol_exprt &symbol)
 {
   std::string result ="(declare-var ";
   result += clean_id(symbol.get_identifier()) +" " + type2sygus(symbol.type()) + ")\n";
   return result;
 }
 
-
-std::string expr2sygus_fun_def(const symbol_exprt &function, const exprt&body)
+std::string fun_def(const symbol_exprt &fun, const exprt &def)
 {
-  std::vector<irep_idt>params;
-  const auto &func_type = to_mathematical_function_type(function.type());
-  for(std::size_t i=0; i<func_type.domain().size(); i++)
-    params.push_back("parameter"+integer2string(i));
+  INVARIANT(fun.type().id() == ID_mathematical_function,
+            "function symbol must have function type");
+  INVARIANT(def.id()==ID_lambda,
+            "function definition must be a lambda expression");  
+  std::string result ="(define-fun " + clean_id(fun.get_identifier()) + " (";
+  auto &fun_def = to_lambda_expr(def);
+  for(const auto & v: fun_def.variables())
+    result += "(" + clean_id(v.get_identifier()) + " " + type2sygus(v.type()) + ")";
 
-  return expr2sygus_fun_def(function, body, params);
-}
-
-std::string expr2sygus_fun_def(const symbol_exprt &function, const exprt&body, std::vector<irep_idt> parameters)
-{
-  INVARIANT(function.type().id()==ID_mathematical_function, "unsupported function definition type");
-  std::string result = "(define-fun " + clean_id(function.get_identifier()) + " (";
-  const auto &func_type = to_mathematical_function_type(function.type());
-
-  for(std::size_t i=0; i<func_type.domain().size(); i++)
-  {
-    result+="( "+ clean_id(parameters[i]) +" "+type2sygus(func_type.domain()[i]) + ")"; 
-  }
-  result +=")\n " + type2sygus(func_type.codomain()) + " " + expr2sygus(body) + ")\n";
+  result += ") " + type2sygus(fun_def.type().codomain()) + "\n";
+  result+= " " + convert_expr(fun_def.where()) + ")\n";
   return result;
 }
 
-std::string expr2sygus_fun_dec(const symbol_exprt &function)
-{
-  // INVARIANT(function.type().id()==ID_mathematical_function, "unsupported function definition type");
-  std::string result = "(declare-fun " + clean_id(function.get_identifier()) + " (";
-  if(function.type().id()==ID_mathematical_function)
-  {
-    const auto &func_type = to_mathematical_function_type(function.type());
 
-    for (std::size_t i = 0; i < func_type.domain().size(); i++)
-      result += type2sygus(func_type.domain()[i]) + " ";
-
-    result += ")\n " + type2sygus(func_type.codomain()) + ")\n";
-  }
-  else
-  {
-    result += ") " + type2sygus(function.type()) + ")\n";
-  }
-  return result;
-}
 
 std::string synth_fun_dec(const synth_fun_commandt &f)
 {
@@ -2344,7 +2317,7 @@ std::string build_sygus_query(const sygus_problemt &problem, bool add_default_gr
 
   // declare the variables
   for(const auto &v: problem.free_var)
-    query += expr2sygus_var_dec(v) + "\n";
+    query += var_dec(v) + "\n";
 
   // synthesis function
   // NB: we only support one synthesis function
@@ -2353,6 +2326,11 @@ std::string build_sygus_query(const sygus_problemt &problem, bool add_default_gr
   else
     query += synth_fun_dec(problem.synth_fun) + "\n";
 
+
+  for(const auto &f: problem.defined_functions)
+  {
+    query+=fun_def(f.first, f.second) + "\n";
+  }
   
   // TODO: either you need to expand the fucntion applications, 
   // or figure out the dependencies between the functions
