@@ -226,6 +226,7 @@ std::optional<sygus_problemt> create_synthesis_problem(const std::string& file, 
     }
 
     problemt smt_problem = build_problem(parser);
+    smt_problem.filename = file;
     for (auto& x : smt_problem.assertions) {
         expand_let_expressions(x);
     }
@@ -288,6 +289,7 @@ int create_synthesis_problem(const cmdlinet &cmdline) {
 
     for (auto& file : all_files) {
         auto s_prob = create_synthesis_problem(file, message);
+
         if (s_prob) {
             std::cout << (*s_prob).filename << std::endl;
         } else {

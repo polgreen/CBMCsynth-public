@@ -31,7 +31,6 @@ Author: Elizabeth Polgreen, epolgreen@gmail.com
 problemt build_problem(parsert &parser) {
     problemt result;
     result.logic = parser.logic;
-    
     for (const auto &a: parser.assertions) {
         result.assertions.push_back(a);
     }

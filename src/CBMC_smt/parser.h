@@ -9,13 +9,14 @@
 class parsert: public smt2_parsert
 {
   public: 
-    explicit parsert(std::istream &_in): smt2_parsert(_in) 
+    explicit parsert(std::istream &_in): smt2_parsert(_in)
     {
         setup_commands();
     }
 
   exprt::operandst assertions;
   std::string logic;
+
 
   // might contain information from where the problem was originally
   std::vector<std::string> set_info_cmds;
