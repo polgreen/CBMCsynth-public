@@ -13,7 +13,7 @@
 #include <filesystem>
 
 #include "constants.h"
-#include "expr_iterator.h"
+#include <util/expr_iterator.h>
 #include <util/cmdline.h>
 #include <util/suffix.h>
 
