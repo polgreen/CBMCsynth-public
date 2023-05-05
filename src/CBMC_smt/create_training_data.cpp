@@ -124,6 +124,7 @@ sygus_problemt create_training_data(const problemt& smt_problem) {
         replace_symbolt substitution = x.value();
         exprt tmp = synth_fun_app;
         substitution(tmp);
+        std::cout << format(tmp) << std::endl;
         // replace term with tmp in smt_problem
         replace_map.insert({term, tmp});
     }
@@ -146,6 +147,10 @@ sygus_problemt create_training_data(const problemt& smt_problem) {
 
     sygus_problem.logic = smt_problem.logic;
     sygus_problem.defined_functions = smt_problem.defined_functions;
+
+    for (const auto& x : smt_problem.free_var) {
+        sygus_problem.free_var.push_back(x.first);
+    }
 
     // replace in assertions
     for (auto assertion : smt_problem.assertions) {

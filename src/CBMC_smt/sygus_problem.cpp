@@ -36,8 +36,9 @@ irep_idt nonterminalID(const typet &type)
     return "NTInt";
   else if(type.id()==ID_bool)
     return "NTbool";
-  else
-    UNEXPECTEDCASE("unsupported type in production rule"); 
+  else {
+      UNEXPECTEDCASE("unsupported type in production rule type : " + type.id_string());
+  }
 }
 
 
