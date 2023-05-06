@@ -22,7 +22,7 @@ int smt2_frontend(const cmdlinet &);
 
 int smt2_frontend(const cmdlinet &, std::istream &in);
 
-decision_proceduret::resultt solve_problem(problemt &problem, namespacet &ns, messaget &log);
+decision_proceduret::resultt solve_problem(problemt &problem, namespacet &ns, messaget &message);
 
 problemt substitute_model_into_problem(const problemt &problem);
 

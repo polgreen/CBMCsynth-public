@@ -30,8 +30,7 @@
 /**
  * We compute the least general generalization (lgg) of a set of terms, and also return the newly created variables
  * */
-std::pair<exprt, std::vector<symbol_exprt>> compute_lgg(const std::vector<exprt>& terms);
-
+std::pair<exprt, std::vector<symbol_exprt>> compute_lgg(const std::vector<exprt> &terms);
 
 
 #endif //SRC_ANTI_UNIFICATION_H

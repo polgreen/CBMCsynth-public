@@ -3,41 +3,32 @@
 //
 
 #include "term_position.h"
-#include "parser.h"
-#include "printing_utils.h"
 #include "problem.h"
 
-#include <fstream>
 #include <iostream>
 
 #include <util/cmdline.h>
-#include <util/cout_message.h>
-#include <util/format_expr.h>
 #include <util/namespace.h>
-#include <util/replace_symbol.h>
-#include <util/simplify_expr.h>
 #include <util/symbol_table.h>
-#include <util/std_expr.h>
 #include <util/expr.h>
 #include "util.h"
-#include <solvers/smt2/smt2_dec.h>
 
 
-term_positiont operator+(term_positiont& first, const term_positiont& second) {
+term_positiont operator+(term_positiont &first, const term_positiont &second) {
     first.position.insert(first.position.end(), second.position.begin(), second.position.end());
     return first;
 }
 
 
-void map_to_string(const std::multimap<irep_idt, term_positiont>& mp, std::ostream& message) {
-    for (const auto& x : mp) {
+void map_to_string(const std::multimap<irep_idt, term_positiont> &mp, std::ostream &message) {
+    for (const auto &x: mp) {
         message << x.first << ": " << to_string(x.second) << std::endl;
     }
 }
 
 
 std::multimap<irep_idt, term_positiont>
-get_function_occurrences_aux(const exprt& expr, const term_positiont& root) {
+get_function_occurrences_aux(const exprt &expr, const term_positiont &root) {
     std::multimap<irep_idt, term_positiont> result_map;
 
     if (!expr.operands().empty()) {
@@ -51,7 +42,7 @@ get_function_occurrences_aux(const exprt& expr, const term_positiont& root) {
 
 
 std::multimap<irep_idt, term_positiont>
-    get_function_occurrences(const problemt& problem) {
+get_function_occurrences(const problemt &problem) {
     std::multimap<irep_idt, term_positiont> result_map;
 
     for (size_t i = 0; i < problem.assertions.size(); ++i) {
@@ -62,7 +53,7 @@ std::multimap<irep_idt, term_positiont>
 }
 
 
-exprt get_term_copy_at_position(term_positiont pos, const exprt& term) {
+exprt get_term_copy_at_position(term_positiont pos, const exprt &term) {
     if (pos.empty()) {
         return term;
     }
@@ -75,18 +66,18 @@ exprt get_term_copy_at_position(term_positiont pos, const exprt& term) {
 }
 
 
-exprt get_term_copy_at_position_in_problem(const term_positiont& pos, const problemt& prob) {
+exprt get_term_copy_at_position_in_problem(const term_positiont &pos, const problemt &prob) {
     return get_term_copy_at_position(pos, prob.assertions[pos.assertion]);
 }
 
 
-std::string to_string(const term_positiont& tp) {
+std::string to_string(const term_positiont &tp) {
     std::string s = "[";
     s = s + std::to_string(tp.assertion);
     s = s + ">";
     for (size_t i = 0; i < tp.position.size(); ++i) {
         s += std::to_string(tp.position[i]);
-        if (i < tp.position.size()-1) {
+        if (i < tp.position.size() - 1) {
             s += "|";
         }
     }
@@ -94,7 +85,7 @@ std::string to_string(const term_positiont& tp) {
     return s;
 }
 
-bool is_overlapping(const term_positiont& pos1, const term_positiont& pos2) {
+bool is_overlapping(const term_positiont &pos1, const term_positiont &pos2) {
     if (pos1.assertion != pos2.assertion) {
         return false;
     }
@@ -110,7 +101,7 @@ bool is_overlapping(const term_positiont& pos1, const term_positiont& pos2) {
 }
 
 
-std::vector<term_positiont> get_pos_of_all_occurrences(const exprt& what, const exprt& in, const term_positiont& pos) {
+std::vector<term_positiont> get_pos_of_all_occurrences(const exprt &what, const exprt &in, const term_positiont &pos) {
     if (what == in) {
         return {pos};
     } else if (!in.has_operands()) {

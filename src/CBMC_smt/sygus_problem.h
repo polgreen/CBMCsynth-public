@@ -12,8 +12,7 @@
 #include <util/mathematical_types.h>
 #include <map>
 
-struct syntactic_templatet
-{
+struct syntactic_templatet {
     std::vector<irep_idt> nt_ids;
     std::map<irep_idt, std::vector<exprt>> production_rules;
 };
@@ -43,6 +42,7 @@ public:
     std::string logic;
 
 };
+
 synth_fun_commandt add_grammar(const synth_fun_commandt &f);
 
 

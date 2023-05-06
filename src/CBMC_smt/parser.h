@@ -6,26 +6,26 @@
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
 
-class parsert: public smt2_parsert
-{
-  public: 
-    explicit parsert(std::istream &_in): smt2_parsert(_in)
-    {
+class parsert : public smt2_parsert {
+public:
+    explicit parsert(std::istream &_in) : smt2_parsert(_in) {
         setup_commands();
     }
 
-  exprt::operandst assertions;
-  std::string logic;
+    exprt::operandst assertions;
+    std::string logic;
 
 
-  // might contain information from where the problem was originally
-  std::vector<std::string> set_info_cmds;
+    // might contain information from where the problem was originally
+    std::vector<std::string> set_info_cmds;
 
-  void print_problem();
-  using smt2_errort = smt2_tokenizert::smt2_errort;
-  void expand_function_applications(exprt &expr);
+    void print_problem();
 
-  protected:
+    using smt2_errort = smt2_tokenizert::smt2_errort;
+
+    void expand_function_applications(exprt &expr);
+
+protected:
     void setup_commands();
 };
 

@@ -19,10 +19,8 @@
 #include <solvers/smt2/smt2_dec.h>
 
 
-
-class problemt
-{
-  public:
+class problemt {
+public:
     std::string filename;
 
     std::vector<exprt> assertions;
@@ -30,7 +28,7 @@ class problemt
     std::map<symbol_exprt, exprt> defined_functions;
     std::string logic;
     std::vector<std::string> comments;
-    
+
 
 };
 
@@ -40,6 +38,6 @@ problemt parse_problem(const std::string &filename);
  * creates conjunction of assertions and negates the term.
  * Turns an unsatisfiable problem into a valid one
  * */
-problemt negate_problem(const problemt& problem);
+problemt negate_problem(const problemt &problem);
 
 #endif /*_PROBLEM_H_*/

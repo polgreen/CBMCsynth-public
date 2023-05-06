@@ -6,38 +6,40 @@
 
 #include <util/find_symbols.h>
 #include <util/std_expr.h>
-#include <util/mathematical_expr.h>
 #include "util.h"
 #include <iostream>
 
-bool occurs_check(const exprt& symbol, const exprt& term) {
+bool occurs_check(const exprt &symbol, const exprt &term) {
     if (symbol.id() != ID_symbol) { // make sure symbol really is a symbol
         throw std::exception();
     }
     return has_symbol_expr(term, symbol.id(), false);
 }
 
-std::optional<replace_symbolt> unify(std::vector<std::pair<exprt, exprt>>& problem)
-{
+
+std::optional<replace_symbolt> unify(std::vector<std::pair<exprt, exprt>> &problem) {
     if (problem.empty()) {
         return std::make_optional<replace_symbolt>({});
     }
     std::pair<exprt, exprt> back = problem.back();
     problem.pop_back();
-    exprt& fst = back.first;
-    exprt& snd = back.second;
+    exprt &fst = back.first;
+    exprt &snd = back.second;
 
     if (fst == snd) {   // delete rule
         return unify(problem);
     }
-
+    // ATTENTION
+    //usually if we have two variables (lhs and rhs are id_symbol) we should check a variable ordering,
+    // here we order left term > right term by using this order in the if-else branches, n
+    // ote that other code might depend on this implementaiton detail
     if (fst.id() == ID_symbol) { // eliminate
         if (occurs_check(fst, snd)) { // failed occurs check
             return std::nullopt;
         }
         replace_symbolt substitution;
         substitution.insert(to_symbol_expr(fst), snd);
-        for (auto& term : problem) {
+        for (auto &term: problem) {
             substitution(term.first);
             substitution(term.second);
         }
@@ -51,11 +53,8 @@ std::optional<replace_symbolt> unify(std::vector<std::pair<exprt, exprt>>& probl
             return std::nullopt;
         }
         replace_symbolt substitution;
-        // TODO wrong types int/bool
-        symbol_exprt e = to_symbol_expr(snd);
-
-        substitution.insert(e, fst);
-        for (auto& term : problem) {
+        substitution.insert(to_symbol_expr(snd), fst);
+        for (auto &term: problem) {
             substitution(term.first);
             substitution(term.second);
         }

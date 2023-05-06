@@ -68,15 +68,14 @@ problemt parse_problem(const std::string &filename) {
     for (const auto &id: parser.id_map) {
         if (id.second.definition.is_nil() && id.second.kind == smt2_parsert::idt::VARIABLE) {
             result.free_var[symbol_exprt(id.first, id.second.type)] = nil_exprt();
-        }
-        else {
+        } else {
             result.defined_functions[symbol_exprt(id.first, id.second.type)] = id.second.definition;
         }
     }
     return result;
 }
 
-problemt negate_problem(const problemt& problem) {
+problemt negate_problem(const problemt &problem) {
     problemt new_problem;
 
     new_problem.logic = problem.logic;

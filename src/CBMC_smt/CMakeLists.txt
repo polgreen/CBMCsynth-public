@@ -5,7 +5,7 @@ include(FetchContent)
 
 
 set(CMAKE_CXX_STANDARD 17)
-set (CMAKE_CXX_FLAGS "-Wno-return-type")
+set(CMAKE_CXX_FLAGS "-Wno-return-type")
 
 #add_subdirectory(lib/cbmc)
 
@@ -33,7 +33,8 @@ set(sources
         sygus_problem.cpp
         term_position.cpp
         unification.cpp
-        expr2sygus.cpp util.cpp)
+        expr2sygus.cpp util.cpp
+        subterm_heuristics.cpp)
 
 set(headers
         create_training_data.h
@@ -46,7 +47,9 @@ set(headers
         term_position.h
         unification.h
         expr2sygus.h util.h
-        constants.h)
+        constants.h
+        progressbar.hpp
+        subterm_heuristics.h)
 
 add_executable(cbmcsmt main.cpp ${sources} ${headers})
 

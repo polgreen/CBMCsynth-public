@@ -12,12 +12,6 @@
 #include <vector>
 
 
-
-//sygus_problemt create_training_data(const std::string& file);
-
-//std::vector<sygus_problemt> create_training_data(const std::vector<std::string>& files);
-
-
 int create_synthesis_problem(const cmdlinet &cmdline);
 
 #endif //SRC_CREATE_TRAINING_DATA_H
