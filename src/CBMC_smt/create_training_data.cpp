@@ -163,7 +163,7 @@ std::optional<sygus_problemt> create_synthesis_problem(const std::string &file, 
         message.debug() << "Problem is UNSAT, working with negation." << messaget::eom;
         new_valid_problem = negate_problem(smt_problem);
     } else if (res == decision_proceduret::resultt::D_ERROR) {
-        throw default_exception("SMT solver error.");
+        throw solver_timeout("SMT solver error.");
     }
 
     auto sygus_problem_opt = create_training_data(new_valid_problem, ns);
@@ -194,11 +194,15 @@ int create_synthesis_problem(const cmdlinet &cmdline) {
     progressbar bar(all_files.size());
     for (auto &file: all_files) {
         bar.update();
-        auto s_prob = create_synthesis_problem(file, message);
-        //message.status() << build_sygus_query(sygus_problem) << messaget::eom;
-        if (!s_prob) {
-            message.debug() << "couldn't handle " + file << messaget::eom;
+        try {
+            auto s_prob = create_synthesis_problem(file, message);
+            if (!s_prob) {
+                message.debug() << "couldn't handle " + file << messaget::eom;
+            }
+        } catch (solver_timeout& e) {
+            continue;
         }
+        //message.status() << build_sygus_query(sygus_problem) << messaget::eom;
     }
 
     return 0;
