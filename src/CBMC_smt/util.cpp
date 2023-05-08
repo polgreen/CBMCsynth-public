@@ -120,8 +120,15 @@ void replace_local_var(exprt &expr, const irep_idt &target, exprt &replacement) 
         if (to_symbol_expr(expr).get_identifier() == target)
             expr = replacement;
     }
-    for (auto &op: expr.operands())
-        replace_local_var(op, target, replacement);
+    if(expr.id()==ID_let)
+    {
+       replace_local_var(to_let_expr(expr).where(), target, replacement);
+       replace_local_var(to_let_expr(expr).value(), target, replacement);
+    }
+    else{
+        for (auto &op: expr.operands())
+            replace_local_var(op, target, replacement);
+    }
 }
 
 
