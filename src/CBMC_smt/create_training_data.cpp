@@ -146,11 +146,21 @@ std::optional<sygus_problemt> create_synthesis_problem(const std::string &file, 
 
     problemt new_valid_problem;
     if (res == decision_proceduret::resultt::D_SATISFIABLE) {
-        // replace the free variables in the assertions with the values from the model
-        new_valid_problem = substitute_model_into_problem(smt_problem);
-        // print the new smt_problem
-        message.debug() << "Problem is satisfiable, working with substitution" << messaget::eom;
 
+        // check for validity
+        problemt neg_problem = negate_problem(smt_problem);
+        decision_proceduret::resultt new_res = solve_problem(neg_problem, ns, message);
+
+        if (new_res == decision_proceduret::resultt::D_UNSATISFIABLE) { // original problem is valid
+            new_valid_problem = smt_problem;
+        } else if (new_res == decision_proceduret::resultt::D_ERROR) {
+            throw solver_timeout("SMT solver error.");
+        } else {
+            // replace the free variables in the assertions with the values from the model
+            new_valid_problem = substitute_model_into_problem(smt_problem);
+            // print the new smt_problem
+            message.debug() << "Problem is satisfiable, working with substitution" << messaget::eom;
+        }
     } else if (res == decision_proceduret::resultt::D_UNSATISFIABLE) {
         message.debug() << "Problem is UNSAT, working with negation." << messaget::eom;
         new_valid_problem = negate_problem(smt_problem);
