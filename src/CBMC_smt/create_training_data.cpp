@@ -4,27 +4,14 @@
 
 #include "create_training_data.h"
 
-#include "progressbar.hpp"
-#include "sygus_problem.h"
 #include <string>
 #include <vector>
-
-#include "problem.h"
-#include "term_position.h"
-#include "anti_unification.h"
-#include "unification.h"
-
-#include <util/replace_symbol.h>
-#include <util/replace_expr.h>
-
-
-#include "parser.h"
-
-#include "util.h"
-
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 
+#include <util/replace_symbol.h>
+#include <util/replace_expr.h>
 #include <util/cmdline.h>
 #include <util/cout_message.h>
 #include <util/format_expr.h>
@@ -32,16 +19,21 @@
 #include <util/symbol_table.h>
 #include <util/std_expr.h>
 #include <util/expr.h>
-
+#include <util/expr_iterator.h>
 #include <solvers/smt2/smt2_dec.h>
 
+#include "problem.h"
+#include "term_position.h"
+#include "anti_unification.h"
+#include "unification.h"
+#include "constants.h"
+#include "progressbar.hpp"
+#include "sygus_problem.h"
 #include "smt2_frontend.h"
-
-#include <util/expr_iterator.h>
-
-
+#include "parser.h"
+#include "util.h"
 #include "subterm_heuristics.h"
-
+#include "expr2sygus.h"
 
 std::optional<sygus_problemt> create_training_data(const problemt &smt_problem, const namespacet &namespacet) {
 
@@ -174,7 +166,7 @@ std::optional<sygus_problemt> create_synthesis_problem(const std::string &file, 
 int create_synthesis_problem(const cmdlinet &cmdline) {
 
     std::string dir = cmdline.args[0];
-    std::vector<std::string> all_files = files_with_suffix_in_dirs({dir}, SMT2_FILE_ENDING);
+    std::vector<std::string> all_files = files_with_suffix_in_dirs({dir}, std::string(SMT2_FILE_ENDING));
 
 
     console_message_handlert message_handler;
@@ -191,18 +183,31 @@ int create_synthesis_problem(const cmdlinet &cmdline) {
         }
     }
     message_handler.set_verbosity(v);
-    progressbar bar(all_files.size());
+    progressbar bar(static_cast<int>(all_files.size()));
+
+    const std::filesystem::path base(cmdline.args[0]);
+    const std::filesystem::path prob_dest(cmdline.args[1]);
+
     for (auto &file: all_files) {
         bar.update();
         try {
+
             auto s_prob = create_synthesis_problem(file, message);
             if (!s_prob) {
                 message.debug() << "couldn't handle " + file << messaget::eom;
+            } else {
+                std::filesystem::path file_path(file);
+                std::filesystem::path new_file = prob_dest / std::filesystem::relative(file_path, base);
+                new_file.replace_extension(SYGUS_FILE_ENDING);
+                create_dir_recursively(new_file.parent_path());
+                std::ofstream myfile(new_file);
+                myfile << build_sygus_query(s_prob.value());
+                myfile.close();
             }
         } catch (solver_timeout& e) {
             continue;
         }
-        //message.status() << build_sygus_query(sygus_problem) << messaget::eom;
+        //message.status() <<  << messaget::eom;
     }
 
     return 0;

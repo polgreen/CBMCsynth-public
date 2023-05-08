@@ -11,8 +11,8 @@ set(CMAKE_CXX_FLAGS "-Wno-return-type")
 
 
 FetchContent_Declare(cbmc
-        GIT_REPOSITORY git@github.com:diffblue/cbmc.git
-        GIT_TAG develop
+        GIT_REPOSITORY git@github.com:jparsert/cbmc.git
+        GIT_TAG smt2dec_options
         )
 FetchContent_MakeAvailable(cbmc)
 

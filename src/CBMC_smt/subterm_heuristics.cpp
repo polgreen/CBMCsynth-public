@@ -24,10 +24,12 @@ std::vector<term_positiont> get_term_positions(const problemt &problem) {
 
     //...
 
-    std::vector<exprt> all_subterms;
+    std::vector<exprt> relevant_subterms;
     for (const exprt &assertion: problem.assertions) {
         for (auto it = assertion.depth_begin(), itend = assertion.depth_end(); it != itend; ++it) {
-            all_subterms.push_back(*it);
+            if (expr_height(*it) >= 2) {
+                relevant_subterms.push_back(*it);
+            }
         }
     }
 
@@ -35,10 +37,10 @@ std::vector<term_positiont> get_term_positions(const problemt &problem) {
     exprt fst;
     exprt snd;
 
-    for (int i = 0; i < all_subterms.size(); ++i) {
-        const auto &x = all_subterms[i];
-        for (int j = i; j < all_subterms.size(); ++j) {
-            const auto &y = all_subterms[j];
+    for (int i = 0; i < relevant_subterms.size(); ++i) {
+        const auto &x = relevant_subterms[i];
+        for (int j = i; j < relevant_subterms.size(); ++j) {
+            const auto &y = relevant_subterms[j];
 
             if (x.type() != y.type()) {
                 continue;
@@ -62,11 +64,12 @@ std::vector<term_positiont> get_term_positions(const problemt &problem) {
                 snd = y;
                 height = expr_height(lgg.first);
             }
+
         }
     }
 
     std::vector<exprt> terms{fst, snd};
-    for (const auto &term: all_subterms) {
+    for (const auto &term: relevant_subterms) {
         if (term.type() != fst.type()) {
             continue;
         }

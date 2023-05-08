@@ -5,6 +5,9 @@
 #ifndef CBMCSMT_UTIL_H
 #define CBMCSMT_UTIL_H
 
+#include <utility>
+#include <filesystem>
+
 #include <util/cmdline.h>
 #include <util/cout_message.h>
 #include <util/format_expr.h>
@@ -15,8 +18,6 @@
 #include <util/std_expr.h>
 #include <util/expr.h>
 #include <util/mathematical_expr.h>
-
-#include <utility>
 
 #include "constants.h"
 
@@ -72,5 +73,6 @@ bool is_subterm(const exprt &what, const exprt &in);
 
 std::string replace_occurences(std::string str, const std::string &from, const std::string &to);
 
+bool create_dir_recursively(const std::filesystem::path& dirName);
 
 #endif //CBMCSMT_UTIL_H

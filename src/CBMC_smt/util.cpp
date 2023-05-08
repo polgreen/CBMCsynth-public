@@ -177,3 +177,18 @@ std::string replace_occurences(std::string str, const std::string &from, const s
     }
     return str;
 }
+
+#include <filesystem>
+
+bool create_dir_recursively(const std::filesystem::path& dirName)
+{
+    std::error_code err;
+    if (!std::filesystem::create_directories(dirName, err)){
+        if (std::filesystem::exists(dirName)){
+            return true;
+        }
+        std::cout << "CreateDirectoryRecuresive: FAILED to create [" << dirName.c_str()  << " " << err.message().c_str() << std::endl;
+        return false;
+    }
+    return true;
+}
