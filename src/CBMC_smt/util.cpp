@@ -123,7 +123,8 @@ void replace_local_var(exprt &expr, const irep_idt &target, exprt &replacement) 
     if(expr.id()==ID_let)
     {
        replace_local_var(to_let_expr(expr).where(), target, replacement);
-       replace_local_var(to_let_expr(expr).value(), target, replacement);
+       for(auto &val: to_let_expr(expr).values())
+           replace_local_var(val, target, replacement);
     }
     else{
         for (auto &op: expr.operands())
