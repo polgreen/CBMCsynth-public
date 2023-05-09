@@ -49,7 +49,8 @@ set(headers
         expr2sygus.h util.h
         constants.h
         progressbar.hpp
-        subterm_heuristics.h)
+        subterm_heuristics.h
+        ctpl_stl.h indicators.h)
 
 add_executable(cbmcsmt main.cpp ${sources} ${headers})
 
