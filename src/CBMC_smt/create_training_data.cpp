@@ -35,6 +35,9 @@
 #include "subterm_heuristics.h"
 #include "expr2sygus.h"
 
+
+using namespace indicators;
+
 std::optional<sygus_problemt> create_training_data(const problemt &smt_problem, const namespacet &namespacet) {
 
     std::vector<term_positiont> positions = get_term_positions(smt_problem);
