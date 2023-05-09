@@ -113,7 +113,7 @@ std::optional<sygus_problemt> create_training_data(const problemt &smt_problem, 
 }
 
 
-std::optional<sygus_problemt> create_synthesis_problem(const std::string &file, messaget message) {
+std::optional<sygus_problemt> create_synthesis_problem(const std::string &file, messaget& message) {
     // parse input file
 
     std::ifstream in(file);
@@ -173,6 +173,26 @@ std::optional<sygus_problemt> create_synthesis_problem(const std::string &file, 
     return sygus_problem_opt;
 }
 
+void create_and_write_problem(const std::string& file, const std::filesystem::path& prob_dest,
+                              const std::filesystem::path& base, messaget& message) {
+    try {
+        auto s_prob = create_synthesis_problem(file, message);
+        if (!s_prob) {
+            message.debug() << "couldn't handle " + file << messaget::eom;
+        } else {
+            std::filesystem::path file_path(file);
+            std::filesystem::path new_file = prob_dest / std::filesystem::relative(file_path, base);
+            new_file.replace_extension(SYGUS_FILE_ENDING);
+            create_dir_recursively(new_file.parent_path());
+            std::ofstream myfile(new_file);
+            myfile << build_sygus_query(s_prob.value());
+            myfile.close();
+        }
+    } catch (solver_timeout& e) {
+        return;
+    }
+}
+
 int create_synthesis_problem(const cmdlinet &cmdline) {
 
     std::string dir = cmdline.args[0];
@@ -193,31 +213,14 @@ int create_synthesis_problem(const cmdlinet &cmdline) {
         }
     }
     message_handler.set_verbosity(v);
-    progressbar bar(static_cast<int>(all_files.size()));
+
 
     const std::filesystem::path base(cmdline.args[0]);
     const std::filesystem::path prob_dest(cmdline.args[1]);
 
-    for (auto &file: all_files) {
-        bar.update();
-        try {
-
-            auto s_prob = create_synthesis_problem(file, message);
-            if (!s_prob) {
-                message.debug() << "couldn't handle " + file << messaget::eom;
-            } else {
-                std::filesystem::path file_path(file);
-                std::filesystem::path new_file = prob_dest / std::filesystem::relative(file_path, base);
-                new_file.replace_extension(SYGUS_FILE_ENDING);
-                create_dir_recursively(new_file.parent_path());
-                std::ofstream myfile(new_file);
-                myfile << build_sygus_query(s_prob.value());
-                myfile.close();
-            }
-        } catch (solver_timeout& e) {
-            continue;
-        }
-        //message.status() <<  << messaget::eom;
+    for (auto i = 0; i < all_files.size(); ++i) {
+        std::cout << i << "/" << all_files.size() << "\t" << all_files[i] << std::endl;
+        create_and_write_problem(all_files[i], prob_dest, base, message);
     }
 
     return 0;

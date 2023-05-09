@@ -21,15 +21,21 @@ std::vector<term_positiont> get_term_positions(const problemt &problem) {
 
     // Potential hyperparameters
     int lgg_max_height = 100;
+    int max_number_of_terms = 1000; // max terms per assertion
 
     //...
 
     std::vector<exprt> relevant_subterms;
     for (const exprt &assertion: problem.assertions) {
+        int i = 0;
         for (auto it = assertion.depth_begin(), itend = assertion.depth_end(); it != itend; ++it) {
             if (expr_height(*it) >= 2) {
                 relevant_subterms.push_back(*it);
             }
+            if (i >= max_number_of_terms) {
+                break;
+            }
+            ++i;
         }
     }
 
