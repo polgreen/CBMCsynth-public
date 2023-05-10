@@ -14,6 +14,7 @@
 
 #define OPTIONS                                                    \
   "(verbosity): "                                                   \
+    "(debug)"                                                          \
 
 
 
@@ -40,7 +41,8 @@ void help(std::ostream &out) {
         "\n"
         "\n"
         "Command line options\n"
-        " --verbosity N                   increase verbosity (10 gives maximum verbosity)\n\n"
+        " --verbosity N                   increase verbosity (10 gives maximum verbosity)\n"
+        "--debug                          run debug mode: parses and prints problem only\n"
         "\n"
         "\n";
 }
@@ -58,7 +60,11 @@ int main(int argc, const char *argv[]) {
         help(std::cout);
         return 1;
     }
-
+    if(cmdline.isset("debug"))
+    {
+        smt2_frontend(cmdline);
+        return 1;
+    }
     try {
         return create_synthesis_problem(cmdline);
     }

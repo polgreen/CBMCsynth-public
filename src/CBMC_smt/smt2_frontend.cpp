@@ -195,32 +195,24 @@ int smt2_frontend(const cmdlinet &cmdline) {
 
     decision_proceduret::resultt res = solve_problem(problem, ns, message);
     // print problem and model
-    message.debug() << "Solving with SMT solver:" << messaget::eom;
-    print_model(problem, message.status());
-    message.status() << messaget::eom;
+    message.status() << "Solving with SMT solver:" << messaget::eom;
 
     if (res == decision_proceduret::resultt::D_SATISFIABLE) {
         // replace the free variables in the assertions with the values from the model
-        problemt new_valid_problem = substitute_model_into_problem(problem);
-        // print the new problem
-        message.status() << "NEW PROBLEM" << messaget::eom;
-        print_problem(new_valid_problem, message.status());
+        message.status()<<"Problem is SATISFIABLE\n";
+        print_model(problem, message.status());
         message.status() << messaget::eom;
 
     } else if (res == decision_proceduret::resultt::D_UNSATISFIABLE) {
-        //problemt new_valid_problem = negate_problem(problem);
-
+        message.status()<<"Problem is UNSATISFIABLE\n";
+        message.status() << messaget::eom;
+    }
+    else
+    {
+        message.status()<<"SMT result error/unknown/timeout\n";
+        message.status() << messaget::eom;
     }
 
-    message.status() << "\n\nRunning traverse_expression" << messaget::eom;
-    traverse_expression(problem.assertions[0], message.status());
-
-
-    message.status() << "\n\nPrinting Function Positions" << messaget::eom;
-    std::multimap<irep_idt, term_positiont> positions = get_function_occurrences(problem);
-    for (auto x: positions) {
-        message.status() << x.first << ": " << to_string(x.second) << messaget::eom;
-    }
     message.status() << messaget::eom; // flush
 
     return 1;
