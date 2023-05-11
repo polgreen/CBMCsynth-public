@@ -93,7 +93,11 @@ std::optional<sygus_problemt> create_training_data(const problemt &smt_problem, 
 
     sygus_problem.synth_fun = synth_fun;
 
-    sygus_problem.logic = smt_problem.logic;
+    if (smt_problem.logic.rfind("QF_",0) == 0) { // check if it starts with
+        sygus_problem.logic = smt_problem.logic.substr(3);
+    } else {
+        sygus_problem.logic = smt_problem.logic;
+    }
     sygus_problem.defined_functions = smt_problem.defined_functions;
     sygus_problem.filename = smt_problem.filename;
 
@@ -134,7 +138,9 @@ std::optional<sygus_problemt> create_synthesis_problem(const std::string &file, 
     } catch (const parsert::smt2_errort &e) {
         message.error() << e.get_line_no() << ": "
                         << e.what() << messaget::eom;
-        throw default_exception("Could not parse.");
+        std::cout << "Could not parse: " << file << std::endl;
+        return std::nullopt;
+        //throw default_exception("Could not parse.");
     }
 
     problemt smt_problem = build_problem(parser);
@@ -211,6 +217,7 @@ int create_synthesis_problem(const cmdlinet &cmdline) {
                 cmdline.get_value("verbosity"));;
         if (v > 10) {
             v = 10;
+
         }
     }
     message_handler.set_verbosity(v);
