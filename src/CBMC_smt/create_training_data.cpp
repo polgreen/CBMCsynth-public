@@ -226,7 +226,9 @@ int create_synthesis_problem(const cmdlinet &cmdline) {
 
         }
     }
+
     message_handler.set_verbosity(v);
+
 
 
 
