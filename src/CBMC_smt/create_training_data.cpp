@@ -66,8 +66,7 @@ std::optional<sygus_problemt> create_training_data(const problemt &smt_problem, 
     replace_mapt replace_map;
     for (auto &term: terms) {
         std::vector<std::pair<exprt, exprt>> to_unify;
-        to_unify.emplace_back(lgg,
-                              term);// The order of arguments here is important due to the ordering in the if-else-if branches in unify. Note that this should be solved at some point with variable ordering. But until then let's keep it this way.
+        to_unify.emplace_back(lgg, term);// The order of arguments here is important due to the ordering in the if-else-if branches in unify. Note that this should be solved at some point with variable ordering. But until then let's keep it this way.
         replace_symbolt substitution = unify(to_unify).value();
         exprt tmp = synth_fun_app;
         substitution(tmp);
@@ -108,9 +107,10 @@ std::optional<sygus_problemt> create_training_data(const problemt &smt_problem, 
     // replace in assertions
     for (auto assertion: smt_problem.assertions) {
         replace_expr(replace_map, assertion);
-        //if (simplify_expr(assertion,namespacet).is_true()) {
-        //    continue;
-        //}
+
+        if (simplify_expr(assertion,namespacet).is_true()) {
+            continue;
+        }
         sygus_problem.assertions.push_back(assertion);
     }
 
@@ -180,15 +180,15 @@ std::optional<sygus_problemt> create_synthesis_problem(const std::string &file, 
     return sygus_problem_opt;
 }
 
-void create_and_write_problem(const std::string& file, const std::filesystem::path& prob_dest,
-                              const std::filesystem::path& base, messaget& message) {
+void create_and_write_problem(const std::string& file, const std::filesystem::path& base,
+                              const std::filesystem::path& problem_dest, messaget& message) {
     try {
         auto s_prob = create_synthesis_problem(file, message);
         if (!s_prob) {
             message.debug() << "couldn't handle " + file << messaget::eom;
         } else {
             std::filesystem::path file_path(file);
-            std::filesystem::path new_file = prob_dest / std::filesystem::relative(file_path, base);
+            std::filesystem::path new_file = problem_dest / std::filesystem::relative(file_path, base);
             new_file.replace_extension(SYGUS_FILE_ENDING);
             create_dir_recursively(new_file.parent_path());
             std::ofstream myfile(new_file);
@@ -203,8 +203,14 @@ void create_and_write_problem(const std::string& file, const std::filesystem::pa
 int create_synthesis_problem(const cmdlinet &cmdline) {
 
     std::string dir = cmdline.args[0];
-    std::vector<std::string> all_files = files_with_suffix_in_dirs({dir}, std::string(SMT2_FILE_ENDING));
 
+    std::filesystem::path base(dir);
+    const std::filesystem::path prob_dest(cmdline.args[1]);
+
+    std::vector<std::string> all_files = files_with_suffix_in_dirs({dir}, std::string(SMT2_FILE_ENDING));
+    if (!std::filesystem::is_directory(base)) {
+        base = base.parent_path();
+    }
 
     console_message_handlert message_handler;
     messaget message(message_handler);
@@ -223,12 +229,10 @@ int create_synthesis_problem(const cmdlinet &cmdline) {
     message_handler.set_verbosity(v);
 
 
-    const std::filesystem::path base(cmdline.args[0]);
-    const std::filesystem::path prob_dest(cmdline.args[1]);
 
     for (auto i = 0; i < all_files.size(); ++i) {
         std::cout << i << "/" << all_files.size() << "\t" << all_files[i] << std::endl;
-        create_and_write_problem(all_files[i], prob_dest, base, message);
+        create_and_write_problem(all_files[i], base, prob_dest, message);
     }
 
     return 0;

@@ -27,6 +27,13 @@ std::pair<exprt, std::vector<symbol_exprt>> compute_lgg(const std::vector<exprt>
         }
     }
 
+    // Same root symbol, and the root symbol is a variable:
+    if(terms[0].id() == ID_symbol) {
+        std::string bytes = std::to_string(uuidGenerator.getUUID().hash());
+        auto new_var = symbol_exprt("var_" + bytes, terms[0].type()); // return fresh variable
+        return {new_var, {new_var}};
+    }
+
     size_t n_op_args = terms[0].operands().size();
     exprt new_sub_lgg = terms[0]; // create lgg with the same root symbol as other terms
     std::vector<symbol_exprt> new_vars;
