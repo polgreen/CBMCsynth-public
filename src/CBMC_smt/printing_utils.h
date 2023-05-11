@@ -12,4 +12,6 @@ void traverse_expression(exprt &expr, std::ostream &out);
 
 void print_problem_tree(problemt &problem, std::ostream &out);
 
+void test_sygus_printing(problemt &problem, std::ostream &out);
+
 #endif
