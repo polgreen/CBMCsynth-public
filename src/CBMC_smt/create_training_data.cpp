@@ -230,9 +230,7 @@ int create_synthesis_problem(const cmdlinet &cmdline) {
     message_handler.set_verbosity(v);
 
 
-
-
-    for (auto i = 0; i < all_files.size(); ++i) {
+    for (auto i = START_AT_FILE_NUMBER; i < all_files.size(); ++i) {
         std::cout << i << "/" << all_files.size() << "\t" << all_files[i] << std::endl;
         create_and_write_problem(all_files[i], base, prob_dest, message);
     }

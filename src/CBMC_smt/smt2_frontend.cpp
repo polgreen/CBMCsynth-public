@@ -25,7 +25,6 @@ Author: Elizabeth Polgreen, epolgreen@gmail.com
 
 #include <solvers/smt2/smt2_dec.h>
 
-#include "term_position.h"
 #include "constants.h"
 
 

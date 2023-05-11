@@ -12,4 +12,5 @@ constexpr std::string_view SYGUS_FILE_ENDING = ".sl";
 
 constexpr int SMT_SOLVER_TIMEOUT = 5;
 
+constexpr int START_AT_FILE_NUMBER = 0;
 #endif //CBMCSMT_CONSTANTS_H
