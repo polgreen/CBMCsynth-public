@@ -925,10 +925,10 @@ std::string convert_expr(const exprt &expr) {
 
 std::string clean_id(const irep_idt &id) {
     std::string dest = id2string(id);
-    std::string::size_type c_pos = dest.find("#");
-    if (c_pos != std::string::npos &&
-        dest.rfind("#") == c_pos)
-        dest.erase(c_pos, std::string::npos);
+    // std::string::size_type c_pos = dest.find("#");
+    // if (c_pos != std::string::npos &&
+    //     dest.rfind("#") == c_pos)
+    //     dest.erase(c_pos, std::string::npos);
 
     std::string::size_type c_pos2 = dest.find("synth::"); //7 chars
     if (c_pos2 != std::string::npos &&

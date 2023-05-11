@@ -191,6 +191,8 @@ int smt2_frontend(const cmdlinet &cmdline) {
 
     print_problem(problem, message.status());
     message.status() << messaget::eom;
+    test_sygus_printing(problem, message.status());
+    message.status() << messaget::eom;
     // solve the problem with an smt solver
 
     decision_proceduret::resultt res = solve_problem(problem, ns, message);

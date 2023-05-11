@@ -1,5 +1,6 @@
 #include "printing_utils.h"
 #include "problem.h"
+#include "expr2sygus.h"
 
 #include <util/format_expr.h>
 #include <util/std_expr.h>
@@ -26,6 +27,27 @@ void print_problem(problemt &problem, std::ostream &out) {
     for (const auto &e: problem.free_var) {
         out << e.first.get_identifier() << std::endl;
     }
+}
+
+void test_sygus_printing(problemt &problem, std::ostream &out)
+{
+    out << "Testing SyGuS printing: " << std::endl;
+
+    for (const auto &e: problem.free_var) {
+        out << var_dec(e.first)<<std::endl;
+    }
+
+    for (const auto &a: problem.defined_functions) {
+        out << fun_def(a.first, a.second);
+    }
+
+    for (const auto &a: problem.assertions) {
+        out << "(assert ";
+        out << expr2sygus(a) << std::endl;
+        out <<")\n";
+    }
+
+
 }
 
 void print_model(problemt &problem, std::ostream &out) {
