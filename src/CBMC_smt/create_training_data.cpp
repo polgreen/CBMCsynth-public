@@ -133,7 +133,7 @@ std::optional<sygus_problemt> create_synthesis_problem(const std::string &file, 
     in.clear();   //  Since ignore will have set eof.
     in.seekg( 0, std::ios_base::beg );
     std::cout << length << std::endl;
-    if (length > 1000000) { // dirty hack to discard files that are too large and would lead to seg faults etc.
+    if (length > MAX_FILE_SIZE) { // dirty hack to discard files that are too large and would lead to seg faults etc.
         return std::nullopt;
     }
 
