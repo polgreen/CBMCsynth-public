@@ -9,7 +9,6 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-
 #include <util/replace_symbol.h>
 #include <util/replace_expr.h>
 #include <util/cmdline.h>
@@ -132,7 +131,6 @@ std::optional<sygus_problemt> create_synthesis_problem(const std::string &file, 
     std::streamsize length = in.gcount();
     in.clear();   //  Since ignore will have set eof.
     in.seekg( 0, std::ios_base::beg );
-    std::cout << length << std::endl;
     if (length > MAX_FILE_SIZE) { // dirty hack to discard files that are too large and would lead to seg faults etc.
         return std::nullopt;
     }
@@ -239,6 +237,12 @@ int create_synthesis_problem(const cmdlinet &cmdline) {
 
     message_handler.set_verbosity(v);
 
+    // wacky support
+    //auto print_and_run = [&](const std::string& file) {
+    //    std::cout << std::find(all_files.begin(), all_files.end(), file) - all_files.begin() << "/" << all_files.size() << "\t" << file << std::endl;
+    //    create_and_write_problem(file, base, prob_dest, message);
+    // };
+    //std::for_each(std::execution::par, all_files.begin(), all_files.end(), print_and_run);
 
     for (auto i = START_AT_FILE_NUMBER; i < all_files.size(); ++i) {
         std::cout << i << "/" << all_files.size() << "\t" << all_files[i] << std::endl;
