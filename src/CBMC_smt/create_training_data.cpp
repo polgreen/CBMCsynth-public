@@ -9,6 +9,8 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <thread>
+
 #include <util/replace_symbol.h>
 #include <util/replace_expr.h>
 #include <util/cmdline.h>
@@ -20,6 +22,7 @@
 #include <util/expr.h>
 #include <util/expr_iterator.h>
 #include <solvers/smt2/smt2_dec.h>
+
 
 #include "problem.h"
 #include "term_position.h"
@@ -188,18 +191,18 @@ std::optional<sygus_problemt> create_synthesis_problem(const std::string &file, 
     return sygus_problem_opt;
 }
 
-void create_and_write_problem(const std::string& file, const std::filesystem::path& base,
-                              const std::filesystem::path& problem_dest, messaget& message) {
+void create_and_write_problem(const std::string& file, const std::string& output, messaget& message) {
     try {
         auto s_prob = create_synthesis_problem(file, message);
         if (!s_prob) {
             message.debug() << "couldn't handle " + file << messaget::eom;
         } else {
-            std::filesystem::path file_path(file);
-            std::filesystem::path new_file = problem_dest / std::filesystem::relative(file_path, base);
-            new_file.replace_extension(SYGUS_FILE_ENDING);
-            create_dir_recursively(new_file.parent_path());
-            std::ofstream myfile(new_file);
+
+            std::filesystem::path file_path(output);
+            std::filesystem::create_directory(file_path.parent_path()); // create intermediate dirs.
+            std::cout << "Writing result to: " << file_path << std::endl;
+
+            std::ofstream myfile(file_path);
             myfile << build_sygus_query(s_prob.value());
             myfile.close();
         }
@@ -210,15 +213,8 @@ void create_and_write_problem(const std::string& file, const std::filesystem::pa
 
 int create_synthesis_problem(const cmdlinet &cmdline) {
 
-    std::string dir = cmdline.args[0];
-
-    std::filesystem::path base(dir);
-    const std::filesystem::path prob_dest(cmdline.args[1]);
-
-    std::vector<std::string> all_files = files_with_suffix_in_dirs({dir}, std::string(SMT2_FILE_ENDING));
-    if (!std::filesystem::is_directory(base)) {
-        base = base.parent_path();
-    }
+    std::string input = cmdline.args[0];
+    std::string output_file = cmdline.args[1];
 
     console_message_handlert message_handler;
     messaget message(message_handler);
@@ -237,17 +233,9 @@ int create_synthesis_problem(const cmdlinet &cmdline) {
 
     message_handler.set_verbosity(v);
 
-    // wacky support
-    //auto print_and_run = [&](const std::string& file) {
-    //    std::cout << std::find(all_files.begin(), all_files.end(), file) - all_files.begin() << "/" << all_files.size() << "\t" << file << std::endl;
-    //    create_and_write_problem(file, base, prob_dest, message);
-    // };
-    //std::for_each(std::execution::par, all_files.begin(), all_files.end(), print_and_run);
 
-    for (auto i = START_AT_FILE_NUMBER; i < all_files.size(); ++i) {
-        std::cout << i << "/" << all_files.size() << "\t" << all_files[i] << std::endl;
-        create_and_write_problem(all_files[i], base, prob_dest, message);
-    }
+    create_and_write_problem(input, output_file, message);
+
 
     return 0;
 }
