@@ -93,6 +93,7 @@ decision_proceduret::resultt solve_problem(problemt &problem, namespacet &ns, me
         expand_function_applications(copy_of_a, problem);
         solver.set_to_true(copy_of_a);
     }
+
     decision_proceduret::resultt result = solver();
 
     switch (result) {

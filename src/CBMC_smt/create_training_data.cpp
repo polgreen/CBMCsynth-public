@@ -128,6 +128,15 @@ std::optional<sygus_problemt> create_synthesis_problem(const std::string &file, 
         throw default_exception("Failed to open file " + file);
     }
 
+    in.ignore( std::numeric_limits<std::streamsize>::max() );
+    std::streamsize length = in.gcount();
+    in.clear();   //  Since ignore will have set eof.
+    in.seekg( 0, std::ios_base::beg );
+    std::cout << length << std::endl;
+    if (length > 1000000) { // dirty hack to discard files that are too large and would lead to seg faults etc.
+        return std::nullopt;
+    }
+
     symbol_tablet symbol_table;
     namespacet ns(symbol_table);
 
@@ -147,6 +156,7 @@ std::optional<sygus_problemt> create_synthesis_problem(const std::string &file, 
     smt_problem.filename = file;
     for (auto &x: smt_problem.assertions) {
         expand_let_expressions(x);
+
     }
 
     decision_proceduret::resultt res = solve_problem(smt_problem, ns, message);
