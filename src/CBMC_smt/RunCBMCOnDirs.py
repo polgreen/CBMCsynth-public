@@ -8,9 +8,8 @@ import concurrent.futures
 
 def run_example(cmd, input_file, output_file, idx, all):
     try :
-        p = subprocess.run([cmd, input_file , output_file], capture_output=True, text=True, timeout=20)
+        subprocess.run([cmd, input_file , output_file], capture_output=True, text=True, timeout=20)
         print("Ran {}/{}\t {}".format(idx, all, input_file))
-        print(p.stdout)
     except subprocess.TimeoutExpired as e:
         return
     return

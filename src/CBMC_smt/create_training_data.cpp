@@ -199,7 +199,7 @@ void create_and_write_problem(const std::string& file, const std::string& output
         } else {
 
             std::filesystem::path file_path(output);
-            std::filesystem::create_directory(file_path.parent_path()); // create intermediate dirs.
+            std::filesystem::create_directories(file_path.parent_path()); // create intermediate dirs.
             std::cout << "Writing result to: " << file_path << std::endl;
 
             std::ofstream myfile(file_path);
