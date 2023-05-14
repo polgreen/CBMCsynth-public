@@ -932,16 +932,16 @@ std::string clean_id(const irep_idt &id) {
     //     dest.rfind("#") == c_pos)
     //     dest.erase(c_pos, std::string::npos);
 
-    // remove hash symbols using regex and replace by "hashSymbolConstant"
-    std::regex hash_reg("#");
-    dest = std::regex_replace(dest, hash_reg, "hashSymbol");
+    // // remove hash symbols using regex and replace by "hashSymbolConstant"
+    // std::regex hash_reg("#");
+    // dest = std::regex_replace(dest, hash_reg, "hashSymbol");
 
     std::string::size_type c_pos2 = dest.find("synth::"); //7 chars
     if (c_pos2 != std::string::npos && dest.rfind("synth::") == c_pos2) {
         dest.erase(0, c_pos2 + 7);
     }
 
-    return dest;
+    return "|"+dest+"|";
 }
 
 void clean_symbols(exprt &expr) {
