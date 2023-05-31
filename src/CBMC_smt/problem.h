@@ -29,7 +29,6 @@ public:
     std::string logic;
     std::vector<std::string> comments;
 
-
 };
 
 problemt parse_problem(const std::string &filename);

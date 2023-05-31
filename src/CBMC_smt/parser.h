@@ -20,6 +20,7 @@ public:
     std::vector<std::string> set_info_cmds;
 
     void print_problem();
+    void parse_model();
 
     using smt2_errort = smt2_tokenizert::smt2_errort;
 
