@@ -9,6 +9,8 @@ Author: Elizabeth Polgreen, epolgreen@gmail.com
 #include "parser.h"
 #include "printing_utils.h"
 #include "problem.h"
+#include "sygus_problem.h"
+#include "util.h"
 
 #include <fstream>
 #include <iostream>
@@ -149,6 +151,38 @@ problemt substitute_model_into_problem(const problemt &problem) {
 
     return new_problem;
 }
+
+void test_cvc5(message_handlert &mh)
+{
+    // construct problem
+    sygus_problemt problem;
+    problem.free_var.push_back(symbol_exprt("x", integer_typet()));
+    problem.free_var.push_back(symbol_exprt("y", integer_typet()));
+    // construct synth fun command
+    synth_fun_commandt synth_fun;
+    synth_fun.id = "f";
+    std::vector<typet> domain;
+    domain.push_back(integer_typet());
+    domain.push_back(integer_typet());
+    synth_fun.type=mathematical_function_typet(domain, integer_typet());
+    std::vector<irep_idt> params;
+    params.push_back("a");
+    params.push_back("b");
+    synth_fun.parameters=params;
+    problem.synth_fun=synth_fun;
+    // add constraints
+    std::vector<exprt> inputs;
+    inputs.push_back(symbol_exprt("x", integer_typet()));
+    inputs.push_back(symbol_exprt("y", integer_typet()));
+    problem.assertions.push_back(
+        equal_exprt(create_func_app("f", inputs, integer_typet()), 
+                    plus_exprt(inputs[0], inputs[1])));
+    cvc5_syntht cvc5_synth(mh);
+    cvc5_synth(problem);
+
+
+}
+
 
 int smt2_frontend(const cmdlinet &cmdline) {
     // parse input file
