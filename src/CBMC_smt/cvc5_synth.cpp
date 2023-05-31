@@ -7,6 +7,13 @@
 #include <util/tempfile.h>
 #include <util/run.h>
 
+
+decision_proceduret::resultt cvc5_syntht::operator()(const sygus_problemt &problem)
+{
+  return solve(problem);
+}
+
+
 decision_proceduret::resultt cvc5_syntht::read_result(std::istream &in, const sygus_problemt &problem)
 {
   if (!in)
