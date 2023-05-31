@@ -13,8 +13,9 @@
 #include <iostream>
 
 #define OPTIONS                                                    \
-  "(verbosity): "                                                   \
-    "(debug)"                                                          \
+  "(verbosity): "                                                  \
+  "(debug)"                                                        \
+  "(test-cvc5)"                                                    \
 
 
 
@@ -43,6 +44,7 @@ void help(std::ostream &out) {
         "Command line options\n"
         " --verbosity N                   increase verbosity (10 gives maximum verbosity)\n"
         "--debug                          run debug mode: parses and prints problem only\n"
+        "--test-cvc5                      test cvc5 interface\n"
         "\n"
         "\n";
 }

@@ -10,6 +10,7 @@ Author: Elizabeth Polgreen, epolgreen@gmail.com
 #include "printing_utils.h"
 #include "problem.h"
 #include "sygus_problem.h"
+#include "cvc5_synth.h"
 #include "util.h"
 
 #include <fstream>
@@ -154,8 +155,11 @@ problemt substitute_model_into_problem(const problemt &problem) {
 
 void test_cvc5(message_handlert &mh)
 {
+    std::cout<<"making cvc5 problem"<<std::endl;
+    messaget message(mh);
     // construct problem
     sygus_problemt problem;
+    problem.logic="LIA";
     problem.free_var.push_back(symbol_exprt("x", integer_typet()));
     problem.free_var.push_back(symbol_exprt("y", integer_typet()));
     // construct synth fun command
@@ -178,21 +182,19 @@ void test_cvc5(message_handlert &mh)
         equal_exprt(create_func_app("f", inputs, integer_typet()), 
                     plus_exprt(inputs[0], inputs[1])));
     cvc5_syntht cvc5_synth(mh);
-    cvc5_synth(problem);
-
-
+    
+    if(cvc5_synth(problem)==decision_proceduret::resultt::D_SATISFIABLE)
+    {
+        std::cout << "Synthesis succeeded" << std::endl;
+        for(const auto &f: cvc5_synth.get_solution())
+        {
+            std::cout<<format(f.first)<<" = "<<format(f.second)<<std::endl;
+        }
+    }
 }
 
 
 int smt2_frontend(const cmdlinet &cmdline) {
-    // parse input file
-    assert(cmdline.args.size() == 1);
-    std::ifstream in(cmdline.args.front());
-
-    if (!in) {
-        std::cerr << "Failed to open input file" << std::endl;
-        return 10;
-    }
 
     console_message_handlert message_handler;
     messaget message(message_handler);
@@ -207,6 +209,25 @@ int smt2_frontend(const cmdlinet &cmdline) {
             v = 10;
         }
     }
+
+    if(cmdline.isset("test-cvc5"))
+    {
+        test_cvc5(message.get_message_handler());
+        return 0;
+    }
+
+    // parse input file
+    assert(cmdline.args.size() == 1);
+    std::ifstream in(cmdline.args.front());
+
+    if (!in) {
+        std::cerr << "Failed to open input file" << std::endl;
+        return 10;
+    }
+
+
+
+    
 
     symbol_tablet symbol_table;
     namespacet ns(symbol_table);
