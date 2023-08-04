@@ -6,7 +6,6 @@
 
 #include <vector>
 
-#include "problem.h"
 #include "term_position.h"
 #include "anti_unification.h"
 #include "util.h"
@@ -17,7 +16,7 @@
 #include <util/expr_iterator.h>
 
 
-std::vector<term_positiont> get_term_positions(const problemt &problem) {
+std::vector<term_positiont> get_term_positions(const smt_problemt &problem) {
 
     // Potential hyperparameters
     int lgg_max_height = 100;

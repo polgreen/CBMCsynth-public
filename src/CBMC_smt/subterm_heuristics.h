@@ -8,7 +8,7 @@
 
 #include <vector>
 #include "term_position.h"
-#include "problem.h"
+#include "smt_problem.h"
 
 
 /**
@@ -16,7 +16,7 @@
  * hyper-parameters impact the data in what way.
  * suggestions : sub-tree similarity
  **/
-std::vector<term_positiont> get_term_positions(const problemt &problem);
+std::vector<term_positiont> get_term_positions(const smt_problemt &problem);
 
 
 #endif //CBMCSMT_SUBTERM_HEURISTICS_H

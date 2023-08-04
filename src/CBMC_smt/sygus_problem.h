@@ -32,10 +32,11 @@ public:
 
     std::vector<std::string> comments;
 
-    synth_fun_commandt synth_fun;
+    std::vector<synth_fun_commandt> synthesis_functions;
 
     std::string filename;
-    std::vector<exprt> assertions;
+    std::vector<exprt> constraints;
+    std::vector<exprt> assumptions;
     std::map<symbol_exprt, exprt> defined_functions;
     std::vector<symbol_exprt> free_var;
 
@@ -43,7 +44,8 @@ public:
 
 };
 
-synth_fun_commandt add_grammar(const synth_fun_commandt &f);
+synth_fun_commandt copy_fun_add_grammar(const synth_fun_commandt &f);
+void add_grammar(synth_fun_commandt &f);
 
 
 #endif //SRC_SYGUS_PROBLEM_H

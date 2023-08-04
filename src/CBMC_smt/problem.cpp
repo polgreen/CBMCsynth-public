@@ -2,14 +2,12 @@
 // Created by julian on 04.04.23.
 //
 
-#include "problem.h"
+#include "smt_problem.h"
 
 #include <string>
 
-
 #include "parser.h"
 #include "printing_utils.h"
-#include "problem.h"
 
 #include <fstream>
 #include <iostream>
@@ -28,7 +26,7 @@
 #include <solvers/smt2/smt2_dec.h>
 
 
-problemt parse_problem(const std::string &filename) {
+smt_problemt parse_problem(const std::string &filename) {
     // parse input file
     std::ifstream in(filename);
 
@@ -57,7 +55,7 @@ problemt parse_problem(const std::string &filename) {
         throw std::exception();
     }
 
-    problemt result;
+    smt_problemt result;
     result.logic = parser.logic;
     result.filename = filename;
     for (const auto &a: parser.assertions) {
@@ -75,8 +73,8 @@ problemt parse_problem(const std::string &filename) {
     return result;
 }
 
-problemt negate_problem(const problemt &problem) {
-    problemt new_problem;
+smt_problemt negate_problem(const smt_problemt &problem) {
+    smt_problemt new_problem;
 
     new_problem.logic = problem.logic;
     new_problem.defined_functions = problem.defined_functions;

@@ -24,7 +24,7 @@
 #include <solvers/smt2/smt2_dec.h>
 
 
-#include "problem.h"
+#include "smt_problem.h"
 #include "term_position.h"
 #include "anti_unification.h"
 #include "unification.h"
@@ -38,7 +38,7 @@
 #include "expr2sygus.h"
 
 
-std::optional<sygus_problemt> create_training_data(const problemt &smt_problem, const namespacet &namespacet) {
+std::optional<sygus_problemt> create_training_data(const smt_problemt &smt_problem, const namespacet &namespacet) {
 
     std::vector<term_positiont> positions = get_term_positions(smt_problem);
     if (positions.empty()) {
@@ -92,7 +92,7 @@ std::optional<sygus_problemt> create_training_data(const problemt &smt_problem, 
         synth_fun.parameters.push_back(x.get_identifier());
     }
 
-    sygus_problem.synth_fun = synth_fun;
+    sygus_problem.synthesis_functions.push_back(synth_fun);
 
     if (smt_problem.logic.rfind("QF_",0) == 0) { // check if it starts with
         sygus_problem.logic = smt_problem.logic.substr(3);
@@ -113,7 +113,7 @@ std::optional<sygus_problemt> create_training_data(const problemt &smt_problem, 
         if (simplify_expr(assertion,namespacet).is_true()) {
             continue;
         }
-        sygus_problem.assertions.push_back(assertion);
+        sygus_problem.constraints.push_back(assertion);
     }
 
     return sygus_problem;
@@ -153,7 +153,7 @@ std::optional<sygus_problemt> create_synthesis_problem(const std::string &file, 
         //throw default_exception("Could not parse.");
     }
 
-    problemt smt_problem = build_problem(parser);
+    smt_problemt smt_problem = parser.get_smt_problem();
     smt_problem.filename = file;
     for (auto &x: smt_problem.assertions) {
         expand_let_expressions(x);
@@ -162,11 +162,11 @@ std::optional<sygus_problemt> create_synthesis_problem(const std::string &file, 
 
     decision_proceduret::resultt res = solve_problem(smt_problem, ns, message);
 
-    problemt new_valid_problem;
+    smt_problemt new_valid_problem;
     if (res == decision_proceduret::resultt::D_SATISFIABLE) {
 
         // check for validity
-        problemt neg_problem = negate_problem(smt_problem);
+        smt_problemt neg_problem = negate_problem(smt_problem);
         decision_proceduret::resultt new_res = solve_problem(neg_problem, ns, message);
 
         if (new_res == decision_proceduret::resultt::D_UNSATISFIABLE) { // original problem is valid

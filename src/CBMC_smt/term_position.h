@@ -11,7 +11,7 @@
 #include <map>
 #include <tuple>
 #include <string>
-#include "problem.h"
+#include "smt_problem.h"
 #include <deque>
 #include <exception>
 
@@ -68,7 +68,7 @@ public:
 term_positiont operator+(term_positiont &first, const term_positiont &second);
 
 // collect occuring functions and their respective positions
-std::multimap<irep_idt, term_positiont> get_function_occurrences(const problemt &problem);
+std::multimap<irep_idt, term_positiont> get_function_occurrences(const smt_problemt &problem);
 
 /*
  * Return copy of subterm of term at position pos.
@@ -78,7 +78,7 @@ exprt get_term_copy_at_position(term_positiont pos, const exprt &term);
 /*
  * Return copy of subterm of term at position pos.
  * */
-exprt get_term_copy_at_position_in_problem(const term_positiont &pos, const problemt &term);
+exprt get_term_copy_at_position_in_problem(const term_positiont &pos, const smt_problemt &term);
 
 
 std::vector<term_positiont> get_pos_of_all_occurrences(const exprt &what, const exprt &in, const term_positiont &pos);

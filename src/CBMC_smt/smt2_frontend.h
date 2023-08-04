@@ -14,18 +14,14 @@
 
 #include <solvers/smt2/smt2_dec.h>
 
-#include "problem.h"
+#include "smt_problem.h"
 #include "parser.h"
 
 
 int smt2_frontend(const cmdlinet &);
 
-int smt2_frontend(const cmdlinet &, std::istream &in);
+decision_proceduret::resultt solve_problem(smt_problemt &problem, namespacet &ns, messaget &message);
 
-decision_proceduret::resultt solve_problem(problemt &problem, namespacet &ns, messaget &message);
-
-problemt substitute_model_into_problem(const problemt &problem);
-
-problemt build_problem(parsert &parser);
+smt_problemt substitute_model_into_problem(const smt_problemt &problem);
 
 #endif /*_SMT2_FRONTEND_H_*/

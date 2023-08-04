@@ -25,6 +25,7 @@ std::string expr2sygus(const exprt &expr);
 std::string synth_fun_dec(const synth_fun_commandt &definition);
 
 std::string fun_def(const symbol_exprt &function, const exprt &body);
+std::string fun_dec(const symbol_exprt &fun);
 
 std::string var_dec(const symbol_exprt &symbol);
 

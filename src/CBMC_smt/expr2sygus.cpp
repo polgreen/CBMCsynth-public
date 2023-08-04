@@ -968,6 +968,24 @@ std::string var_dec(const symbol_exprt &symbol) {
     return result;
 }
 
+std::string fun_dec(const symbol_exprt &fun) {
+    std::string result = "(declare-fun " + clean_id(fun.get_identifier()) + " (";
+
+    if(fun.type().id()==ID_mathematical_function)
+    {
+        const auto &func_type = to_mathematical_function_type(fun.type());
+        for (const auto &d: func_type.domain())
+            result += type2sygus(d) + " ";
+        result += ") " + type2sygus(func_type.codomain()) + ")\n";
+    }
+    else
+    {
+        result += ") " + type2sygus(fun.type()) + ")\n";
+    }
+
+    return result;
+}
+
 std::string fun_def(const symbol_exprt &fun, const exprt &def) {
     INVARIANT(fun.type().id() == ID_mathematical_function,
               "function symbol must have function type");
@@ -1998,12 +2016,13 @@ std::string build_sygus_query(const sygus_problemt &problem, bool add_default_gr
         query += var_dec(v) + "\n";
 
     // synthesis function
-    // NB: we only support one synthesis function
-    if (add_default_grammar)
-        query += synth_fun_dec(add_grammar(problem.synth_fun)) + "\n";
-    else
-        query += synth_fun_dec(problem.synth_fun) + "\n";
-
+    for (const auto &f : problem.synthesis_functions)
+    {
+        if (add_default_grammar)
+            query += synth_fun_dec(copy_fun_add_grammar(f)) + "\n";
+        else
+            query += synth_fun_dec(f) + "\n";
+    }
 
     for (const auto &f: problem.defined_functions) {
         query += fun_def(f.first, f.second) + "\n";
@@ -2014,7 +2033,7 @@ std::string build_sygus_query(const sygus_problemt &problem, bool add_default_gr
     // so they can be printed in the correct order
 
 
-    for (const auto &c: problem.assertions) {
+    for (const auto &c: problem.constraints) {
         query += "(constraint " + expr2sygus(c) + ")\n";
 
     }

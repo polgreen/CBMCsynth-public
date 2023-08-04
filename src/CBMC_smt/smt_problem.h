@@ -1,5 +1,5 @@
-#ifndef _PROBLEM_H_
-#define _PROBLEM_H_
+#ifndef _SMT_PROBLEM_H_
+#define _SMT_PROBLEM_H_
 
 // we store anything we might need to pass around here
 #include <util/std_expr.h>
@@ -19,7 +19,7 @@
 #include <solvers/smt2/smt2_dec.h>
 
 
-class problemt {
+class smt_problemt {
 public:
     std::string filename;
 
@@ -31,12 +31,12 @@ public:
 
 };
 
-problemt parse_problem(const std::string &filename);
+smt_problemt parse_problem(const std::string &filename);
 
 /*
  * creates conjunction of assertions and negates the term.
  * Turns an unsatisfiable problem into a valid one
  * */
-problemt negate_problem(const problemt &problem);
+smt_problemt negate_problem(const smt_problemt &problem);
 
-#endif /*_PROBLEM_H_*/
+#endif /*_SMT_PROBLEM_H_*/

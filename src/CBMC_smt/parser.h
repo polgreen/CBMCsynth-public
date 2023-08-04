@@ -2,6 +2,8 @@
 #define PARSER_CPP
 
 #include <solvers/smt2/smt2_parser.h>
+#include "sygus_problem.h"
+#include "smt_problem.h"
 
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
@@ -14,8 +16,11 @@ public:
 
     exprt::operandst assertions;
     std::string logic;
+    exprt::operandst constraints;
+    exprt::operandst assumptions;
 
-
+    // store synth funcs
+    smt2_parsert::id_mapt synthesis_functions;
     // might contain information from where the problem was originally
     std::vector<std::string> set_info_cmds;
 
@@ -26,8 +31,19 @@ public:
 
     void expand_function_applications(exprt &expr);
 
+    smt_problemt get_smt_problem();
+    sygus_problemt get_sygus_problem();
+
 protected:
     void setup_commands();
+    void add_synth_fun_id(irep_idt id, exprt expr);
+    void build_smt_problem();
+    void build_sygus_problem();
+    syntactic_templatet parse_grammar();
+    symbol_exprt NTDef();
+    std::vector<exprt> GTerm_seq(const symbol_exprt &nonterminal);
+    smt_problemt smt_problem;
+    sygus_problemt sygus_problem;
 };
 
 #endif

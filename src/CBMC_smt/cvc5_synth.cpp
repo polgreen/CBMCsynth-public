@@ -39,7 +39,9 @@ decision_proceduret::resultt cvc5_syntht::read_result(std::istream &in, const sy
 
   for (auto &id : result_parser.id_map)
   {
-    if(id.first==problem.synth_fun.id)
+    for(const auto &synth_fun: problem.synthesis_functions)
+    {
+    if(id.first==synth_fun.id)
     {
       if (id.second.type.id() == ID_mathematical_function)
       {
@@ -55,6 +57,7 @@ decision_proceduret::resultt cvc5_syntht::read_result(std::istream &in, const sy
         clean_symbols(id.second.definition);
         last_solution[symbol] = id.second.definition;
       }
+    }
     }
   }
   return decision_proceduret::resultt::D_SATISFIABLE;

@@ -3,12 +3,10 @@
 //
 
 #include "sygus_problem.h"
-#include "problem.h"
 
 
 #include "parser.h"
 #include "printing_utils.h"
-#include "problem.h"
 
 #include <fstream>
 #include <iostream>
@@ -85,9 +83,15 @@ std::map<irep_idt, std::vector<exprt>> production_rules(const synth_fun_commandt
 }
 
 
-synth_fun_commandt add_grammar(const synth_fun_commandt &f) {
+synth_fun_commandt copy_fun_add_grammar(const synth_fun_commandt &f) {
     synth_fun_commandt result = f;
-    syntactic_templatet grammar;
+    add_grammar(result);
+    return result;
+}
+
+void add_grammar(synth_fun_commandt &f) {
+    f.grammar.nt_ids.clear();
+    f.grammar.production_rules.clear();
 
     auto func = to_mathematical_function_type(f.type);
     for (const auto &t: func.domain()) {
@@ -95,15 +99,19 @@ synth_fun_commandt add_grammar(const synth_fun_commandt &f) {
             UNEXPECTEDCASE("bitvector synthesis not supported yet");
     }
 
-    grammar.nt_ids.push_back(nonterminalID(func.codomain()));
-    grammar.production_rules = production_rules(f);
+    f.grammar.nt_ids.push_back(nonterminalID(func.codomain()));
+    f.grammar.production_rules = production_rules(f);
 
-    for (const auto &r: grammar.production_rules) {
+    for (const auto &r: f.grammar.production_rules) {
         if (r.first == nonterminalID(func.codomain()))
             continue;
-        grammar.nt_ids.push_back(r.first);
+        f.grammar.nt_ids.push_back(r.first);
     }
 
-    result.grammar = grammar;
-    return result;
+}
+
+void add_grammar_to_problem(sygus_problemt &problem) {
+    for (auto &f: problem.synthesis_functions) {
+        add_grammar(f);
+    }
 }

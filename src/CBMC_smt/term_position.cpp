@@ -3,7 +3,6 @@
 //
 
 #include "term_position.h"
-#include "problem.h"
 
 #include <iostream>
 
@@ -42,7 +41,7 @@ get_function_occurrences_aux(const exprt &expr, const term_positiont &root) {
 
 
 std::multimap<irep_idt, term_positiont>
-get_function_occurrences(const problemt &problem) {
+get_function_occurrences(const smt_problemt &problem) {
     std::multimap<irep_idt, term_positiont> result_map;
 
     for (size_t i = 0; i < problem.assertions.size(); ++i) {
@@ -66,7 +65,7 @@ exprt get_term_copy_at_position(term_positiont pos, const exprt &term) {
 }
 
 
-exprt get_term_copy_at_position_in_problem(const term_positiont &pos, const problemt &prob) {
+exprt get_term_copy_at_position_in_problem(const term_positiont &pos, const smt_problemt &prob) {
     return get_term_copy_at_position(pos, prob.assertions[pos.assertion]);
 }
 
