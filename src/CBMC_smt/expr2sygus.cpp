@@ -170,33 +170,7 @@ std::string convert_expr(const exprt &expr) {
         const bitnot_exprt &bitnot_expr = to_bitnot_expr(expr);
 
         if (bitnot_expr.type().id() == ID_vector) {
-            // if(use_datatypes)
-            // {
-            //   const std::string &smt_typename = datatype_map.at(bitnot_expr.type());
-
-            //   // extract elements
-            //   const vector_typet &vector_type = to_vector_type(bitnot_expr.type());
-
-            //   mp_integer size = numeric_cast_v<mp_integer>(vector_type.size());
-
-            //   result+= "(let ((?vectorop ";
-            //   result += convert_expr(bitnot_expr.op());
-            //   result+= ")) ";
-
-            //   result+= "(mk-" + smt_typename;
-
-            //   typet index_type=vector_type.size().type();
-
-            //   // do bitnot component-by-component
-            //   for(mp_integer i=0; i!=size; ++i)
-            //   {
-            //     result+= " (bvnot (" + smt_typename + "." + (size-i-1)
-            //         + " ?vectorop))";
-            //   }
-
-            //   result+= "))"; // mk-, let
-            // }
-            // else
+           
             //   SMT2_TODO("bitnot for vectors");
         } else {
             result += "(bvnot ";
@@ -270,9 +244,9 @@ std::string convert_expr(const exprt &expr) {
         DATA_INVARIANT(
                 expr.type().id() == ID_bool,
                 "logical and, or, and xor expressions should have Boolean type");
-        DATA_INVARIANT(
-                expr.operands().size() >= 2,
-                "logical and, or, and xor expressions should have at least two operands");
+        // DATA_INVARIANT(
+        //         expr.operands().size() >= 2,
+        //         "logical and, or, and xor expressions should have at least two operands");
 
         result += "(" + id2string(expr.id());
         forall_operands(it, expr) {
@@ -369,6 +343,13 @@ std::string convert_expr(const exprt &expr) {
         result += convert_floatbv_div(to_ieee_float_op_expr(expr));
     } else if (expr.id() == ID_mod) {
         result += convert_mod(to_mod_expr(expr));
+    } else if (expr.id() == ID_euclidean_mod)
+    {
+        result += "(mod ";
+        result += convert_expr(to_euclidean_mod_expr(expr).op0());
+        result += ' ';
+        result+= convert_expr(to_euclidean_mod_expr(expr).op1());
+        result += ')';
     } else if (expr.id() == ID_mult) {
         result += convert_mult(to_mult_expr(expr));
     } else if (expr.id() == ID_floatbv_mult) {
@@ -1416,14 +1397,14 @@ std::string convert_div(const div_exprt &expr) {
         // to ID_floatbv_div during symbolic execution, adding
         // the rounding mode.  See smt2_convt::convert_floatbv_div.
         UNREACHABLE;
-    } else if (expr.type().id() == ID_real) {
+    } else if (expr.type().id() == ID_real || expr.type().id()==ID_integer) {
         result = "(/ ";
         result += convert_expr(expr.op0());
         result += " ";
         result += convert_expr(expr.op1());
         result += ")";
 
-    } else
+    } else 
         UNEXPECTEDCASE("unsupported type for /: " + expr.type().id_string());
     return result;
 }
@@ -1997,7 +1978,7 @@ std::string convert_floatbv_typecast(const floatbv_typecast_exprt &expr) {
 }
 
 std::string build_sygus_query(const sygus_problemt &problem) {
-    return build_sygus_query(problem, true);
+    return build_sygus_query(problem, false);
 }
 
 
@@ -2035,6 +2016,10 @@ std::string build_sygus_query(const sygus_problemt &problem, bool add_default_gr
 
     for (const auto &c: problem.constraints) {
         query += "(constraint " + expr2sygus(c) + ")\n";
+
+    }
+    for (const auto &c: problem.assumptions) {
+        query += "(assume " + expr2sygus(c) + ")\n";
 
     }
     query += "(check-synth)\n";
