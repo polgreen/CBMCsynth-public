@@ -172,7 +172,6 @@ void parsert::setup_commands()
     const irep_idt id = smt2_tokenizer.get_buffer();
 
     const auto signature = function_signature_definition();
-    std::cout<<"parsed function signature and id "<< id2string(id)<<std::endl;
 
     // put the parameters into the scope and take care of hiding
     std::vector<std::pair<irep_idt, idt>> hidden_ids;
