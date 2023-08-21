@@ -125,7 +125,7 @@ int sygus_frontend(const cmdlinet &cmdline)
   {
     for (auto &f : problem.synthesis_functions)
     {
-      message.status()<<"adding default grammars to sygus problems"<<messaget::eom;
+      message.debug()<<"adding default grammars to sygus problems"<<messaget::eom;
       add_grammar(f);
     }
     // replace all grammars in the sygus problem with default
@@ -134,13 +134,13 @@ int sygus_frontend(const cmdlinet &cmdline)
   if (cmdline.isset("dump-problem-as-smt"))
   {
     // dump the sygus problem as an smt problem
-    message.status() << "Dumping problem as smt\n *************************\n" << messaget::eom;
+    message.debug() << "Dumping problem as smt\n *************************\n" << messaget::eom;
     print_sygus_as_smt(problem, message.status());
     message.status()<<messaget::eom; //flush
   }
   if (cmdline.isset("dump-problem"))
   {
-    message.status()<<"Dumping problem\n *************************\n "<<messaget::eom;
+    message.debug()<<"Dumping problem\n *************************\n "<<messaget::eom;
     print_sygus_problem(problem, message.status());
     message.status()<<messaget::eom; //flush
     // just print the problem
