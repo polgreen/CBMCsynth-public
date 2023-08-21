@@ -1002,7 +1002,7 @@ std::string fun_def(const symbol_exprt &fun, const exprt &def) {
 }
 
 
-std::string synth_fun_dec(const synth_fun_commandt &f) {
+std::string synth_fun_dec(const synth_funt &f) {
     std::string result = "(synth-fun " + clean_id(f.id);
 
     if (f.type.id() != ID_mathematical_function) {

@@ -84,7 +84,7 @@ std::optional<sygus_problemt> create_training_data(const smt_problemt &smt_probl
     ss << "Solution: " << format(lgg);
     sygus_problem.comments.push_back(ss.str());
 
-    synth_fun_commandt synth_fun;
+    synth_funt synth_fun;
     synth_fun.id = to_symbol_expr(synth_fun_app.function()).get_identifier();
     synth_fun.type = synth_fun_app.function_type();
     // synth_fun.parameters = irep_args;
@@ -232,8 +232,6 @@ int create_synthesis_problem(const cmdlinet &cmdline) {
     }
 
     message_handler.set_verbosity(v);
-
-
     create_and_write_problem(input, output_file, message);
 
 

@@ -17,7 +17,7 @@ struct syntactic_templatet {
     std::map<irep_idt, std::vector<exprt>> production_rules;
 };
 
-class synth_fun_commandt {
+class synth_funt {
 
 public:
     irep_idt id;
@@ -32,7 +32,7 @@ public:
 
     std::vector<std::string> comments;
 
-    std::vector<synth_fun_commandt> synthesis_functions;
+    std::vector<synth_funt> synthesis_functions;
 
     std::string filename;
     std::vector<exprt> constraints;
@@ -44,8 +44,8 @@ public:
 
 };
 
-synth_fun_commandt copy_fun_add_grammar(const synth_fun_commandt &f);
-void add_grammar(synth_fun_commandt &f);
+synth_funt copy_fun_add_grammar(const synth_funt &f);
+void add_grammar(synth_funt &f);
 
 
 #endif //SRC_SYGUS_PROBLEM_H

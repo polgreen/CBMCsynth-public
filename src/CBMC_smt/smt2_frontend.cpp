@@ -180,10 +180,13 @@ int smt2_frontend(const cmdlinet &cmdline)
 
   message_handler.set_verbosity(v);
   parsert parser(in);
+  smt_problemt problem;
   // parse the problem
   try
   {
     parser.parse();
+    problem = parser.get_smt_problem();
+
   }
   catch (const parsert::smt2_errort &e)
   {
@@ -191,8 +194,6 @@ int smt2_frontend(const cmdlinet &cmdline)
                     << e.what() << messaget::eom;
     return 20;
   }
-
-  auto problem = parser.get_smt_problem();
 
   if (cmdline.isset("dump-problem"))
   {
@@ -224,6 +225,10 @@ int smt2_frontend(const cmdlinet &cmdline)
     }
 
     message.status() << messaget::eom; // flush
+  }
+  else
+  {
+    message.status() <<"No command line option given for SMT files  \n"<<messaget::eom;
   }
 
   return 1;

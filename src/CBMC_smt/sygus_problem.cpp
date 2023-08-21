@@ -40,7 +40,7 @@ irep_idt nonterminalID(const typet &type) {
 }
 
 
-std::map<irep_idt, std::vector<exprt>> production_rules(const synth_fun_commandt &f) {
+std::map<irep_idt, std::vector<exprt>> production_rules(const synth_funt &f) {
     irep_idt int_id = nonterminalID(integer_typet());
     irep_idt bool_id = nonterminalID(bool_typet());
     symbol_exprt NT_integer = symbol_exprt(int_id, integer_typet());
@@ -83,13 +83,13 @@ std::map<irep_idt, std::vector<exprt>> production_rules(const synth_fun_commandt
 }
 
 
-synth_fun_commandt copy_fun_add_grammar(const synth_fun_commandt &f) {
-    synth_fun_commandt result = f;
+synth_funt copy_fun_add_grammar(const synth_funt &f) {
+    synth_funt result = f;
     add_grammar(result);
     return result;
 }
 
-void add_grammar(synth_fun_commandt &f) {
+void add_grammar(synth_funt &f) {
     f.grammar.nt_ids.clear();
     f.grammar.production_rules.clear();
 

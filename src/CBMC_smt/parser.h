@@ -20,7 +20,7 @@ public:
     exprt::operandst assumptions;
 
     // store synth funcs
-    smt2_parsert::id_mapt synthesis_functions;
+    std::map<irep_idt, synth_funt> synthesis_functions;
     // might contain information from where the problem was originally
     std::vector<std::string> set_info_cmds;
 
@@ -36,7 +36,8 @@ public:
 
 protected:
     void setup_commands();
-    void add_synth_fun_id(irep_idt id, exprt expr);
+    void add_synth_fun_id(irep_idt id, 
+    const smt2_parsert::signature_with_parameter_idst &sig, const syntactic_templatet& grammar);
     void build_smt_problem();
     void build_sygus_problem();
     syntactic_templatet parse_grammar();

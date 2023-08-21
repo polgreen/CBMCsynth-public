@@ -34,7 +34,7 @@ int test_cvc5(const cmdlinet &cmdline)
   problem.free_var.push_back(symbol_exprt("x", integer_typet()));
   problem.free_var.push_back(symbol_exprt("y", integer_typet()));
   // construct synth fun command
-  synth_fun_commandt synth_fun;
+  synth_funt synth_fun;
   synth_fun.id = "f";
   std::vector<typet> domain;
   domain.push_back(integer_typet());
@@ -106,10 +106,12 @@ int sygus_frontend(const cmdlinet &cmdline)
 
   message_handler.set_verbosity(v);
   parsert parser(in);
+  sygus_problemt problem;
   // parse the problem
   try
   {
     parser.parse();
+    problem = parser.get_sygus_problem();
   }
   catch (const parsert::smt2_errort &e)
   {
@@ -118,31 +120,34 @@ int sygus_frontend(const cmdlinet &cmdline)
     return 20;
   }
 
-  auto problem = parser.get_sygus_problem();
-
   // pre-processing
   if (cmdline.isset("add-default-grammar"))
   {
     for (auto &f : problem.synthesis_functions)
     {
+      message.status()<<"adding default grammars to sygus problems"<<messaget::eom;
       add_grammar(f);
     }
     // replace all grammars in the sygus problem with default
   }
-
   // do stuff
   if (cmdline.isset("dump-problem-as-smt"))
   {
     // dump the sygus problem as an smt problem
+    message.status() << "Dumping problem as smt\n *************************\n" << messaget::eom;
     print_sygus_as_smt(problem, message.status());
+    message.status()<<messaget::eom; //flush
   }
   if (cmdline.isset("dump-problem"))
   {
+    message.status()<<"Dumping problem\n *************************\n "<<messaget::eom;
     print_sygus_problem(problem, message.status());
+    message.status()<<messaget::eom; //flush
     // just print the problem
   }
   if (cmdline.isset("solve-sygus"))
   {
+    message.status()<<"Solving sygus problem with CVC5"<<messaget::eom;
     // we solve with cvc5
     cvc5_syntht cvc5_synth(message.get_message_handler());
     decision_proceduret::resultt res = cvc5_synth(problem);

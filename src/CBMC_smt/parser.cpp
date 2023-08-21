@@ -92,27 +92,27 @@ syntactic_templatet parsert::parse_grammar()
   return result;
 }
 
-void parsert::add_synth_fun_id(irep_idt id, exprt expr)
+void parsert::add_synth_fun_id(irep_idt id, 
+const smt2_parsert::signature_with_parameter_idst &sig, const syntactic_templatet& grammar)
 {
-  if (id_map.find(id) != id_map.end())
-  {
-    throw error() << "identifier '" << id << "' defined twice";
-  }
-  if (!synthesis_functions
-           .emplace(
-               std::piecewise_construct,
-               std::forward_as_tuple(id),
-               std::forward_as_tuple(idt::VARIABLE, std::move(expr)))
-           .second)
-  {
-    // id already used
-    throw error() << "identifier '" << id << "' defined twice";
-  }
+  // put in ID map
+  add_unique_id(id, exprt(ID_nil, sig.type));
+  // and put in synthesis function list
+  synth_funt f;
+  f.grammar = grammar;
+  f.id = id;
+  f.type = sig.type;
+  f.parameters = sig.parameters;
+  synthesis_functions[id] = f;
 }
 
 // I can add things to the CBMC parser by adding to the commands.
 void parsert::setup_commands()
 {
+  commands["check-synth"] = [this] {
+    exit=true;
+  };
+
   commands["assert"] = [this]()
   {
     exprt e = expression();
@@ -120,6 +120,15 @@ void parsert::setup_commands()
     {
       // expand_function_applications(e);
       assertions.push_back(e);
+    }
+  };
+  commands["constraint"] = [this]()
+  {
+    exprt e = expression();
+    if (e.is_not_nil())
+    {
+      // expand_function_applications(e);
+      constraints.push_back(e);
     }
   };
   commands["assume"] = [this]()
@@ -160,9 +169,10 @@ void parsert::setup_commands()
     if (next_token() != smt2_tokenizert::SYMBOL)
       throw error("expected a symbol after synth-fun");
 
-    // const irep_idt id = smt2_tokenizer.get_buffer();
+    const irep_idt id = smt2_tokenizer.get_buffer();
 
     const auto signature = function_signature_definition();
+    std::cout<<"parsed function signature and id "<< id2string(id)<<std::endl;
 
     // put the parameters into the scope and take care of hiding
     std::vector<std::pair<irep_idt, idt>> hidden_ids;
@@ -180,7 +190,7 @@ void parsert::setup_commands()
     }
 
     // now parse grammar if there is one
-
+    syntactic_templatet grammar = parse_grammar();
 
     // remove parameter ids
     for (auto &id : signature.parameters)
@@ -191,10 +201,7 @@ void parsert::setup_commands()
       id_map.insert(std::move(hidden_id));
 
     // create the synthesis function
-    // add_synth_fun_id(id, exprt(ID_nil, signature));
-
-    if (next_token() != smt2_tokenizert::CLOSE)
-      throw error("expected ')' at end of synth-fun declaration");
+     add_synth_fun_id(id, signature, grammar);
   };
 }
 
@@ -256,14 +263,28 @@ void parsert::build_sygus_problem()
   for (const auto &cmd : set_info_cmds)
     sygus_problem.comments.push_back(cmd);
 
+  for(const auto &f: synthesis_functions)
+  {
+    sygus_problem.synthesis_functions.push_back(f.second);
+  }
+
 
   // identify the free variables and defined functions in the problem
   for (const auto &id : id_map)
   {
     if (id.second.definition.is_nil() && id.second.kind == smt2_parsert::idt::VARIABLE)
-      sygus_problem.free_var.push_back(symbol_exprt(id.first, id.second.type));
+    {
+      if(synthesis_functions.find(id.first)==synthesis_functions.end())
+      {
+        if(id.second.type.id()==ID_mathematical_function)
+          throw error("SyGuS problem cannot contain n-ary uninterpreted functions");
+        sygus_problem.free_var.push_back(symbol_exprt(id.first, id.second.type));
+      }
+    }
     else
+    {
       sygus_problem.defined_functions[symbol_exprt(id.first, id.second.type)] = id.second.definition;
+    }
   }
 }
 

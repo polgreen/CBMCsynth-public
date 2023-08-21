@@ -18,7 +18,9 @@
   "(debug)"             \
   "(test-cvc5)"         \
   "(add-grammar-sygus)" \
-  "(create-training-data)"
+  "(create-training-data)" \
+  "(dump-problem)" \
+  "(dump-problem-as-smt)" \
 
 /// File ending of SMT2 files. Used to determine the language frontend that
 /// shall be used.
@@ -74,10 +76,11 @@ int main(int argc, const char *argv[])
       test_cvc5(cmdline);
       return 0;
     }
-    if (cmdline.isset("create-training-data"))
-    {
-      return create_synthesis_problem(cmdline);
-    }
+    // if (cmdline.isset("create-training-data") || cmdline.args.size()==1)
+    // {
+    //   std::cout<<"Creating training data\n";
+    //   return create_synthesis_problem(cmdline);
+    // }
 
     // all other options need an input file
     if (has_suffix(cmdline.args.back(), SYGUS_FILE_ENDING))
