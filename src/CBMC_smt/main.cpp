@@ -17,7 +17,7 @@
   "(verbosity): "       \
   "(debug)"             \
   "(test-cvc5)"         \
-  "(add-grammar-sygus)" \
+  "(add-default-grammar)" \
   "(create-training-data)" \
   "(dump-problem)" \
   "(dump-problem-as-smt)" \
@@ -49,6 +49,8 @@ void help(std::ostream &out)
          "--create-training-data           create training data from smt2 file \n"
          "--test-cvc5                      test cvc5 interface\n"
          "--add-default-grammar            replace all synthesis function grammars with default\n"
+         "--dump-problem                   print problem\n"
+         "--dump-problem-as-smt            use quantifiers to print a sygus problem as an smt problem\n"
          "\n"
          "\n";
 }
@@ -79,7 +81,6 @@ int main(int argc, const char *argv[])
     // this doesn't preserve the previous behaviour
     if (cmdline.isset("create-training-data"))
     {
-      std::cout<<"Creating training data\n";
       return create_synthesis_problem(cmdline);
     }
 
