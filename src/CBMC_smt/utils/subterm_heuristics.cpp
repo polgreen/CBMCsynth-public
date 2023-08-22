@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "term_position.h"
-#include "anti_unification.h"
+#include "../unification/anti_unification.h"
 #include "util.h"
 
 #include <util/namespace.h>

@@ -1,6 +1,6 @@
 #include "cvc5_synth.h"
-#include "expr2sygus.h"
-#include "parser.h"
+#include "utils/expr2sygus.h"
+#include "parsing/parser.h"
 
 #include <fstream>
 #include <solvers/decision_procedure.h>

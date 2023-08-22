@@ -8,7 +8,7 @@
 
 #include <vector>
 #include "term_position.h"
-#include "smt_problem.h"
+#include "../smt_problem.h"
 
 
 /**

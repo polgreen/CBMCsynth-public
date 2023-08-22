@@ -4,10 +4,6 @@
 
 #include "sygus_problem.h"
 
-
-#include "parser.h"
-#include "printing_utils.h"
-
 #include <fstream>
 #include <iostream>
 #include <set>
@@ -24,7 +20,7 @@
 
 #include <solvers/smt2/smt2_dec.h>
 #include "smt2_frontend.h"
-#include "term_position.h"
+// #include "term_position.h"
 
 #define UNEXPECTEDCASE(S) PRECONDITION_WITH_DIAGNOSTICS(false, S);
 

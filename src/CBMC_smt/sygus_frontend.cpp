@@ -1,9 +1,9 @@
 #include "sygus_frontend.h"
 #include "sygus_problem.h"
 #include "cvc5_synth.h"
-#include "util.h"
-#include "parser.h"
-#include "printing_utils.h"
+#include "utils/util.h"
+#include "parsing/parser.h"
+#include "utils/printing_utils.h"
 #include <util/format_expr.h>
 #include <util/std_expr.h>
 #include <util/cout_message.h>

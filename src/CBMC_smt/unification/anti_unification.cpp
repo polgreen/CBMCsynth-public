@@ -14,9 +14,7 @@ UUIDv4::UUIDGenerator<std::mt19937_64> uuidGenerator;
 
 // Plotkin Anti-Unification
 std::pair<exprt, std::vector<symbol_exprt>> compute_lgg(const std::vector<exprt> &terms) {
-    if (terms.empty()) {
-        throw default_exception("Empty list of terms for LGG calculation."); // TODO logging
-    }
+    INVARIANT(!terms.empty(),"Empty list of terms for LGG calculation.");
 
     // check if all the terms have the same root symbol
     for (const exprt &t: terms) {

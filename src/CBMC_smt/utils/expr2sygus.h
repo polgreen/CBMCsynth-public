@@ -4,7 +4,7 @@
 #include <util/expr.h>
 #include <util/floatbv_expr.h>
 #include <iostream>
-#include "sygus_problem.h"
+#include "../sygus_problem.h"
 
 enum class wheret {
     BEGIN, END

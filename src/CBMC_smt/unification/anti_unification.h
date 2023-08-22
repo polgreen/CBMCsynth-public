@@ -10,7 +10,7 @@
 #include <map>
 #include <tuple>
 #include <string>
-#include "smt_problem.h"
+#include "../utils/util.h"
 #include <deque>
 #include <exception>
 

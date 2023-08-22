@@ -1,8 +1,8 @@
 #ifndef __PRINTING_UTILS_H__
 #define __PRINTING_UTILS_H__
 
-#include "smt_problem.h"
-#include "sygus_problem.h"
+#include "../smt_problem.h"
+#include "../sygus_problem.h"
 #include <fstream>
 
 void print_smt_problem(const smt_problemt &problem, std::ostream &out);

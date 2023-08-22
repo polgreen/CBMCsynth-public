@@ -6,11 +6,11 @@ Author: Elizabeth Polgreen, epolgreen@gmail.com
 
 \*******************************************************************/
 
-#include "parser.h"
-#include "printing_utils.h"
+#include "utils/printing_utils.h"
 #include "sygus_problem.h"
 #include "cvc5_synth.h"
-#include "util.h"
+#include "utils/util.h"
+#include "parsing/parser.h"
 
 #include <fstream>
 #include <iostream>

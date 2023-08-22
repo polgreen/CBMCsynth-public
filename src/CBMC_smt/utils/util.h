@@ -19,32 +19,7 @@
 #include <util/expr.h>
 #include <util/mathematical_expr.h>
 
-#include "constants.h"
-
-class default_exception : std::exception {
-
-    std::string msg;
-
-public:
-
-    explicit default_exception(std::string message) : msg{std::move(message)} {}
-
-    std::string what() { return msg; }
-
-};
-
-class solver_timeout : std::exception {
-
-    std::string msg;
-
-public:
-
-    explicit solver_timeout(std::string message) : msg{std::move(message)} {}
-
-    std::string what() { return msg; }
-
-};
-
+#include "../constants.h"
 
 bool root_equality(const exprt &a, const exprt &b);
 

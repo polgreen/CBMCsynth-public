@@ -11,7 +11,7 @@
 #include <map>
 #include <tuple>
 #include <string>
-#include "smt_problem.h"
+#include "../smt_problem.h"
 #include <deque>
 #include <exception>
 

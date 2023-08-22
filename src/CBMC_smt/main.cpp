@@ -8,7 +8,6 @@
 
 #include "smt2_frontend.h"
 #include "sygus_frontend.h"
-#include "create_training_data.h"
 #include "constants.h"
 
 #include <iostream>
@@ -73,17 +72,12 @@ int main(int argc, const char *argv[])
   }
   try
   {
+    // debugging options go here
     if (cmdline.isset("test-cvc5"))
     {
       test_cvc5(cmdline);
       return 0;
     }
-    // this doesn't preserve the previous behaviour
-    if (cmdline.isset("create-training-data"))
-    {
-      return create_synthesis_problem(cmdline);
-    }
-
     // all other options need an input file
     if (has_suffix(cmdline.args.back(), SYGUS_FILE_ENDING))
     {

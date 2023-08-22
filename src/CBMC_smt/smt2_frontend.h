@@ -15,7 +15,7 @@
 #include <solvers/smt2/smt2_dec.h>
 
 #include "smt_problem.h"
-#include "parser.h"
+#include "parsing/parser.h"
 
 
 int smt2_frontend(const cmdlinet &);

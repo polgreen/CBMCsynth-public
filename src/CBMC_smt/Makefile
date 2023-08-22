@@ -1,6 +1,8 @@
-SRC=main.cpp smt2_frontend.cpp sygus_frontend.cpp parser.cpp printing_utils.cpp printing_utils.h \
-term_position.cpp anti_unification.cpp create_training_data.cpp sygus_problem.cpp \
- smt_problem.cpp expr2sygus.cpp unification.cpp util.cpp subterm_heuristics.cpp cvc5_synth.cpp
+SRC=main.cpp smt2_frontend.cpp sygus_frontend.cpp \
+parsing/parser.cpp utils/printing_utils.cpp utils/util.cpp \
+utils/term_position.cpp unification/anti_unification.cpp  sygus_problem.cpp \
+ smt_problem.cpp utils/expr2sygus.cpp unification/unification.cpp \
+ utils/subterm_heuristics.cpp cvc5_synth.cpp
 
 OBJ+= ../../$(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \
       ../../$(CPROVER_DIR)/src/assembler/assembler$(LIBEXT) \

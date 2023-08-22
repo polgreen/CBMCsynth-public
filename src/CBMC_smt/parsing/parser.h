@@ -2,8 +2,8 @@
 #define PARSER_CPP
 
 #include <solvers/smt2/smt2_parser.h>
-#include "sygus_problem.h"
-#include "smt_problem.h"
+#include "../sygus_problem.h"
+#include "../smt_problem.h"
 
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
