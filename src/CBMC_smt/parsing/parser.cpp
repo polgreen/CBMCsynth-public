@@ -92,6 +92,37 @@ syntactic_templatet parsert::parse_grammar()
   return result;
 }
 
+smt2_parsert::signature_with_parameter_idst parsert::inv_function_signature()
+{
+  if(smt2_tokenizer.next_token()!=smt2_tokenizert::OPEN)
+    throw error("expected '(' at beginning of signature");
+
+  mathematical_function_typet::domaint domain;
+  std::vector<irep_idt> parameter_ids;
+
+  while(smt2_tokenizer.peek()!=smt2_tokenizert::CLOSE)
+  {
+    if(smt2_tokenizer.next_token()!=smt2_tokenizert::OPEN)
+      throw error("expected '(' at beginning of parameter");
+
+    if(smt2_tokenizer.next_token()!=smt2_tokenizert::SYMBOL)
+      throw error("expected symbol in parameter");
+
+    const irep_idt id=smt2_tokenizer.get_buffer();
+    const auto parameter_type = sort();
+    domain.push_back(parameter_type);
+    parameter_ids.push_back(id);
+
+    if(smt2_tokenizer.next_token()!=smt2_tokenizert::CLOSE)
+      throw error("expected ')' at end of parameter");
+  }
+
+  smt2_tokenizer.next_token(); // eat the ')'
+
+  auto type = mathematical_function_typet(domain, bool_typet());
+  return signature_with_parameter_idst(type, parameter_ids);
+}
+
 void parsert::add_synth_fun_id(irep_idt id, 
 const smt2_parsert::signature_with_parameter_idst &sig, const syntactic_templatet& grammar)
 {
@@ -162,6 +193,64 @@ void parsert::setup_commands()
       info += " " + s;
     }
     set_info_cmds.push_back(info);
+
+  {
+    if(smt)
+      throw error("SMT problem does not support invariant synthesis");
+    if (next_token() != smt2_tokenizert::SYMBOL)
+      throw error("expected a symbol after synth-fun");
+
+    const irep_idt id = smt2_tokenizer.get_buffer();
+
+    const auto signature = inv_function_signature();
+
+    // put the parameters into the scope and take care of hiding
+    std::vector<std::pair<irep_idt, idt>> hidden_ids;
+
+    for (const auto &pair : signature.ids_and_types())
+    {
+      auto insert_result =
+          id_map.insert({pair.first, idt{idt::PARAMETER, pair.second}});
+      if (!insert_result.second) // already there
+      {
+        auto &id_entry = *insert_result.first;
+        hidden_ids.emplace_back(id_entry.first, std::move(id_entry.second));
+        id_entry.second = idt{idt::PARAMETER, pair.second};
+      }
+    }
+    // now parse grammar if there is one (would be surprising, but possible)
+    syntactic_templatet grammar = parse_grammar();
+
+    // remove parameter ids
+    for (auto &id : signature.parameters)
+      id_map.erase(id);
+
+    // restore the hidden ids, if any
+    for (auto &hidden_id : hidden_ids)
+      id_map.insert(std::move(hidden_id));
+
+    // create the synthesis function
+     add_synth_fun_id(id, signature, grammar);
+
+
+
+  };
+
+  commands["inv-constraint"] = [this] {
+    if(smt)
+      throw error("SMT problem does not support invariant synthesis");
+    if(next_token() != smt2_tokenizert::SYMBOL)
+      throw error() << "expected a symbol for invariant in inv-constraint" ;
+    sygus_problem.invariant = smt2_tokenizer.get_buffer();
+    if(next_token() != smt2_tokenizert::SYMBOL)
+      throw error() << "expected a symbol for pre in inv-constraint" ;
+    sygus_problem.precondition=smt2_tokenizer.get_buffer();
+    if(next_token() != smt2_tokenizert::SYMBOL)
+      throw error() << "expected a symbol for trans in inv-constraint" ;
+    sygus_problem.transition_relation=smt2_tokenizer.get_buffer();
+    if(next_token() != smt2_tokenizert::SYMBOL)
+      throw error() << "expected a symbol for post in inv-constraint" ;
+   sygus_problem.postcondition=smt2_tokenizer.get_buffer();
   };
 
   commands["synth-fun"] = [this]()

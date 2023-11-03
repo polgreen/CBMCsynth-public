@@ -38,6 +38,7 @@ protected:
     void setup_commands();
     void add_synth_fun_id(irep_idt id, 
     const smt2_parsert::signature_with_parameter_idst &sig, const syntactic_templatet& grammar);
+    smt2_parsert::signature_with_parameter_idst inv_function_signature();
     void build_smt_problem();
     void build_sygus_problem();
     syntactic_templatet parse_grammar();
