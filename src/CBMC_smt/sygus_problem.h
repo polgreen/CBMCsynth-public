@@ -40,6 +40,8 @@ public:
     std::map<symbol_exprt, exprt> defined_functions;
     std::vector<symbol_exprt> free_var;
 
+    // only used for invariant problems
+    irep_idt inv_id, pre_id, trans_id, post_id;
     std::string logic;
 
 };

@@ -111,3 +111,4 @@ void add_grammar_to_problem(sygus_problemt &problem) {
         add_grammar(f);
     }
 }
+

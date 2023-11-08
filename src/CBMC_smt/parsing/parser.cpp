@@ -2,6 +2,7 @@
 #include <util/replace_symbol.h>
 #include <iostream>
 
+
 std::vector<exprt> parsert::GTerm_seq(const symbol_exprt &nonterminal)
 {
   irep_idt id;
@@ -150,7 +151,7 @@ void parsert::setup_commands()
     if (e.is_not_nil())
     {
       // expand_function_applications(e);
-      assertions.push_back(e);
+      smt_problem.assertions.push_back(e);
     }
   };
   commands["constraint"] = [this]()
@@ -159,7 +160,7 @@ void parsert::setup_commands()
     if (e.is_not_nil())
     {
       // expand_function_applications(e);
-      constraints.push_back(e);
+      sygus_problem.constraints.push_back(e);
     }
   };
   commands["assume"] = [this]()
@@ -168,7 +169,7 @@ void parsert::setup_commands()
     if (e.is_not_nil())
     {
       // expand_function_applications(e);
-      assumptions.push_back(e);
+      sygus_problem.assumptions.push_back(e);
     }
   };
   commands["set-logic"] = [this]()
@@ -177,7 +178,8 @@ void parsert::setup_commands()
       throw error("expected a string after set-logic");
 
     const auto s = smt2_tokenizer.get_buffer();
-    logic = s;
+    logic=s;
+   
   };
   commands["set-info"] = [this]()
   {
@@ -192,11 +194,11 @@ void parsert::setup_commands()
       const auto s = smt2_tokenizer.get_buffer();
       info += " " + s;
     }
-    set_info_cmds.push_back(info);
+     set_info_cmds.push_back(info);
+  };
 
+  commands["synth-inv"] = [this]()
   {
-    if(smt)
-      throw error("SMT problem does not support invariant synthesis");
     if (next_token() != smt2_tokenizert::SYMBOL)
       throw error("expected a symbol after synth-fun");
 
@@ -231,26 +233,22 @@ void parsert::setup_commands()
 
     // create the synthesis function
      add_synth_fun_id(id, signature, grammar);
-
-
-
   };
 
   commands["inv-constraint"] = [this] {
-    if(smt)
-      throw error("SMT problem does not support invariant synthesis");
+
     if(next_token() != smt2_tokenizert::SYMBOL)
       throw error() << "expected a symbol for invariant in inv-constraint" ;
-    sygus_problem.invariant = smt2_tokenizer.get_buffer();
+    sygus_problem.inv_id= smt2_tokenizer.get_buffer();
     if(next_token() != smt2_tokenizert::SYMBOL)
       throw error() << "expected a symbol for pre in inv-constraint" ;
-    sygus_problem.precondition=smt2_tokenizer.get_buffer();
+    sygus_problem.pre_id=smt2_tokenizer.get_buffer();
     if(next_token() != smt2_tokenizert::SYMBOL)
       throw error() << "expected a symbol for trans in inv-constraint" ;
-    sygus_problem.transition_relation=smt2_tokenizer.get_buffer();
+    sygus_problem.trans_id=smt2_tokenizer.get_buffer();
     if(next_token() != smt2_tokenizert::SYMBOL)
       throw error() << "expected a symbol for post in inv-constraint" ;
-   sygus_problem.postcondition=smt2_tokenizer.get_buffer();
+    sygus_problem.post_id=smt2_tokenizer.get_buffer();
   };
 
   commands["synth-fun"] = [this]()
@@ -293,18 +291,19 @@ void parsert::setup_commands()
   };
 }
 
+
+
 void parsert::build_smt_problem()
 {
-  if (constraints.size() != 0 || assumptions.size() != 0 || synthesis_functions.size() != 0)
-    throw error("SMT problem cannot contain constraints or assumptions or synthess functions");
+  if (smt_problem.assertions.size() == 0)
+    throw error("SMT problem has no assertions");
 
-  smt_problem.logic = logic;
-
-  for (const auto &a : assertions)
-    smt_problem.assertions.push_back(a);
-
-  for (const auto &cmd : set_info_cmds)
-    smt_problem.comments.push_back(cmd);
+  if(!sygus_problem.constraints.empty() || synthesis_functions.size()!=0 || sygus_problem.inv_id!="")
+    std::cout<< "Parser found SyGuS constraints and/or synthesis functions, ignoring these to build SMT problem"<<std::endl;
+  
+  smt_problem.logic=logic;
+  for(const auto &c: set_info_cmds)
+    smt_problem.comments.push_back(c);
 
   // identify the free variables and defined functions in the problem
   for (const auto &id : id_map)
@@ -336,26 +335,16 @@ sygus_problemt parsert::get_sygus_problem()
 
 void parsert::build_sygus_problem()
 {
-  if (assertions.size() != 0)
-    throw error("SyGuS problem cannot contain assertions");
   if (synthesis_functions.size() == 0)
     throw error("SyGuS problem has no synthesis functions");
 
-  sygus_problem.logic = logic;
-  for (const auto &a : constraints)
-    sygus_problem.constraints.push_back(a);
-
-  for (const auto &a : assumptions)
-    sygus_problem.assumptions.push_back(a);
-
-  for (const auto &cmd : set_info_cmds)
-    sygus_problem.comments.push_back(cmd);
-
   for(const auto &f: synthesis_functions)
-  {
     sygus_problem.synthesis_functions.push_back(f.second);
-  }
 
+  for(const auto &c: set_info_cmds)
+    sygus_problem.comments.push_back(c);
+
+  sygus_problem.logic=logic;
 
   // identify the free variables and defined functions in the problem
   for (const auto &id : id_map)
@@ -364,6 +353,7 @@ void parsert::build_sygus_problem()
     {
       if(synthesis_functions.find(id.first)==synthesis_functions.end())
       {
+        std::cout<<"looking for "<< id2string(id.first)<<std::endl;
         if(id.second.type.id()==ID_mathematical_function)
           throw error("SyGuS problem cannot contain n-ary uninterpreted functions");
         sygus_problem.free_var.push_back(symbol_exprt(id.first, id.second.type));
@@ -374,7 +364,79 @@ void parsert::build_sygus_problem()
       sygus_problem.defined_functions[symbol_exprt(id.first, id.second.type)] = id.second.definition;
     }
   }
+
+  if(sygus_problem.inv_id!="")
+    generate_inv_constraint();
 }
+
+
+lambda_exprt parsert::get_lambda(const irep_idt &id)
+{
+  auto it = id_map.find(id);
+  if(it == id_map.end())
+    throw error() << "undeclared function `" << id << '\'';
+  const auto &f = it->second;
+  if(f.definition.id() != ID_lambda)
+    throw error("invariant functions must have lambda type");
+  return to_lambda_expr(f.definition);
+}
+
+
+void parsert::generate_inv_constraint()
+{
+  const auto &pre_lambda = get_lambda(sygus_problem.pre_id);
+  const auto &trans_lambda = get_lambda(sygus_problem.trans_id);
+  const auto &post_lambda = get_lambda(sygus_problem.post_id);
+  symbol_exprt inv(sygus_problem.inv_id, pre_lambda.type());
+
+
+  exprt::operandst pre_arguments;
+  unsigned int count_start_point = sygus_problem.free_var.size();
+  for(const auto &v: pre_lambda.variables())
+  {
+    pre_arguments.push_back(v);
+    sygus_problem.free_var.push_back(v);
+  }
+  
+
+  exprt::operandst post_arguments;
+  unsigned int count=count_start_point;
+  for(const auto &v: post_lambda.variables())
+  {
+    post_arguments.push_back(v);
+    if(sygus_problem.free_var[count]!=v)
+      throw error("variables used by pre and post condition must have same names");
+    count++;
+  }
+
+  exprt::operandst trans_arguments;
+  count=count_start_point;
+  for(const auto &v: trans_lambda.variables())
+  {
+    trans_arguments.push_back(v);
+    if(count<post_arguments.size())
+    {
+      if(sygus_problem.free_var[count]!=v)
+        throw error("variables used by pre and post condition must have same names");
+    }
+    else
+      sygus_problem.free_var.push_back(v);
+    count++;
+  }
+
+  // invariant application:
+  function_application_exprt inv_app = function_application_exprt(inv, pre_arguments);
+  function_application_exprt invprime_app = function_application_exprt(inv, post_arguments);
+
+  // make constraints
+  // these currently expand the function applications
+  sygus_problem.constraints.push_back(implies_exprt(pre_lambda.application(pre_arguments), inv_app));
+  sygus_problem.constraints.push_back(implies_exprt(and_exprt(inv, trans_lambda.application(trans_arguments)), invprime_app));
+  sygus_problem.constraints.push_back(implies_exprt(post_lambda.application(post_arguments), inv_app));
+
+}
+
+
 
 void parsert::parse_model()
 {

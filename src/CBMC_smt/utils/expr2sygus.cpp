@@ -921,8 +921,8 @@ std::string clean_id(const irep_idt &id) {
     if (c_pos2 != std::string::npos && dest.rfind("synth::") == c_pos2) {
         dest.erase(0, c_pos2 + 7);
     }
-
-    return "|"+dest+"|";
+   // return "|"+dest+"|";
+   return dest;
 }
 
 void clean_symbols(exprt &expr) {
@@ -2009,7 +2009,7 @@ std::string build_sygus_query(const sygus_problemt &problem, bool add_default_gr
         query += fun_def(f.first, f.second) + "\n";
     }
 
-    // TODO: either you need to expand the fucntion applications,
+    // TODO: either you need to expand the function applications,
     // or figure out the dependencies between the functions
     // so they can be printed in the correct order
 

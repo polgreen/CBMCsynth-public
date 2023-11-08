@@ -35,6 +35,8 @@ public:
     sygus_problemt get_sygus_problem();
 
 protected:
+    enum invariant_variablet { PRIMED, UNPRIMED };
+
     void setup_commands();
     void add_synth_fun_id(irep_idt id, 
     const smt2_parsert::signature_with_parameter_idst &sig, const syntactic_templatet& grammar);
@@ -46,6 +48,10 @@ protected:
     std::vector<exprt> GTerm_seq(const symbol_exprt &nonterminal);
     smt_problemt smt_problem;
     sygus_problemt sygus_problem;
+    lambda_exprt get_lambda(const irep_idt &id);
+    void generate_inv_constraint();
+
+    
 };
 
 #endif
