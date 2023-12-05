@@ -100,7 +100,7 @@ void add_grammar(synth_funt &f)
   for (const auto &t : func.domain())
   {
     if (t.id() == ID_unsignedbv || t.id() == ID_signedbv)
-      UNEXPECTEDCASE("bitvector synthesis not supported yet");
+      UNEXPECTEDCASE("bitvector default grammar not supported yet");
   }
 
   f.grammar.nt_ids.push_back(nonterminalID(func.codomain()));
@@ -112,6 +112,22 @@ void add_grammar(synth_funt &f)
       continue;
     f.grammar.nt_ids.push_back(r.first);
   }
+  f.grammar.start = f.grammar.nt_ids[0];
+  f.grammar.start_type = func.codomain();
+}
+
+void add_grammar_weights(syntactic_templatet &g)
+{
+  g.production_rule_weights.clear();
+  for (const auto &r : g.production_rules)
+  {
+    std::vector<unsigned> weights;
+    for (unsigned int i=0; i<r.second.size(); i++)
+    {
+      weights.push_back(1);
+    }
+    g.production_rule_weights[r.first] = weights;
+  }
 }
 
 void add_grammar_to_problem(sygus_problemt &problem)
@@ -119,6 +135,7 @@ void add_grammar_to_problem(sygus_problemt &problem)
   for (auto &f : problem.synthesis_functions)
   {
     add_grammar(f);
+    add_grammar_weights(f.grammar);
   }
 }
 
@@ -137,4 +154,15 @@ std::vector<exprt> sygus_problemt::nnf_constraints() const
     result.push_back(copy);
   }
   return result;
+}
+
+syntactic_templatet sygus_problemt::get_grammar() const
+{
+  PRECONDITION_WITH_DIAGNOSTICS(synthesis_functions.size() == 1, "only one synthesis function supported");
+  if (synthesis_functions[0].grammar.nt_ids.size() == 0)
+  {
+    std::cout << "No grammar found, adding a default grammar" << std::endl;
+    add_grammar_to_problem(const_cast<sygus_problemt &>(*this));
+  }
+  return synthesis_functions[0].grammar;
 }

@@ -8,68 +8,8 @@
 #include <util/std_expr.h>
 #include <util/cout_message.h>
 
-int test_cvc5(const cmdlinet &cmdline)
-{
-  console_message_handlert message_handler;
-  messaget message(message_handler);
+#include "synthesis/synth.h"
 
-  // this is our default verbosity
-  unsigned int v = messaget::M_STATISTICS;
-
-  if (cmdline.isset("verbosity"))
-  {
-    v = std::stol(
-        cmdline.get_value("verbosity"));
-    ;
-    if (v > 10)
-    {
-      v = 10;
-    }
-  }
-  message_handler.set_verbosity(v);
-
-  // construct problem
-  sygus_problemt problem;
-  problem.logic = "LIA";
-  problem.free_var.push_back(symbol_exprt("x", integer_typet()));
-  problem.free_var.push_back(symbol_exprt("y", integer_typet()));
-  // construct synth fun command
-  synth_funt synth_fun;
-  synth_fun.id = "f";
-  std::vector<typet> domain;
-  domain.push_back(integer_typet());
-  domain.push_back(integer_typet());
-  synth_fun.type = mathematical_function_typet(domain, integer_typet());
-  std::vector<irep_idt> params;
-  params.push_back("a");
-  params.push_back("b");
-  synth_fun.parameters = params;
-  problem.synthesis_functions.push_back(synth_fun);
-  // add constraints
-  std::vector<exprt> inputs;
-  inputs.push_back(symbol_exprt("x", integer_typet()));
-  inputs.push_back(symbol_exprt("y", integer_typet()));
-  problem.constraints.push_back(
-      equal_exprt(create_func_app("f", inputs, integer_typet()),
-                  plus_exprt(inputs[0], inputs[1])));
-  cvc5_syntht cvc5_synth(message.get_message_handler());
-
-  if (cvc5_synth(problem) == decision_proceduret::resultt::D_SATISFIABLE)
-  {
-    message.status() << "Synthesis succeeded" << messaget::eom;
-    for (const auto &f : cvc5_synth.get_solution())
-    {
-      message.status() << format(f.first) << " = " << format(f.second) << messaget::eom;
-    }
-    return 0;
-  }
-  else
-  {
-    message.status() << "Synthesis failed" << messaget::eom;
-    return 1;
-  }
-  return 0;
-}
 
 int sygus_frontend(const cmdlinet &cmdline)
 {
@@ -168,6 +108,14 @@ int sygus_frontend(const cmdlinet &cmdline)
       message.status() << messaget::eom; // flush
       return 1;
     }
+  }
+  if(cmdline.isset("enumerate"))
+  {
+    message.status()<<"Enumerating problem grammar"<<messaget::eom;
+    syntht synth(message.get_message_handler(), problem);
+    synth.set_program_size(5);
+    synth.top_down_enumerate();
+    
   }
 
   return 0;

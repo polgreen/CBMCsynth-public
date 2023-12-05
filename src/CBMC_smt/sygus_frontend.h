@@ -6,7 +6,7 @@
 
 
 int sygus_frontend(const cmdlinet &);
-int test_cvc5(const cmdlinet &cmdline);
+
 
 
 #endif /*_SYGUS_FRONTEND_H_*/

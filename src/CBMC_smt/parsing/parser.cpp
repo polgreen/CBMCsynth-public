@@ -78,6 +78,9 @@ syntactic_templatet parsert::parse_grammar()
     non_terminals.push_back(next_nonterminal);
     result.nt_ids.push_back(next_nonterminal.get_identifier());
   }
+  // start terminal:
+  result.start = non_terminals[0].get_identifier();
+  result.start_type = non_terminals[0].type();
     // eat the close
   smt2_tokenizer.next_token();
   // eat the open

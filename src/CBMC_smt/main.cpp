@@ -9,13 +9,13 @@
 #include "smt2_frontend.h"
 #include "sygus_frontend.h"
 #include "constants.h"
+#include <random>
 
 #include <iostream>
 
 #define OPTIONS         \
   "(verbosity): "       \
   "(debug)"             \
-  "(test-cvc5)"         \
   "(add-default-grammar)" \
   "(dump-problem)" \
   "(dump-problem-as-smt)" \
@@ -24,7 +24,8 @@
   "(solve)" \
   "(cvc5)" \
   "(z3)" \
-  "(solve-sygus-as-smt)"
+  "(solve-sygus-as-smt)" \
+  "(enumerate)"
 
 /// File ending of SMT2 files. Used to determine the language frontend that
 /// shall be used.
@@ -33,6 +34,8 @@
 /// shall be used.
 #define SYGUS_FILE_ENDING ".sl"
 #define SMT2_FILE_ENDING ".smt2"
+
+
 
 void help(std::ostream &out)
 {
@@ -50,7 +53,6 @@ void help(std::ostream &out)
          "Command line options\n"
          " --verbosity N                   increase verbosity (10 gives maximum verbosity)\n"
          "--debug                          run debug mode: parses and prints problem only\n"
-         "--test-cvc5                      test cvc5 interface\n"
          "--add-default-grammar            replace all synthesis function grammars with default\n"
          "--dump-problem                   print problem\n"
          "--dump-problem-as-smt            use quantifiers to print a sygus problem as an smt problem\n"
@@ -76,12 +78,6 @@ int main(int argc, const char *argv[])
   }
   try
   {
-    // debugging options go here
-    if (cmdline.isset("test-cvc5"))
-    {
-      test_cvc5(cmdline);
-      return 0;
-    }
     // all other options need an input file
     if (has_suffix(cmdline.args.back(), SYGUS_FILE_ENDING))
     {
