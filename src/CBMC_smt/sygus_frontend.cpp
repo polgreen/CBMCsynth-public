@@ -9,6 +9,8 @@
 #include <util/cout_message.h>
 
 #include "synthesis/synth.h"
+#include "verification/verify.h"
+#include "cegis.h"
 
 
 int sygus_frontend(const cmdlinet &cmdline)
@@ -112,10 +114,18 @@ int sygus_frontend(const cmdlinet &cmdline)
   if(cmdline.isset("enumerate"))
   {
     message.status()<<"Enumerating problem grammar"<<messaget::eom;
-    syntht synth(message.get_message_handler(), problem);
+    syntht synth(message_handler, problem);
     synth.set_program_size(5);
     synth.top_down_enumerate();
-    
+  }
+  if(cmdline.isset("cegis"))
+  {
+    message.status()<<"Basic CEGIS"<<messaget::eom;
+    syntht synth(message_handler, problem);
+    synth.set_program_size(20);
+    verifyt verify(ns, message_handler);
+    cegist cegis(synth, verify, problem, ns);
+    cegis.doit();
   }
 
   return 0;

@@ -21,6 +21,7 @@ public:
   solutiont get_solution() const;
   void top_down_enumerate();
   void set_program_size(std::size_t size);
+  resultt operator()();
 
 protected:
   std::vector<counterexamplet> counterexamples;
@@ -34,7 +35,7 @@ protected:
   void create_distributions();
   std::map<irep_idt, std::discrete_distribution<int>> distributions;
   // set of previous solutions
-  
+
 };
 
 #endif /* SYNTH_H_ */

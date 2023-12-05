@@ -25,7 +25,8 @@
   "(cvc5)" \
   "(z3)" \
   "(solve-sygus-as-smt)" \
-  "(enumerate)"
+  "(enumerate)" \
+  "(cegis)" \
 
 /// File ending of SMT2 files. Used to determine the language frontend that
 /// shall be used.

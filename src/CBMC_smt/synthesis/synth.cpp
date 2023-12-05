@@ -88,8 +88,6 @@ bool syntht::replace_nts(exprt &expr, std::size_t &current_depth)
 
 void syntht::top_down_enumerate()
 {
-  while(true)
- {
   exprt current_program = symbol_exprt(grammar.start, grammar.start_type);
   // enumerate through the grammar until a complete program is found
   while (true)
@@ -100,7 +98,7 @@ void syntht::top_down_enumerate()
       break;
   }
   std::cout << "Complete prog: " << expr2sygus(current_program) << std::endl;
- }
+  last_solution.functions[symbol_exprt(problem.synthesis_functions[0].id, problem.synthesis_functions[0].type)] = current_program;
 }
 
 solutiont syntht::get_solution() const
@@ -126,6 +124,11 @@ void syntht::create_distributions()
     distributions[nt.first] = std::discrete_distribution<int>(nt.second.begin(), nt.second.end());
     std::cout<<"created distribution for "<<nt.first<<std::endl;
   }
+}
 
-
+syntht::resultt syntht::operator()()
+{
+  std::cout<<"starting enumeration"<<std::endl;
+  top_down_enumerate();
+  return CANDIDATE;
 }
