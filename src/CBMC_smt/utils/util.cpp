@@ -9,6 +9,170 @@
 
 #include <util/expr_iterator.h>
 #include <util/suffix.h>
+#include <util/arith_tools.h>
+#include <util/expr_util.h>
+
+#include <iostream>
+
+void dnf(exprt &expr)
+{
+  // nnf(expr, false);
+  // for (auto &op: expr.operands())
+  //   dnf(op);
+
+  // if(expr.id()==ID_and)
+  // {
+  //   std::vector<exprt> disjuncts;
+  //   std::vector<exprt> conjuncts;
+  //   for(auto &op: expr.operands())
+  //   {
+  //     // if(op.id()==ID_or)
+  //     // {
+
+  //     // }
+  //     // elif (op.id()==ID_and)
+  //     // {
+  //     //   conjuncts.push_back(op);
+  //     // }
+  //   }
+  // }
+  
+}
+
+
+void nnf(exprt &expr, bool negate)
+{
+  if(!expr.is_boolean())
+    return;
+
+  if(expr.is_true())
+  {
+    if(negate)
+      expr=false_exprt();
+  }
+  else if(expr.is_false())
+  {
+    if(negate)
+      expr=true_exprt();
+  }
+  else if(expr.id()==ID_not)
+  {
+    nnf(to_not_expr(expr).op(), !negate);
+    exprt tmp;
+    tmp.swap(to_not_expr(expr).op());
+    expr.swap(tmp);
+  }
+  else if(expr.id()==ID_and)
+  {
+    if(negate)
+      expr.id(ID_or);
+
+    Forall_operands(it, expr)
+      nnf(*it, negate);
+  }
+  else if(expr.id()==ID_or)
+  {
+    if(negate)
+      expr.id(ID_and);
+
+    Forall_operands(it, expr)
+      nnf(*it, negate);
+  }
+  else if(expr.id()==ID_typecast)
+  {
+    const auto &typecast_expr = to_typecast_expr(expr);
+
+    if(
+      typecast_expr.op().type().id() == ID_unsignedbv ||
+      typecast_expr.op().type().id() == ID_signedbv)
+    {
+      equal_exprt tmp(
+        typecast_expr.op(), from_integer(0, typecast_expr.op().type()));
+      nnf(tmp, !negate);
+      expr.swap(tmp);
+    }
+    else if(negate)
+    {
+      expr = boolean_negate(expr);
+    }
+  }
+  else if(expr.id()==ID_le)
+  {
+    if(negate)
+    {
+      // !a<=b <-> !b=>a <-> b<a
+      expr.id(ID_lt);
+      auto &rel = to_binary_relation_expr(expr);
+      std::swap(rel.lhs(), rel.rhs());
+    }
+  }
+  else if(expr.id()==ID_lt)
+  {
+    if(negate)
+    {
+      // !a<b <-> !b>a <-> b<=a
+      expr.id(ID_le);
+      auto &rel = to_binary_relation_expr(expr);
+      std::swap(rel.lhs(), rel.rhs());
+    }
+  }
+  else if(expr.id()==ID_ge)
+  {
+    if(negate)
+      expr.id(ID_lt);
+    else
+    {
+      expr.id(ID_le);
+      auto &rel = to_binary_relation_expr(expr);
+      std::swap(rel.lhs(), rel.rhs());
+    }
+  }
+  else if(expr.id()==ID_gt)
+  {
+    if(negate)
+      expr.id(ID_le);
+    else
+    {
+      expr.id(ID_lt);
+      auto &rel = to_binary_relation_expr(expr);
+      std::swap(rel.lhs(), rel.rhs());
+    }
+  }
+  else if(expr.id()==ID_equal)
+  {
+    if(negate)
+      expr.id(ID_notequal);
+  }
+  else if(expr.id()==ID_notequal)
+  {
+    if(negate)
+      expr.id(ID_equal);
+  }
+  else if(expr.id()==ID_implies)
+  {
+    if(negate)
+    {
+      and_exprt tmp(to_implies_expr(expr).op0(), boolean_negate(to_implies_expr(expr).op1()));
+      expr.swap(tmp);
+    }
+    else
+    {
+    or_exprt tmp(boolean_negate(to_implies_expr(expr).op0()), to_implies_expr(expr).op1());
+    expr.swap(tmp);
+    }
+    nnf(expr, negate);
+  }
+  else if(negate)
+  {
+    expr = boolean_negate(expr);
+  }
+  else
+  {
+    // no change
+    std::cout<<"no change"<<std::endl;
+  }
+}
+
 
 
 /*

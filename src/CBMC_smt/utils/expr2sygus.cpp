@@ -969,7 +969,7 @@ std::string fun_dec(const symbol_exprt &fun) {
 
 std::string fun_def(const symbol_exprt &fun, const exprt &def) {
     INVARIANT(fun.type().id() == ID_mathematical_function,
-              "function symbol must have function type");
+              "function symbol must have function type, got " + fun.type().id_string()+ " for " + id2string(fun.get_identifier()));
     INVARIANT(def.id() == ID_lambda,
               "function definition must be a lambda expression");
     std::string result = "(define-fun " + clean_id(fun.get_identifier()) + " (";

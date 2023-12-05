@@ -17,9 +17,14 @@
   "(debug)"             \
   "(test-cvc5)"         \
   "(add-default-grammar)" \
-  "(create-training-data)" \
   "(dump-problem)" \
   "(dump-problem-as-smt)" \
+ "(dump-problem-as-python)" \
+  "(convert-to-smt)" \
+  "(solve)" \
+  "(cvc5)" \
+  "(z3)" \
+  "(solve-sygus-as-smt)"
 
 /// File ending of SMT2 files. Used to determine the language frontend that
 /// shall be used.
@@ -32,7 +37,7 @@
 void help(std::ostream &out)
 {
   out << "\n"
-         "* *                          CBMC SMT stuff                    * *\n";
+         "* *      A library of SyGuS and SMT manipulating utils         * *\n";
 
   out << "* *                                                            * *\n"
          "\n"
@@ -45,7 +50,6 @@ void help(std::ostream &out)
          "Command line options\n"
          " --verbosity N                   increase verbosity (10 gives maximum verbosity)\n"
          "--debug                          run debug mode: parses and prints problem only\n"
-         "--create-training-data           create training data from smt2 file \n"
          "--test-cvc5                      test cvc5 interface\n"
          "--add-default-grammar            replace all synthesis function grammars with default\n"
          "--dump-problem                   print problem\n"

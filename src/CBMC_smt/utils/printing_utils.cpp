@@ -4,6 +4,39 @@
 #include <util/format_expr.h>
 #include <util/std_expr.h>
 #include <util/expr.h>
+#include <ansi-c/expr2c.h>
+
+void print_problem(const sygus_problemt &problem, std::ostream &out)
+{
+  out << "Printing problem" << std::endl;
+  out << "logic: "<< problem.logic << std::endl;
+  out << "free vars: " << std::endl; 
+  for (const auto &e : problem.free_var)
+  {
+    out << e.get_identifier() << " : " << e.type().pretty() << std::endl;
+  } 
+  out << "synthesis functions: " << std::endl;
+  for (const auto &f : problem.synthesis_functions)
+  {
+    out << f.id << " : " << f.type.pretty() << std::endl;
+  }
+  out << "constraints: " << std::endl;
+  for (const auto &c : problem.constraints)
+  {
+    out << format(c) << std::endl;
+  }
+  out << "assumptions: " << std::endl;
+  for (const auto &a : problem.assumptions)
+  {
+    out << format(a) << std::endl;
+  }
+  out << "defined functions: " << std::endl;
+  for (const auto &f : problem.defined_functions)
+  {
+    out << f.first.get_identifier() << " : " << format(f.second) << std::endl;
+  }
+  
+}
 
 // print the expression tree for each assertion
 void print_smt_problem(const smt_problemt &problem, std::ostream &out)
@@ -55,6 +88,32 @@ void print_sygus_as_smt(const sygus_problemt &problem, std::ostream &out)
   out <<")\n";
 
   out <<"(check-sat)\n";
+}
+
+
+
+void print_sygus_as_python(const sygus_problemt &problem, std::ostream &out, namespacet &ns)
+{
+  for(const auto &f: problem.synthesis_functions)
+  {
+    out << "def " << f.id << "(";
+    unsigned int count=1;
+    for(const auto &p: f.parameters)
+    {
+      out << p ;
+      if(count < f.parameters.size())
+        out << ", ";
+      count++;
+    }
+    out << "):" << std::endl;
+  }
+
+  // put the constraints in as comments, similar to the human eval benchmark set
+  out << "\"\"\"" << std::endl;
+  out << "Write a function which satisfies the following constraints\n" << std::endl;
+  for (const auto &c: problem.nnf_constraints())
+    out << "assert(" << expr2c(c, ns) << ") \n";
+   out << "\"\"\"" << std::endl; 
 }
 
 void print_sygus_problem(const sygus_problemt &problem, std::ostream &out)

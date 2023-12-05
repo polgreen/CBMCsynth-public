@@ -43,6 +43,7 @@ public:
     // only used for invariant problems
     irep_idt inv_id, pre_id, trans_id, post_id;
     std::string logic;
+    std::vector<exprt> nnf_constraints() const;
 
 };
 

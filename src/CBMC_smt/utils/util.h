@@ -50,4 +50,7 @@ std::string replace_occurences(std::string str, const std::string &from, const s
 
 bool create_dir_recursively(const std::filesystem::path& dirName);
 
+void nnf(exprt &expr, bool negate);
+void dnf(exprt &expr);
+
 #endif //CBMCSMT_UTIL_H

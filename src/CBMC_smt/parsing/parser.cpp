@@ -326,7 +326,7 @@ smt_problemt parsert::get_smt_problem()
 
 sygus_problemt parsert::get_sygus_problem()
 {
-  if(sygus_problem.constraints.empty())
+  if(sygus_problem.free_var.empty())
     build_sygus_problem();
   if(sygus_problem.constraints.empty())
     throw error("SyGuS problem has no constraints");
@@ -335,6 +335,7 @@ sygus_problemt parsert::get_sygus_problem()
 
 void parsert::build_sygus_problem()
 {
+  std::cout<<"building sygus problem"<<std::endl;
   if (synthesis_functions.size() == 0)
     throw error("SyGuS problem has no synthesis functions");
 
