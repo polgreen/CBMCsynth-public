@@ -50,5 +50,18 @@ public:
 synth_funt copy_fun_add_grammar(const synth_funt &f);
 void add_grammar(synth_funt &f);
 
+class solutiont
+{
+  public:
+  std::map<symbol_exprt, exprt> functions;
+};
+
+class counterexamplet
+{
+public:
+  std::unordered_map<exprt, exprt, irep_hash> assignment;
+  void clear() { assignment.clear(); }
+};
+
 
 #endif //SRC_SYGUS_PROBLEM_H

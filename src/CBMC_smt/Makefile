@@ -1,8 +1,8 @@
 SRC=main.cpp smt2_frontend.cpp sygus_frontend.cpp \
 parsing/parser.cpp utils/printing_utils.cpp utils/util.cpp \
-utils/term_position.cpp unification/anti_unification.cpp  sygus_problem.cpp \
- smt_problem.cpp utils/expr2sygus.cpp unification/unification.cpp \
- utils/subterm_heuristics.cpp cvc5_synth.cpp
+ sygus_problem.cpp \
+ smt_problem.cpp utils/expr2sygus.cpp  \
+ cvc5_synth.cpp verification/verify.cpp verification/verify_encoding.cpp \
 
 OBJ+= ../../$(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \
       ../../$(CPROVER_DIR)/src/assembler/assembler$(LIBEXT) \
