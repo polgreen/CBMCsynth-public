@@ -20,7 +20,7 @@ public:
   std::map<symbol_exprt, exprt> functions;
 
     /// Free input variables by which to test.
-  std::set<symbol_exprt> free_variables;
+  std::vector<symbol_exprt> free_variables;
 
   counterexamplet get_counterexample(
     const decision_proceduret &) const;

@@ -1,6 +1,5 @@
 
 #include "verify_encoding.h"
-
 #include <util/arith_tools.h>
 
 
@@ -19,6 +18,13 @@ void verify_encodingt::check_function_bodies(
       throw "function body has wrong type";
     }
   }
+}
+
+void verify_encodingt::check_function_body(
+  const mathematical_function_typet &signature,
+  const exprt &expr)
+{
+ // currently does nothing
 }
 
 
