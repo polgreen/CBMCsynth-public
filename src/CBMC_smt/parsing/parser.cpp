@@ -78,6 +78,20 @@ syntactic_templatet parsert::parse_grammar()
     non_terminals.push_back(next_nonterminal);
     result.nt_ids.push_back(next_nonterminal.get_identifier());
   }
+   // put the parameters into the scope and take care of hiding
+  std::vector<std::pair<irep_idt, idt>> hidden_ids;
+  for(const auto &nt: non_terminals)
+  {
+    auto insert_result =
+          id_map.insert({nt.get_identifier(), idt{idt::PARAMETER, nt.type()}});
+    if (!insert_result.second) // already there
+    {
+      auto &id_entry = *insert_result.first;
+      hidden_ids.emplace_back(id_entry.first, std::move(id_entry.second));
+      id_entry.second = idt{idt::PARAMETER, nt.type()};
+    }
+  }
+  
   // start terminal:
   result.start = non_terminals[0].get_identifier();
   result.start_type = non_terminals[0].type();
@@ -92,6 +106,9 @@ syntactic_templatet parsert::parse_grammar()
     result.production_rules[nt.get_identifier()] = production_rule;
   }
   smt2_tokenizer.next_token(); // eat the close
+
+  for(auto &id : result.nt_ids)
+    id_map.erase(id);
 
   return result;
 }
@@ -285,6 +302,8 @@ void parsert::setup_commands()
     for (auto &id : signature.parameters)
       id_map.erase(id);
 
+ 
+
     // restore the hidden ids, if any
     for (auto &hidden_id : hidden_ids)
       id_map.insert(std::move(hidden_id));
@@ -357,7 +376,6 @@ void parsert::build_sygus_problem()
     {
       if(synthesis_functions.find(id.first)==synthesis_functions.end())
       {
-        std::cout<<"looking for "<< id2string(id.first)<<std::endl;
         if(id.second.type.id()==ID_mathematical_function)
           throw error("SyGuS problem cannot contain n-ary uninterpreted functions");
         sygus_problem.free_var.push_back(symbol_exprt(id.first, id.second.type));

@@ -8,13 +8,17 @@
 #include <string>
 #include <vector>
 #include <util/expr.h>
+#include <util/std_expr.h>
 #include <util/symbol.h>
 #include <util/mathematical_types.h>
 #include <map>
 
 struct syntactic_templatet {
+    irep_idt start;
+    typet start_type;
     std::vector<irep_idt> nt_ids;
     std::map<irep_idt, std::vector<exprt>> production_rules;
+    std::map<irep_idt, std::vector<unsigned>> production_rule_weights;
 };
 
 class synth_funt {
@@ -31,7 +35,8 @@ class sygus_problemt {
 public:
 
     std::vector<std::string> comments;
-
+    // assume we only have one synthesis function for enumeration, 
+    // but keep this as a vector so we can parse multiple
     std::vector<synth_funt> synthesis_functions;
 
     std::string filename;
@@ -44,11 +49,13 @@ public:
     irep_idt inv_id, pre_id, trans_id, post_id;
     std::string logic;
     std::vector<exprt> nnf_constraints() const;
+    syntactic_templatet get_grammar() const;
 
 };
 
 synth_funt copy_fun_add_grammar(const synth_funt &f);
 void add_grammar(synth_funt &f);
+void add_grammar_weights(syntactic_templatet &g);
 
 class solutiont
 {

@@ -2,6 +2,7 @@
 #include "../utils/expr2sygus.h"
 #include <util/arith_tools.h>
 #include <iostream>
+
 std::mt19937 rng(0);
 
 bool syntht::contains_nonterminal(const exprt &expr)
