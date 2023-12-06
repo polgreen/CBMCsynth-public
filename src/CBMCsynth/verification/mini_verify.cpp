@@ -22,7 +22,9 @@ void mini_verifyt::add_problem(const sygus_problemt &problem, const solutiont &s
     UNEXPECTEDCASE( "Assumptions are not supported in mini_verify")
 
     exprt constraints = conjunction(problem.constraints);
+    expand_function_applications(constraints, solution.functions);
     expand_function_applications(constraints, problem.defined_functions);
+    // expand again, incase the body of any defined functions contained the synth functions
     expand_function_applications(constraints, solution.functions);
     solver.set_to_false(constraints);
     // add counterexample to solver

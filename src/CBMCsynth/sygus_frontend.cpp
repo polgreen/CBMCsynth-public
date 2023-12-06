@@ -118,7 +118,7 @@ int sygus_frontend(const cmdlinet &cmdline)
     message.status()<<"Basic CEGIS"<<messaget::eom;
     mini_verifyt mini_verify(ns, message_handler);
     top_down_syntht synth(message_handler, problem, mini_verify);
-    synth.set_program_size(20);
+    synth.set_program_size(5);
     verifyt verify(ns, message_handler);
     cegist cegis(synth, verify, problem, ns);
     cegis.doit();

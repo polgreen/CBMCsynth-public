@@ -38,10 +38,12 @@ void verifyt::add_problem(const sygus_problemt &problem, const solutiont &soluti
  if(problem.assumptions.size() > 0)
     UNEXPECTEDCASE( "Assumptions are not supported in verify yet")
   // expand function applications, and add to solver.
-  exprt encoded_constraints = conjunction(problem.constraints);
-  expand_function_applications(encoded_constraints, problem.defined_functions);
-  expand_function_applications(encoded_constraints, solution.functions);
-  solver.set_to_false(encoded_constraints);
+  exprt constraints = conjunction(problem.constraints);
+  expand_function_applications(constraints, solution.functions);
+  expand_function_applications(constraints, problem.defined_functions);
+  // expand again, incase the body of any defined functions contained the synth functions
+  expand_function_applications(constraints, solution.functions);
+  solver.set_to_false(constraints);
 }
 
 counterexamplet verifyt::get_counterexample(
