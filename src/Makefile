@@ -1,8 +1,8 @@
-DIRS = CBMC_smt
+DIRS = CBMCsynth
 
 include config.inc
 
-all: CBMC_smt.dir
+all: CBMCsynth.dir
 
 .PHONY: $(DIRS)
 
@@ -11,7 +11,7 @@ $(patsubst %, %.dir, $(DIRS)):
 
 # Dependencies
 
-CBMC_smt.dir: cprover.dir
+CBMCsynth.dir: cprover.dir
 
 # building cbmc proper
 .PHONY: cprover.dir

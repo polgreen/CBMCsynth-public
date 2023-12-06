@@ -25,11 +25,11 @@ include ../config.inc
 include ../../$(CPROVER_DIR)/src/config.inc
 include ../../$(CPROVER_DIR)/src/common
 
-CLEANFILES = CBMC_smt$(EXEEXT)
+CLEANFILES = CBMCsynth$(EXEEXT)
 
-all: CBMC_smt$(EXEEXT)
+all: CBMCsynth$(EXEEXT)
 
 ###############################################################################
 
-CBMC_smt$(EXEEXT): $(OBJ)
+CBMCsynth$(EXEEXT): $(OBJ)
 	$(LINKBIN)

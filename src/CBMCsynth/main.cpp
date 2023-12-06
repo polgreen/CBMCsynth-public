@@ -1,5 +1,5 @@
 /*******************************************************************\
- Module: CBMC SMT stuff
+ Module: Basic synthesizer, and some utils for manipulating SyGUs and SMT files
  Author: Elizabeth Polgreen, epolgreen@gmail.com.
 \*******************************************************************/
 
@@ -34,14 +34,15 @@
 void help(std::ostream &out)
 {
   out << "\n"
-         "* *      A library of SyGuS and SMT manipulating utils         * *\n";
+         "* *               A basic synthesiser and a                * *\n"
+        "* *     library of SyGuS and SMT manipulating utils         * *\n";
 
   out << "* *                                                            * *\n"
          "\n"
          "Usage:                           Purpose:\n"
          "\n"
-         " CBMC_smt [-?] [-h] [--help]       show help\n"
-         " CBMC_smt file.smt2 ...              source file names\n"
+         " CBMCsynth [-?] [-h] [--help]       show help\n"
+         " CBMCsynth file.smt2 ...              source file names\n"
          "\n"
          "\n"
          "Command line options\n"

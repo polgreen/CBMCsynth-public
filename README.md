@@ -1,4 +1,6 @@
-# CBMC_smt
+# CBMCsynth
+
+Basic synthesizer using CBMC datatypes
 
 ### Building
 Prerequisites: All prerequisties for CBMC must be installed (https://github.com/diffblue/cbmc/blob/develop/COMPILING.md). Plus Z3 must be added to $PATH.  
@@ -16,25 +18,17 @@ cd lib/cbmc/src
 make minisat2-download
 make
 ~~~
-Compile CBMC_smt
+Compile CBMCsynth
 ~~~
-cd CBMC_smt/src
+cd CBMCsynth/src
 make
 ~~~
 
-The binary is found at `CBMC_smt/src/CBMC_smt/CBMC_smt`. 
+The binary is found at `CBMCsynth/src/CBMCsynth/CBMCsynth`. 
 
-To run CBMC_smt on a file:
+To run CBMCsynth on a SyGuS file and do basic cegis:
 ~~~
-CBMC_smt file.smt2
+CBMCsynth file.sl --cegis
 ~~~
 
 
-use/install     
-https://github.com/crashoz/uuid_v4     
-version:  v1.0.0
-
-
-### Modifying
-
-All the useful code is in src/CBMC_smt/smt2_frontend.cpp. Start here.
