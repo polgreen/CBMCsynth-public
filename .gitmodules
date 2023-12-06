@@ -1,4 +1,4 @@
 [submodule "lib/cbmc"]
 	path = lib/cbmc
-	url = git@github.com:jparsert/cbmc.git
-	branch = smt2dec_options
+	url = https://github.com/diffblue/cbmc.git
+	branch = develop
