@@ -64,6 +64,22 @@ int sygus_frontend(const cmdlinet &cmdline)
     return 20;
   }
 
+  if(cmdline.isset("probs"))
+  {
+    message.status()<<"trying to parse prob file"<<messaget::eom;
+    try
+    {
+      std::string filename = cmdline.get_value("probs");
+      parse_probs(filename, problem);
+
+    }
+    catch(const std::exception& e)
+    {
+      message.error()<<"Failed to open probabilities file"<<messaget::eom;
+      return 30;
+    }
+  }
+
   // pre-processing
   if (cmdline.isset("add-default-grammar"))
   {

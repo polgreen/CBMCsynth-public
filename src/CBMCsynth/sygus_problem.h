@@ -56,6 +56,7 @@ public:
 synth_funt copy_fun_add_grammar(const synth_funt &f);
 void add_grammar(synth_funt &f);
 void add_grammar_weights(syntactic_templatet &g);
+void parse_probs(std::string filename, sygus_problemt& problem);
 
 class solutiont
 {

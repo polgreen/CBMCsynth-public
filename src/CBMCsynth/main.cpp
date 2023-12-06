@@ -20,6 +20,7 @@
   "(dump-problem-as-smt)" \
   "(solve-with-cvc5)" \
   "(cegis)" \
+  "(probs): " \
 
 /// File ending of SMT2 files. Used to determine the language frontend that
 /// shall be used.

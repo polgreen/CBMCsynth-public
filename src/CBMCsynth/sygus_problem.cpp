@@ -166,3 +166,34 @@ syntactic_templatet sygus_problemt::get_grammar() const
   }
   return synthesis_functions[0].grammar;
 }
+
+void parse_probs(std::string filename, sygus_problemt& problem)
+{
+   std::ifstream prob_file(filename);
+   std::vector<int> weights;
+   int weight;
+   while(prob_file >> weight)
+   {
+     weights.push_back(weight);
+   }
+   if(weights.size()==0)
+      UNEXPECTEDCASE("no weights in probability file or file not found");
+
+   if(problem.synthesis_functions.size()!=1)
+     UNEXPECTEDCASE("only one synthesis function supported, if probability file is given");
+  
+    auto &grammar = problem.synthesis_functions[0].grammar;
+    // TODO: parse into weights
+    std::size_t count=0;
+
+    for(const auto &nt_id: grammar.nt_ids)
+    {
+      for(int i=0; i<grammar.production_rules[nt_id].size(); i++)
+      {
+        if(count>=weights.size())
+          UNEXPECTEDCASE("not enough weights in probability file");
+        grammar.production_rule_weights[nt_id].push_back(weights[count]);
+        count++;
+      }
+    }
+}
