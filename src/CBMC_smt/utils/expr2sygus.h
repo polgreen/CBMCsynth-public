@@ -6,6 +6,8 @@
 #include <iostream>
 #include "../sygus_problem.h"
 
+// converts exprts to SyGuS strings
+
 enum class wheret {
     BEGIN, END
 };

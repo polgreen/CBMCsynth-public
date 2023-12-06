@@ -6,6 +6,8 @@
 #include "sygus_problem.h"
 #include <util/namespace.h>
 
+// class for doing CEGIS. Can receive any syntht synthesizer and a verifyt verifier.
+
 class cegist
 {
 public:

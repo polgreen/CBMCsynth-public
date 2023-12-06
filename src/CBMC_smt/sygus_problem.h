@@ -26,7 +26,7 @@ class synth_funt {
 public:
     irep_idt id;
     typet type;
-    std::vector<irep_idt> parameters;
+    std::vector<symbol_exprt> parameters;
     syntactic_templatet grammar;
 };
 

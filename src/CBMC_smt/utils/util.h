@@ -21,16 +21,24 @@
 
 #include "../constants.h"
 
-bool root_equality(const exprt &a, const exprt &b);
 
+// creates a function application exprt, given the function name, operands, and codomain
 function_application_exprt
 create_func_app(irep_idt function_name, const std::vector<exprt> &operands, const typet &codomain);
 
+// expands let expressions in an expression
 void expand_let_expressions(exprt &expr);
 
+// expands function applications in an expression
+void expand_function_applications(exprt &expr, const std::map<symbol_exprt, exprt> &defined_functions);
+
+// Replaces all occurences of a string in a string with another string
 std::string replace_occurences(std::string str, const std::string &from, const std::string &to);
 
+// converts a exprt to NNF form
 void nnf(exprt &expr, bool negate);
+
+// not implemented. Will convert function to DNF form
 void dnf(exprt &expr);
 
 #endif //CBMCSMT_UTIL_H

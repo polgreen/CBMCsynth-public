@@ -8,7 +8,6 @@ Author: Elizabeth Polgreen, epolgreen@gmail.com
 
 #include "utils/printing_utils.h"
 #include "sygus_problem.h"
-#include "cvc5_synth.h"
 #include "utils/util.h"
 #include "parsing/parser.h"
 

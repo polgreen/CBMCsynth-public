@@ -1,6 +1,6 @@
 #include "sygus_frontend.h"
 #include "sygus_problem.h"
-#include "cvc5_synth.h"
+#include "utils/cvc5_synth.h"
 #include "utils/util.h"
 #include "parsing/parser.h"
 #include "utils/printing_utils.h"
@@ -9,7 +9,9 @@
 #include <util/cout_message.h>
 
 #include "synthesis/synth.h"
+#include "synthesis/synth_td.h"
 #include "verification/verify.h"
+#include "verification/mini_verify.h"
 #include "cegis.h"
 
 
@@ -87,7 +89,7 @@ int sygus_frontend(const cmdlinet &cmdline)
     message.status()<<messaget::eom; //flush
     // just print the problem
   }
-  if (cmdline.isset("solve-sygus"))
+  if (cmdline.isset("solve-with-cvc5"))
   {
     message.status()<<"Solving sygus problem with CVC5"<<messaget::eom;
     // we solve with cvc5
@@ -111,17 +113,11 @@ int sygus_frontend(const cmdlinet &cmdline)
       return 1;
     }
   }
-  if(cmdline.isset("enumerate"))
-  {
-    message.status()<<"Enumerating problem grammar"<<messaget::eom;
-    syntht synth(message_handler, problem);
-    synth.set_program_size(5);
-    synth.top_down_enumerate();
-  }
   if(cmdline.isset("cegis"))
   {
     message.status()<<"Basic CEGIS"<<messaget::eom;
-    syntht synth(message_handler, problem);
+    mini_verifyt mini_verify(ns, message_handler);
+    top_down_syntht synth(message_handler, problem, mini_verify);
     synth.set_program_size(20);
     verifyt verify(ns, message_handler);
     cegist cegis(synth, verify, problem, ns);

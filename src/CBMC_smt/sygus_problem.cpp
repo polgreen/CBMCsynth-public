@@ -50,15 +50,15 @@ std::map<irep_idt, std::vector<exprt>> production_rules(const synth_funt &f)
   std::map<irep_idt, std::vector<exprt>> rules;
 
   auto func_type = to_mathematical_function_type(f.type);
-  for (std::size_t i = 0; i < func_type.domain().size(); i++)
+  for(const auto &p: f.parameters)
   {
-    if (func_type.domain()[i] == integer_typet()) // add relevant parameters
-      integer_rules.push_back(symbol_exprt(f.parameters[i], integer_typet()));
-    else if (func_type.domain()[i] == bool_typet())
-      bool_rules.push_back(symbol_exprt(f.parameters[i], bool_typet()));
+    if(p.type().id()==ID_integer)
+      integer_rules.push_back(p);
+    else if(p.type().id()==ID_bool)
+      bool_rules.push_back(p);
     else
     {
-      UNEXPECTEDCASE("synthesis function parameter of unexpected type: " + func_type.domain()[i].id_string());
+      UNEXPECTEDCASE("synthesis function parameter of unexpected type: " + p.type().id_string());
     }
   }
   // constants

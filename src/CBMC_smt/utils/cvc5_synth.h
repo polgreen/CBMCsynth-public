@@ -4,8 +4,9 @@
 #include <solvers/decision_procedure.h>
 #include <util/namespace.h>
 #include <util/message.h>
-#include "sygus_problem.h"
+#include "../sygus_problem.h"
 
+// class that calls CVC5 to solve a sygus problem using CVC5's sygus interface
 class cvc5_syntht
 {
 public:

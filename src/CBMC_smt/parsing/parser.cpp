@@ -154,8 +154,12 @@ const smt2_parsert::signature_with_parameter_idst &sig, const syntactic_template
   f.grammar = grammar;
   f.id = id;
   f.type = sig.type;
-  f.parameters = sig.parameters;
-  synthesis_functions[id] = f;
+  auto &func_type = to_mathematical_function_type(sig.type);
+  for(int i=0; i<sig.parameters.size(); i++)
+  {
+    f.parameters.push_back(symbol_exprt(sig.parameters[i], func_type.domain()[i]));
+  }
+   synthesis_functions[id] = f;
 }
 
 // I can add things to the CBMC parser by adding to the commands.

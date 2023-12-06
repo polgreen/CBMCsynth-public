@@ -6,6 +6,7 @@
 #include <util/expr.h>
 #include <ansi-c/expr2c.h>
 
+
 void print_problem(const sygus_problemt &problem, std::ostream &out)
 {
   out << "Printing problem" << std::endl;
@@ -100,7 +101,7 @@ void print_sygus_as_python(const sygus_problemt &problem, std::ostream &out, nam
     unsigned int count=1;
     for(const auto &p: f.parameters)
     {
-      out << p ;
+      out << p.get_identifier();
       if(count < f.parameters.size())
         out << ", ";
       count++;
@@ -149,14 +150,3 @@ void traverse_expression(exprt &expr, std::ostream &out)
   }
 }
 
-void print_problem_tree(smt_problemt &problem, std::ostream &out)
-{
-  out << "Problem tree:" << std::endl;
-  int count = 0;
-  for (const auto &a : problem.assertions)
-  {
-    out << "Assertion " << count << std::endl;
-    count++;
-    out << a.pretty() << std::endl;
-  }
-}

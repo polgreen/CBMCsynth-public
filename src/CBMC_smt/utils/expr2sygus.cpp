@@ -985,14 +985,15 @@ std::string fun_def(const symbol_exprt &fun, const exprt &def) {
 
 std::string synth_fun_dec(const synth_funt &f) {
     std::string result = "(synth-fun " + clean_id(f.id);
+    std::cout<<"f type is "<< f.type.pretty()<<std::endl;
 
     if (f.type.id() != ID_mathematical_function) {
         result += " () " + type2sygus(f.type);
     } else {
         result += "(";
         const auto &func_type = to_mathematical_function_type(f.type);
-        for (std::size_t i = 0; i < f.parameters.size(); i++) {
-            result += "(" + clean_id(f.parameters[i]) + " " + type2sygus(func_type.domain()[i]) + ")";
+        for (const auto &p: f.parameters) {
+            result += "(" + clean_id(p.get_identifier()) + " " + type2sygus(p.type()) + ")";
         }
         result += ") " + type2sygus(func_type.codomain()) + "\n";
     }
@@ -1742,7 +1743,6 @@ std::string flatten2bv(const exprt &expr) {
 std::string convert_typecast(const typecast_exprt &expr) {
     std::string result;
     const exprt &src = expr.op();
-
     typet dest_type = expr.type();
     typet src_type = src.type();
 
@@ -1772,8 +1772,7 @@ std::string convert_typecast(const typecast_exprt &expr) {
         }
     } else if (dest_type.id() == ID_unsignedbv ||
                dest_type.id() == ID_signedbv ||
-               dest_type.id() == ID_fixedbv ||
-               dest_type.id() == ID_unsignedbv) {
+               dest_type.id() == ID_fixedbv ) {
         if (src_type.id() == ID_bool) {
             result += "(ite ";
             result += convert_expr(src);
@@ -1782,6 +1781,13 @@ std::string convert_typecast(const typecast_exprt &expr) {
             result += " ";
             result += convert_expr(from_integer(0, dest_type));
             result += " )";
+        }
+        // SyGuS doesn't have a notion of signed or unsigned bitvecs. We fix the signedness
+        // when we print the comparisons.
+        else if (src_type.id() == ID_unsignedbv ||
+                 src_type.id() == ID_signedbv ||
+                 src_type.id() == ID_fixedbv ) {
+            result += convert_expr(src);
         }
     } else if (dest_type.id() == ID_floatbv) {
         // Typecast from integer to floating-point should have be been

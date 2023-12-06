@@ -1,7 +1,7 @@
 #include "verify.h"
+#include "../utils/util.h"
 
 #include <solvers/smt2/smt2_dec.h>
-
 #include <langapi/language_util.h>
 
 #include <util/format_expr.h>
@@ -12,6 +12,7 @@
 #include "../utils/expr2sygus.h"
 #include <iostream>
 
+// prints solution
 void display_solution(const solutiont &solution)
 {
   std::cout<<"SOLUTION:"<<std::endl;
@@ -21,6 +22,7 @@ void display_solution(const solutiont &solution)
   }
 }
 
+// prints counterexample
 void display_cex(const counterexamplet &cex)
 {
   std::cout<<"Counterexample:"<<std::endl;
@@ -30,36 +32,42 @@ void display_cex(const counterexamplet &cex)
   }
 }
 
-void verifyt::replace_synth_fun_parameters(const sygus_problemt &problem, std::map <symbol_exprt, exprt> &solution_functions)
-{
-  for(const auto &sf: problem.synthesis_functions)
-  {
-    const auto &args = sf.parameters;
-    auto sol = solution_functions.find(symbol_exprt(sf.id, sf.type));
-    if(sol==solution_functions.end())
-      std::cout<<"warning, no solution for synth fun "<< id2string(sf.id)<<std::endl;
-
-    const auto &domain = to_mathematical_function_type(sf.type).domain();
-    for(std::size_t i=0; i< domain.size(); i++)
-      replace_expr(symbol_exprt((args[i]), domain[i]), symbol_exprt("synth::parameter"+integer2string(i),domain[i]),sol->second);
-  }
+// adds the constraints to the solver
+void verifyt::add_problem(const sygus_problemt &problem, const solutiont &solution, decision_proceduret &solver)
+{   
+ if(problem.assumptions.size() > 0)
+    UNEXPECTEDCASE( "Assumptions are not supported in verify yet")
+  // expand function applications, and add to solver.
+  exprt encoded_constraints = conjunction(problem.constraints);
+  expand_function_applications(encoded_constraints, problem.defined_functions);
+  expand_function_applications(encoded_constraints, solution.functions);
+  solver.set_to_false(encoded_constraints);
 }
 
-void verifyt::add_problem(const sygus_problemt &problem, const solutiont &solution, decision_proceduret &solver)
+counterexamplet verifyt::get_counterexample(
+  const decision_proceduret &solver, const sygus_problemt &problem) const
 {
-  // add verification problem "/exists x /neg (/alpha \implies \phi"
-  verify_encoding.clear();
-  verify_encodingt::check_function_bodies(solution.functions);
-  verify_encoding.functions = solution.functions;
-  replace_synth_fun_parameters(problem, verify_encoding.functions);
-  
-  verify_encoding.free_variables = problem.free_var;
-  
-  const exprt encoded_constraints = (problem.assumptions.size()>1)?
-      verify_encoding(implies_exprt(conjunction(problem.assumptions),conjunction(problem.constraints))): 
-      verify_encoding(conjunction(problem.constraints));
+  counterexamplet result;
 
-  solver.set_to_false(encoded_constraints);
+  // iterate over nondeterministic symbols, and get their value
+  for(const auto &var : problem.free_var)
+  {
+    exprt value=solver.get(var);
+    result.assignment[var]=value;
+    if(value==nil_exprt() && var.id()==ID_nondet_symbol)
+    {
+      nondet_symbol_exprt tmp_var=to_nondet_symbol_expr(var);
+      tmp_var.set_identifier("nondet_"+id2string(to_nondet_symbol_expr(var).get_identifier()));
+      value=solver.get(tmp_var);
+      result.assignment[var]=value;
+    }
+    if(value==nil_exprt())
+    {
+      result.assignment[var] = constant_exprt("0", var.type());
+    }
+  }
+
+  return result;
 }
 
 
@@ -84,7 +92,7 @@ verifyt::resultt verifyt::operator()(sygus_problemt &problem,
     {
       case decision_proceduret::resultt::D_SATISFIABLE:
       {
-        counterexample = verify_encoding.get_counterexample(solver);
+        counterexample = get_counterexample(solver, problem);
         std::cout<<"Got a counterexample "<<std::endl;
         display_cex(counterexample);
         return verifyt::resultt::FAIL; 
@@ -92,7 +100,6 @@ verifyt::resultt verifyt::operator()(sygus_problemt &problem,
       case decision_proceduret::resultt::D_UNSATISFIABLE:
       {
         counterexample.clear();
-        // std::cout<<"No counterexample "<<std::endl;
         return verifyt::resultt::PASS;
       }
 
@@ -100,8 +107,6 @@ verifyt::resultt verifyt::operator()(sygus_problemt &problem,
       default:
       {
         std::cout<<"ERROR in verification\n";
-        counterexample=
-        verify_encoding.get_counterexample(solver);
         return verifyt::resultt::FAIL;
       } 
     }

@@ -15,17 +15,10 @@
 
 #define OPTIONS         \
   "(verbosity): "       \
-  "(debug)"             \
   "(add-default-grammar)" \
   "(dump-problem)" \
   "(dump-problem-as-smt)" \
- "(dump-problem-as-python)" \
-  "(convert-to-smt)" \
-  "(solve)" \
-  "(cvc5)" \
-  "(z3)" \
-  "(solve-sygus-as-smt)" \
-  "(enumerate)" \
+  "(solve-with-cvc5)" \
   "(cegis)" \
 
 /// File ending of SMT2 files. Used to determine the language frontend that
@@ -53,10 +46,18 @@ void help(std::ostream &out)
          "\n"
          "Command line options\n"
          " --verbosity N                   increase verbosity (10 gives maximum verbosity)\n"
-         "--debug                          run debug mode: parses and prints problem only\n"
+         "\n"
+         "The following options are applicable to SyGuS problems:\n"
+         "--cegis                          attempt to do CEGIS with the basic random top-down enumerator\n"
          "--add-default-grammar            replace all synthesis function grammars with default\n"
-         "--dump-problem                   print problem\n"
-         "--dump-problem-as-smt            use quantifiers to print a sygus problem as an smt problem\n"
+         "--dump-problem                   print problem in SyGuS-IF format\n"
+         "--dump-problem-as-smt            use quantifiers to print a sygus problem in SMT-LIB\n"
+         "--solve-with-cvc5                call CVC5 to solve the SyGuS problem\n"
+         "\n"
+         "\n"
+         "The following options are applicable to SMT problems:\n"
+         "--solve-smt                      solve the SMT problem with Z3\n"
+         "--dump-problem                   print problem in SMT-lib format\n"
          "\n"
          "\n";
 }

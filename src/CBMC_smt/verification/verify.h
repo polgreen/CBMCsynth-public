@@ -1,13 +1,12 @@
 #ifndef VERIFY_H
 #define VERIFY_H
 
-#include "verify_encoding.h"
 #include "../sygus_problem.h"
 #include <solvers/decision_procedure.h>
 #include <util/namespace.h>
 #include <util/message.h>
 
-
+// Class for verifying a solution to a sygus problem.
 class verifyt
 {
  public:
@@ -28,13 +27,11 @@ class verifyt
   counterexamplet get_counterexample();
 
   protected:
+  counterexamplet get_counterexample(
+  const decision_proceduret &solver, const sygus_problemt &problem) const;
   namespacet ns;
   messaget log;
-  /// Encoding for the verification decision procedure call.
-  verify_encodingt verify_encoding;
   counterexamplet counterexample;
-
-  void replace_synth_fun_parameters(const sygus_problemt &problem, std::map <symbol_exprt, exprt> &solution_functions); 
   void add_problem(const sygus_problemt &problem, const solutiont &solution, decision_proceduret &solver );
 
 };
