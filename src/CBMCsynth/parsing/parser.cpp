@@ -162,6 +162,22 @@ const smt2_parsert::signature_with_parameter_idst &sig, const syntactic_template
    synthesis_functions[id] = f;
 }
 
+
+void parsert::setup_expressions()
+{
+    expressions["abs"] = [this] {
+    auto op = operands();
+
+    if(op.size() != 1)
+      throw error("abs takes one operand");
+
+    if(op[0].type().id() != ID_integer && op[0].type().id() != ID_real)
+      throw error("abs takes a real or integer operand");
+
+    return abs_exprt(op[0]);
+    };
+}
+
 // I can add things to the CBMC parser by adding to the commands.
 void parsert::setup_commands()
 {

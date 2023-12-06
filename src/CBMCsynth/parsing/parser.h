@@ -12,6 +12,7 @@ class parsert : public smt2_parsert {
 public:
     explicit parsert(std::istream &_in) : smt2_parsert(_in) {
         setup_commands();
+        setup_expressions();
     }
 
     exprt::operandst assertions;
@@ -38,6 +39,7 @@ protected:
     enum invariant_variablet { PRIMED, UNPRIMED };
 
     void setup_commands();
+    void setup_expressions();
     void add_synth_fun_id(irep_idt id, 
     const smt2_parsert::signature_with_parameter_idst &sig, const syntactic_templatet& grammar);
     smt2_parsert::signature_with_parameter_idst inv_function_signature();
