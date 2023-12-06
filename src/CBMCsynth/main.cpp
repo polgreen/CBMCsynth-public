@@ -55,6 +55,8 @@ void help(std::ostream &out)
          "--dump-problem                   print problem in SyGuS-IF format\n"
          "--dump-problem-as-smt            use quantifiers to print a sygus problem in SMT-LIB\n"
          "--solve-with-cvc5                call CVC5 to solve the SyGuS problem\n"
+         "--probs F                        give a file with weights for each rule. The weights must be integers,\n"
+         "                                 one integer per line, in the order that the NTs and rules appear in the grammar\n"
          "\n"
          "\n"
          "The following options are applicable to SMT problems:\n"
