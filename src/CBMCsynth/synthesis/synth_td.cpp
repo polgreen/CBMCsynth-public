@@ -4,28 +4,9 @@
 #include <iostream>
 #include <util/mathematical_expr.h>
 
-std::mt19937 rng(0);
+std::mt19937 rng(rand());
 
-bool top_down_syntht::contains_nonterminal(const exprt &expr)
-{
-  if (expr.id() == ID_symbol)
-  {
-    auto &symbol = to_symbol_expr(expr);
-    if (grammar.production_rules.find(symbol.get_identifier()) != grammar.production_rules.end())
-    {
-      return true;
-    }
-  }
-  else
-  {
-    for (auto &op : expr.operands())
-    {
-      if (contains_nonterminal(op))
-        return true;
-    }
-  }
-  return false;
-}
+
 
 bool top_down_syntht::replace_nts(exprt &expr, std::size_t &current_depth)
 {
@@ -50,7 +31,7 @@ bool top_down_syntht::replace_nts(exprt &expr, std::size_t &current_depth)
           // replace with a terminal
           for (auto &rule : rules)
           {
-            if (!contains_nonterminal(rule))
+            if (!contains_nonterminal(rule, grammar))
             {
               expr = rule;
               replaced_something=true;
@@ -59,6 +40,7 @@ bool top_down_syntht::replace_nts(exprt &expr, std::size_t &current_depth)
           if(replaced_something==false)
           {
             // there was no terminal so we make up a terminal of the correct type
+            // TODO: we could also just return here and try again from the start
             replaced_something=true;
             if (symbol.type().id() == ID_bool)
               expr = true_exprt();
