@@ -190,6 +190,7 @@ void parse_probs(std::string filename, sygus_problemt& problem)
     {
       for(int i=0; i<grammar.production_rules[nt_id].size(); i++)
       {
+        std::cout<<"adding weight "<<weights[count]<<" to "<<expr2sygus(grammar.production_rules[nt_id][i])<<std::endl;
         if(count>=weights.size())
           UNEXPECTEDCASE("not enough weights in probability file");
         grammar.production_rule_weights[nt_id].push_back(weights[count]);

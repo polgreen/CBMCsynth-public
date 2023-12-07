@@ -1,7 +1,7 @@
 SRC=main.cpp smt2_frontend.cpp sygus_frontend.cpp \
 parsing/parser.cpp utils/printing_utils.cpp utils/util.cpp \
- sygus_problem.cpp synthesis/synth_td.cpp \
- smt_problem.cpp utils/expr2sygus.cpp cegis.cpp \
+ sygus_problem.cpp synthesis/synth_td.cpp synthesis/synth_bu.cpp \
+ smt_problem.cpp utils/expr2sygus.cpp cegis.cpp synthesis/synth.cpp \
  utils/cvc5_synth.cpp verification/verify.cpp verification/mini_verify.cpp \
 
 OBJ+= ../../$(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \

@@ -1,5 +1,5 @@
-#ifndef TD_SYNTH_H_
-#define TD_SYNTH_H_
+#ifndef BU_SYNTH_H_
+#define BU_SYNTH_H_
 
 #include "synth.h"
 #include "../verification/mini_verify.h"
@@ -8,25 +8,28 @@
 #include <util/namespace.h>
 #include <util/message.h>
 #include <random>
+#include <set>
 
 // a top down enumerator that randomly enumerates a grammar
 // NB: this only handles sygus_problems with a single synthesis function
-class top_down_syntht : public syntht
+class bottom_up_syntht : public syntht
 {
 public:
-  top_down_syntht(message_handlert &_ms, sygus_problemt &_problem, mini_verifyt &_cex_verifier) : 
+  bottom_up_syntht(message_handlert &_ms, sygus_problemt &_problem, mini_verifyt &_cex_verifier) : 
   message_handler(_ms),
                                                             problem(_problem),
                                                             cex_verifier(_cex_verifier),
                                                             grammar(_problem.get_grammar()){
                                                               create_distributions();
+                                                              current_pool = &program_pool1;
+                                                              prev_pool = &program_pool2;
                                                             };
 
   solutiont get_solution() const override;
 
   // initialises the top down enumeration wtih the start symbol of the grammar
   // then calls replace_nts to enumerate through the grammar
-  void top_down_enumerate();
+  void bottom_up_enumerate();
 
   // set maximum depth of enumeration
   void set_program_size(std::size_t size) override;
@@ -54,15 +57,29 @@ protected:
   std::vector<counterexamplet> counterexamples;
   // last solution we found
   solutiont last_solution;
+  // namespacet ns;
+
+  void get_next_programs();
+  void initialise_program_pool();
+  void empty_current_pool();
+  std::set<exprt> replace_one_nt(const exprt &expr, const syntactic_templatet &grammar, std::set<exprt> &new_exprs);
+
+  
+  // we have two program pools, 
+  // we use program_pool1 as the current pool on odd iterations (e.g., 1, 3)
+  // and program_pool2 as the current pool on even iterations
+  // the other pool is always the pool from the previous iteration
+  std::map<irep_idt, std::set<exprt>> program_pool1;
+  std::map<irep_idt, std::set<exprt>> program_pool2;
+
+  std::map<irep_idt, std::set<exprt>> *current_pool;
+  std::map<irep_idt, std::set<exprt>> *prev_pool;
+  std::size_t iteration;
  
   // depth we enumerate to
   std::size_t program_size;
 
-  // randomly chooses a production rule to apply whenever it finds
-  // a non-terminal in the exprt. If it hits maximum depth, it replaces the non-terminal
-  // with the first terminal in the production rules that it finds.
-  // it returns when it has found a complete program.
-  bool replace_nts(exprt &expr, std::size_t &current_depth);
+
 
   // creates the distributions based on non-terminal weights
   void create_distributions();
@@ -74,4 +91,4 @@ protected:
 
 };
 
-#endif /* TD_SYNTH_H_ */
+#endif /* BU_SYNTH_H_ */

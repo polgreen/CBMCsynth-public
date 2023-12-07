@@ -23,4 +23,9 @@ public:
   
 };
 
+bool contains_nonterminal(const exprt &expr, const syntactic_templatet& grammar);
+std::size_t count_nonterminals(const exprt &expr, const syntactic_templatet& grammar);
+std::vector<symbol_exprt> list_nonterminals(const exprt &expr, const syntactic_templatet& grammar);
+
+
 #endif /* SYNTH_H_ */

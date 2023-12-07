@@ -15,6 +15,41 @@
 #include <iostream>
 
 
+void basic_simplify(exprt &expr)
+{
+  std::cout<<"calling basic simplify on "<< expr.pretty()<<std::endl;
+  if (expr.id() == ID_if)
+  {
+    if (to_if_expr(expr).true_case() == to_if_expr(expr).false_case())
+    {
+      expr = to_if_expr(expr).true_case();
+    }
+    else if (to_if_expr(expr).cond() == true_exprt())
+    {
+      expr = to_if_expr(expr).true_case();
+    }
+    else if (to_if_expr(expr).cond() == false_exprt())
+    {
+      expr = to_if_expr(expr).false_case();
+    }
+  }
+  else if (expr.id() == ID_equal || expr.id() == ID_le || expr.id() == ID_ge)
+  {
+    if (expr.operands()[0] == expr.operands()[1])
+      expr = true_exprt();
+  }
+  else if (expr.id() == ID_lt || expr.id() == ID_gt)
+  {
+    if (expr.operands()[0] == expr.operands()[1])
+      expr = false_exprt();
+  }
+
+  for (auto &op : expr.operands())
+  {
+    basic_simplify(op);
+  }
+}
+
 
 void expand_function_applications(exprt &expr, const std::map<symbol_exprt, exprt> &defined_functions)
 {

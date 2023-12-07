@@ -41,4 +41,7 @@ void nnf(exprt &expr, bool negate);
 // not implemented. Will convert function to DNF form
 void dnf(exprt &expr);
 
+// does some basic simplification of an expression
+void basic_simplify(exprt &expr);
+
 #endif //CBMCSMT_UTIL_H
