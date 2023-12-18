@@ -3,7 +3,6 @@
 //
 
 #include "util.h"
-#include "expr2sygus.h"
 #include <iostream>
 #include <vector>
 #include <filesystem>
@@ -16,10 +15,9 @@
 #include <iostream>
 
 
-
-
-bool basic_simplify(exprt &expr)
+void basic_simplify(exprt &expr)
 {
+  std::cout<<"calling basic simplify on "<< expr.pretty()<<std::endl;
   if (expr.id() == ID_if)
   {
     if (to_if_expr(expr).true_case() == to_if_expr(expr).false_case())
@@ -34,75 +32,22 @@ bool basic_simplify(exprt &expr)
     {
       expr = to_if_expr(expr).false_case();
     }
-    else if(expr2sygus(to_if_expr(expr).true_case())>expr2sygus(to_if_expr(expr).false_case()))
-    {
-      return false;
-    }
   }
   else if (expr.id() == ID_equal || expr.id() == ID_le || expr.id() == ID_ge)
   {
-    if (expr.operands()[0] == expr.operands()[1] || 
-      (expr.operands()[0].id()==ID_constant && expr.operands()[1].id()==ID_constant))
-        expr = true_exprt(); 
+    if (expr.operands()[0] == expr.operands()[1])
+      expr = true_exprt();
   }
-  else if (expr.id() == ID_lt || expr.id() == ID_gt )
+  else if (expr.id() == ID_lt || expr.id() == ID_gt)
   {
-    if (expr.operands()[0] == expr.operands()[1] || 
-      (expr.operands()[0].id()==ID_constant && expr.operands()[1].id()==ID_constant))
+    if (expr.operands()[0] == expr.operands()[1])
       expr = false_exprt();
-  }
-  else if(expr.id()==ID_minus)
-  {
-    if(expr.operands()[1].id()==ID_constant)
-    {
-      constant_exprt &constant1 = to_constant_expr(expr.operands()[1]);
-      if (constant1.value_is_zero_string())
-      {
-        expr = expr.operands()[0];
-      }
-    }
-    else if (expr.operands()[0] == expr.operands()[1])
-      expr=from_integer(0, expr.type());
-  }
-  else if (expr.id()==ID_plus || expr.id()==ID_mult)
-  {
-    if(expr.operands()[0].id()==ID_constant)
-    {
-      constant_exprt &constant0 = to_constant_expr(expr.operands()[0]);
-      if (constant0.value_is_zero_string())
-      {
-        expr = expr.operands()[1];
-      }
-      else if (expr.operands()[1].id()==ID_constant)
-      {
-        constant_exprt &constant1 = to_constant_expr(expr.operands()[1]);
-        if (constant1.value_is_zero_string())
-        {
-          expr = expr.operands()[0];
-        }
-      }
-    }
-    else if(expr.operands()[1].id()==ID_constant)
-    {
-      constant_exprt &constant1 = to_constant_expr(expr.operands()[1]);
-      if (constant1.value_is_zero_string())
-      {
-        expr = expr.operands()[0];
-      }
-    }
-  }
-  // discard commutative operators when op1 > op0
-  if(expr.id()==ID_and || expr.id()==ID_or || expr.id()==ID_equal || expr.id()==ID_plus || expr.id()==ID_mult)
-  {
-    if(expr2sygus(expr.operands()[0])>expr2sygus(expr.operands()[1]))
-      return false;
   }
 
   for (auto &op : expr.operands())
   {
     basic_simplify(op);
   }
-  return true;
 }
 
 

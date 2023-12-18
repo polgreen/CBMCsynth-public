@@ -1,6 +1,5 @@
 #include "synth_bu.h"
 #include "../utils/expr2sygus.h"
-#include "../utils/execute_expr.h"
 #include "../utils/util.h"
 #include <util/arith_tools.h>
 #include <iostream>
@@ -55,7 +54,7 @@ std::vector<std::vector<exprt>> cartesian(std::vector<std::vector<exprt>> &sets)
   return temp;
 }
 
-bool bottom_up_syntht::initialise_program_pool()
+void bottom_up_syntht::initialise_program_pool()
 {
   // initialise program set with all terminals in the grammar
   for (const auto &nt : grammar.nt_ids)
@@ -64,20 +63,15 @@ bool bottom_up_syntht::initialise_program_pool()
     for (const auto &nt_rule : grammar.production_rules.at(nt))
     {
       if (!contains_nonterminal(nt_rule, grammar))
-      {
         (*current_pool)[nt].insert(nt_rule);
-        if(verify_against_counterexamples(nt_rule))
-          return true;
-      }
     }
   }
-  return false;
 }
 
 void bottom_up_syntht::empty_current_pool()
 {
   (*current_pool).clear();
-  // initialise program set with an empty set for each nonterminal
+  // initialise program set with all terminals in the grammar
   for (const auto &nt : grammar.nt_ids)
   {
     (*current_pool)[nt] = std::set<exprt>();
@@ -92,53 +86,14 @@ std::string print_pool(std::map<irep_idt, std::set<exprt>> &pool)
     result += id2string(nt.first) + ": ";
     for (const auto &expr : nt.second)
     {
-
       result += expr2sygus(expr) + ", ";
     }
-    result += "\n\n";
+    result += "\n";
   }
   return result;
 }
 
-
-bool bottom_up_syntht::is_observationally_unique(const exprt &expr, const irep_idt &nt)
-{
-  if(counterexamples.size()==0)
-    return true;
-  // create lamda expression
-  lambda_exprt lambda(problem.synthesis_functions[0].parameters, expr);
-  bool is_new=false;
-  std::vector<int> outputs;
-  for(int i=0; i<counterexamples.size(); i++)
-  {
-    std::vector<exprt> inputs;
-    // construct inputs for the counterexample
-    for(const auto &p: problem.synthesis_functions[0].parameters)
-    {
-      inputs.push_back(counterexamples[i].assignment.at(p));
-    }
-    exprt fapp = lambda.application(inputs);
-    if(fapp.type().id()==ID_bool)
-      outputs.push_back(execute_boolean_expr(fapp)?1:0);
-    else if(fapp.type().id()==ID_integer)
-      outputs.push_back(execute_integer_expr(fapp));
-    else
-      std::cout<<"observational equivalence not support for this type"<<std::endl;
-  }
-  std::cout<<"cex: " << counterexamples.size()<<" outputs: ";
-  for(const auto &o: outputs)
-    std::cout<<o<<", ";
-  if(counterexample_results[nt].insert(outputs).second == true)
-    is_new=true;
-  if(is_new)
-    std::cout<<"new program: "<<expr2sygus(expr)<<std::endl;
-  else
-    std::cout<<"not new: "<<expr2sygus(expr)<<std::endl;
-  return is_new;
-}
-
-
-bool bottom_up_syntht::get_next_programs()
+void bottom_up_syntht::get_next_programs()
 {
   // in each iteration we switch set the current pool to be the previous pool
   // and clear the current pool
@@ -146,7 +101,8 @@ bool bottom_up_syntht::get_next_programs()
   empty_current_pool();
   if (prev_pool->size() == 0)
   {
-    return initialise_program_pool();
+    initialise_program_pool();
+    return;
   }
   // get all possible combinations of programs for each nonterminal
   for (const auto &nt : grammar.nt_ids)
@@ -173,24 +129,14 @@ bool bottom_up_syntht::get_next_programs()
         {
           replace_first_expr(nonterminals[i], tuple[i], new_expr);
         }
-        // std::cout << "adding " << expr2sygus(new_expr)<<std::endl;
-        // TODO: check observational equivalence here before adding to the pool
-        if (basic_simplify(new_expr) && is_observationally_unique(new_expr, nt))
-        {
-         if((*prev_pool).at(nt).find(new_expr) == (*prev_pool).at(nt).end())
-          {
-            (*current_pool)[nt].insert(new_expr);
-            if (nt == grammar.start)
-            {
-              if(verify_against_counterexamples(new_expr))
-                return true;
-            }
-          }
-        }
+        std::cout << "adding " << expr2sygus(new_expr)<<std::endl;
+        // TODO: simplify here
+        basic_simplify(new_expr);
+        std::cout << " simplified " << expr2sygus(new_expr) << std::endl;
+        (*current_pool)[nt].insert(new_expr);
       }
     }
   }
-  return false;
 }
 
 solutiont bottom_up_syntht::get_solution() const
@@ -206,12 +152,6 @@ void bottom_up_syntht::set_program_size(std::size_t size)
 void bottom_up_syntht::add_counterexample(const counterexamplet &cex)
 {
   counterexamples.push_back(cex);
-  // initialise the map of cex results
-  if(counterexample_results.size()==0)
-  {
-    for(const auto &nt: grammar.nt_ids)
-      counterexample_results[nt] = std::set<std::vector<int>>();
-  }
 }
 
 void bottom_up_syntht::create_distributions()
@@ -228,37 +168,37 @@ void bottom_up_syntht::create_distributions()
   }
 }
 
-bool bottom_up_syntht::verify_against_counterexamples(const exprt & expr)
-{
-  std::cout << "checking solution " << expr2sygus(expr) << std::endl;
-      last_solution.functions[symbol_exprt(problem.synthesis_functions[0].id,
-                                           problem.synthesis_functions[0].type)] =
-          lambda_exprt(problem.synthesis_functions[0].parameters, expr);
-  if (counterexamples.size() == 0)
-    return true;
-  else if (cex_verifier(problem, last_solution, counterexamples) == mini_verifyt::resultt::PASS)
-  {
-    std::cout << "counterexample verifier passed " << std::endl;
-        return true;
- }
- else
- {
-   std::cout << "counterexample verifier failed " << std::endl;
-   return false;
- }
-}
-
-
 bottom_up_syntht::resultt bottom_up_syntht::operator()()
 {
-  std::size_t iteration = 0;
+  std::cout << "starting enumeration" << std::endl;
   while (true)
   {
-    std::cout<<"iteration "<<iteration<<std::endl;
     // maybe put this in a timeout
-    if(get_next_programs())
-      return CANDIDATE;
-    iteration++;
+    get_next_programs();
+
+    for (const auto &p : (*current_pool)[grammar.start])
+    {
+      std::cout << "Pool of solutions" << grammar.start << std::endl;
+      std::cout << expr2sygus(p) << std::endl;
+      last_solution.functions[symbol_exprt(problem.synthesis_functions[0].id,
+                                           problem.synthesis_functions[0].type)] =
+          lambda_exprt(problem.synthesis_functions[0].parameters, p);
+      // check against counterexamples
+      if (counterexamples.size() == 0)
+      {
+        std::cout << "No counterexamples, returning candidate" << std::endl;
+        return CANDIDATE;
+      }
+      else if (cex_verifier(problem, last_solution, counterexamples) == mini_verifyt::resultt::PASS)
+      {
+        std::cout << "counterexample verifier passed " << std::endl;
+        return CANDIDATE;
+      }
+      else
+      {
+        std::cout << "counterexample verifier failed " << std::endl;
+      }
+    }
   }
   return NO_SOLUTION;
 }

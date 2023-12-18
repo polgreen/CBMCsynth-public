@@ -31,10 +31,6 @@ public:
   // then calls replace_nts to enumerate through the grammar
   void bottom_up_enumerate();
 
-  // filters the current pool of programs based on observational equivalence 
-  // and simplification
-  void filter_pool();
-
   // set maximum depth of enumeration
   void set_program_size(std::size_t size) override;
 
@@ -59,18 +55,12 @@ protected:
   syntactic_templatet grammar;
   // counterexamples
   std::vector<counterexamplet> counterexamples;
-  // for each nonterminal, the map contains a set of vectors of integers.
-  // each vector of integers is a list of outputs obtained
-  // by executing a candidate program on the vector of counterexamples.
-  // we use this to check if we are adding candidates taht are observationally
-  // equivalent to the current pool.
-  std::map<irep_idt,std::set<std::vector<int>>> counterexample_results;
   // last solution we found
   solutiont last_solution;
   // namespacet ns;
 
-  bool get_next_programs();
-  bool initialise_program_pool();
+  void get_next_programs();
+  void initialise_program_pool();
   void empty_current_pool();
   std::set<exprt> replace_one_nt(const exprt &expr, const syntactic_templatet &grammar, std::set<exprt> &new_exprs);
 
@@ -81,9 +71,6 @@ protected:
   // the other pool is always the pool from the previous iteration
   std::map<irep_idt, std::set<exprt>> program_pool1;
   std::map<irep_idt, std::set<exprt>> program_pool2;
-  // we keep the pool of new potential solutions here so we can check
-  // them, without checking every program in the pool
-  std::set<exprt> latest_solution_pool;
 
   std::map<irep_idt, std::set<exprt>> *current_pool;
   std::map<irep_idt, std::set<exprt>> *prev_pool;
@@ -92,11 +79,7 @@ protected:
   // depth we enumerate to
   std::size_t program_size;
 
-  bool is_observationally_unique(const exprt &expr, const irep_idt &nt);
-  // program inputs and outputs
-  std::set<std::pair<std::vector<constant_exprt>, constant_exprt>> program_io;
 
-  bool verify_against_counterexamples(const exprt & expr);
 
   // creates the distributions based on non-terminal weights
   void create_distributions();
