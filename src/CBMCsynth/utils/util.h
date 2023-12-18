@@ -42,6 +42,8 @@ void nnf(exprt &expr, bool negate);
 void dnf(exprt &expr);
 
 // does some basic simplification of an expression
-void basic_simplify(exprt &expr);
+// returns false if expression shoudl be discarded
+// we discard every commutative operator where the op0 is > op1.
+bool basic_simplify(exprt &expr);
 
 #endif //CBMCSMT_UTIL_H
