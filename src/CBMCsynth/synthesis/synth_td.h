@@ -8,6 +8,7 @@
 #include <util/namespace.h>
 #include <util/message.h>
 #include <random>
+#include <set>
 
 // a top down enumerator that randomly enumerates a grammar
 // NB: this only handles sygus_problems with a single synthesis function
@@ -38,6 +39,8 @@ public:
   // adds a counterexample to the list
   void add_counterexample(const counterexamplet &cex) override;
 
+  using enum_resultt = enum { CHANGED, NO_CHANGE, ABORT};
+
 protected:
   // used for printing. TODO: make all the printing use the message handlers correctly
   message_handlert &message_handler;
@@ -54,6 +57,7 @@ protected:
   std::vector<counterexamplet> counterexamples;
   // last solution we found
   solutiont last_solution;
+  std::set<std::vector<unsigned>> prev_solutions;
  
   // depth we enumerate to
   std::size_t program_size;
@@ -62,7 +66,7 @@ protected:
   // a non-terminal in the exprt. If it hits maximum depth, it replaces the non-terminal
   // with the first terminal in the production rules that it finds.
   // it returns when it has found a complete program.
-  bool replace_nts(exprt &expr, std::size_t &current_depth);
+  enum_resultt replace_nts(exprt &expr, std::size_t &current_depth, std::vector<unsigned> &sequence);
 
   // creates the distributions based on non-terminal weights
   void create_distributions();
