@@ -17,7 +17,6 @@
 
 void basic_simplify(exprt &expr)
 {
-  std::cout<<"calling basic simplify on "<< expr.pretty()<<std::endl;
   if (expr.id() == ID_if)
   {
     if (to_if_expr(expr).true_case() == to_if_expr(expr).false_case())

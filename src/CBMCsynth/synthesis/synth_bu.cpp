@@ -129,10 +129,8 @@ void bottom_up_syntht::get_next_programs()
         {
           replace_first_expr(nonterminals[i], tuple[i], new_expr);
         }
-        std::cout << "adding " << expr2sygus(new_expr)<<std::endl;
         // TODO: simplify here
         basic_simplify(new_expr);
-        std::cout << " simplified " << expr2sygus(new_expr) << std::endl;
         (*current_pool)[nt].insert(new_expr);
       }
     }
