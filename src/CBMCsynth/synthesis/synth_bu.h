@@ -10,7 +10,7 @@
 #include <random>
 #include <set>
 
-// a top down enumerator that randomly enumerates a grammar
+// a bottom up enumerator that enumerates a grammar
 // NB: this only handles sygus_problems with a single synthesis function
 class bottom_up_syntht : public syntht
 {
@@ -63,9 +63,9 @@ protected:
   void get_next_programs();
   void initialise_program_pool();
   void empty_current_pool();
+
   std::set<exprt> replace_one_nt(const exprt &expr, const syntactic_templatet &grammar, std::set<exprt> &new_exprs);
 
-  
   // we have two program pools, 
   // we use program_pool1 as the current pool on odd iterations (e.g., 1, 3)
   // and program_pool2 as the current pool on even iterations
@@ -82,16 +82,15 @@ protected:
 
   std::vector<exprt> solutions_to_check;
 
-
-
   // creates the distributions based on non-terminal weights
   void create_distributions();
-
   // the distributions for each non-terminal
   // irep_idt is the nonterminal name, the distribution has a weight for each
   // production rule for that nonterminal.
   std::map<irep_idt, std::discrete_distribution<int>> distributions;
-
 };
+
+  std::vector<std::vector<exprt>> cartesian(std::vector<std::vector<exprt>> &sets);
+  bool replace_first_expr(const exprt &what, const exprt &by, exprt &dest);
 
 #endif /* BU_SYNTH_H_ */

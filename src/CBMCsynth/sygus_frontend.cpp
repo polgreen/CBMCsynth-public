@@ -11,6 +11,7 @@
 #include "synthesis/synth.h"
 #include "synthesis/synth_td.h"
 #include "synthesis/synth_bu.h"
+#include "synthesis/synth_prob_bu.h"
 #include "verification/verify.h"
 #include "verification/mini_verify.h"
 #include "cegis.h"
@@ -132,19 +133,30 @@ int sygus_frontend(const cmdlinet &cmdline)
   }
   if(cmdline.isset("cegis"))
   {
-    message.status()<<"Basic CEGIS"<<messaget::eom;
+    message.status()<<"top down CEGIS"<<messaget::eom;
     mini_verifyt mini_verify(ns, message_handler);
     top_down_syntht synth(message_handler, problem, mini_verify);
     synth.set_program_size(5);
     verifyt verify(ns, message_handler);
     cegist cegis(synth, verify, problem, ns);
     cegis.doit();
+    return 0;
   }
-  if(cmdline.isset("cegis-bu"))
+  else if(cmdline.isset("cegis-bu"))
   {
-    message.status()<<"Basic CEGIS"<<messaget::eom;
+    message.status()<<"Basic bottom up CEGIS"<<messaget::eom;
     mini_verifyt mini_verify(ns, message_handler);
     bottom_up_syntht synth(message_handler, problem, mini_verify);
+    synth.set_program_size(5);
+    verifyt verify(ns, message_handler);
+    cegist cegis(synth, verify, problem, ns);
+    cegis.doit();
+  }
+  else if(cmdline.isset("cegis-prob-bu"))
+  {
+    message.status()<<"probabilistic bottom up CEGIS"<<messaget::eom;
+    mini_verifyt mini_verify(ns, message_handler);
+    prob_bu_syntht synth(message_handler, problem, mini_verify);
     synth.set_program_size(5);
     verifyt verify(ns, message_handler);
     cegist cegis(synth, verify, problem, ns);

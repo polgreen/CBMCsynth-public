@@ -109,8 +109,9 @@ void bottom_up_syntht::get_next_programs()
   {
     // for each production rule, we generate a new program for
     // every combination of replacements for the nonterminal in the rule
-    for (const auto &rule : grammar.production_rules.at(nt))
+    for(unsigned i=0; i<grammar.production_rules.at(nt).size(); i++)
     {
+      const auto &rule = grammar.production_rules.at(nt)[i];
       std::vector<symbol_exprt> nonterminals = list_nonterminals(rule, grammar);
       std::vector<std::vector<exprt>> sets_of_progs;
       for (const auto &nt_id : nonterminals)
@@ -158,11 +159,6 @@ void bottom_up_syntht::create_distributions()
   {
     std::cout << "adding default weights" << std::endl;
     add_grammar_weights(grammar);
-  }
-  for (auto &nt : grammar.production_rule_weights)
-  {
-    distributions[nt.first] = std::discrete_distribution<int>(nt.second.begin(), nt.second.end());
-    std::cout << "created distribution for " << nt.first << std::endl;
   }
 }
 

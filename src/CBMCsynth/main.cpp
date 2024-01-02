@@ -21,6 +21,7 @@
   "(solve-with-cvc5)" \
   "(cegis)" \
   "(cegis-bu)" \
+  "(cegis-prob-bu)" \
   "(probs): " \
 
 /// File ending of SMT2 files. Used to determine the language frontend that
@@ -53,6 +54,8 @@ void help(std::ostream &out)
          "The following options are applicable to SyGuS problems:\n"
          "--cegis                          do CEGIS with the basic random top-down enumerator\n"
          "--cegis-bu                       do CEGIS with bottom up enumerator (no probabilities)\n"
+         "--cegis-prob-bu                  do CEGIS with bottom up enumerator with weights. \n"
+         "                                 we enumerate programs with the highest weight first\n"
          "--add-default-grammar            replace all synthesis function grammars with default\n"
          "--dump-problem                   print problem in SyGuS-IF format\n"
          "--dump-problem-as-smt            use quantifiers to print a sygus problem in SMT-LIB\n"
