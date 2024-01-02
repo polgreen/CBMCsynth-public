@@ -26,7 +26,7 @@ protected:
   void setup_rule_weights();
   void get_next_programs();
   void initialise_program_pool();
-  void calculate_program_score(const double &rule_score, const std::vector<exprt> &operands, const exprt &new_expr);
+  double calculate_program_score(const double &rule_score, const std::vector<exprt> &operands, const exprt &new_expr);
 
 
 };

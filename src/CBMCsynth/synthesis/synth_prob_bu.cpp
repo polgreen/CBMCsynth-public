@@ -4,7 +4,7 @@
 #include <iostream>
 
 
-void prob_bu_syntht::calculate_program_score(const double &rule_score, const std::vector<exprt> &operands, const exprt &new_expr)
+double prob_bu_syntht::calculate_program_score(const double &rule_score, const std::vector<exprt> &operands, const exprt &new_expr)
 {
   double new_score = rule_score;
   for(const auto &op : operands)
@@ -14,7 +14,7 @@ void prob_bu_syntht::calculate_program_score(const double &rule_score, const std
       new_score *= program_score[op];
     }
   }
-  program_score[new_expr] = new_score;
+  return new_score;
 }
 
 
@@ -74,10 +74,13 @@ void prob_bu_syntht::get_next_programs()
         {
           replace_first_expr(nonterminals[i], tuple[i], new_expr);
         }
-        calculate_program_score(score, tuple, new_expr);
+        double new_score = calculate_program_score(score, tuple, new_expr);
         // TODO: simplify here
         basic_simplify(new_expr);
-        (*current_pool)[nt].insert(new_expr);
+        if((*current_pool)[nt].insert(new_expr).second)
+        {
+          program_score[new_expr] = new_score;
+        }
       }
     }
   }
@@ -138,7 +141,9 @@ prob_bu_syntht::resultt prob_bu_syntht::operator()()
     }
     // get the next programs
     get_next_programs();
+
     // remove equivalent programs
+    // TO DO
 
     // add programs to the solution list
     for(const auto &p : (*current_pool)[grammar.start])
