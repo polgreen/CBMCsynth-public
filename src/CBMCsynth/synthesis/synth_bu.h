@@ -59,6 +59,7 @@ protected:
   solutiont last_solution;
   // namespacet ns;
 
+  bool verify_against_counterexamples(const exprt &p);
   void get_next_programs();
   void initialise_program_pool();
   void empty_current_pool();
@@ -78,6 +79,8 @@ protected:
  
   // depth we enumerate to
   std::size_t program_size;
+
+  std::vector<exprt> solutions_to_check;
 
 
 

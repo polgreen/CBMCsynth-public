@@ -166,36 +166,63 @@ void bottom_up_syntht::create_distributions()
   }
 }
 
+bool bottom_up_syntht::verify_against_counterexamples(const exprt &p)
+{
+  std::cout<<"checking solution "<< expr2sygus(p)<<std::endl;
+  last_solution.functions[symbol_exprt(problem.synthesis_functions[0].id,
+                                       problem.synthesis_functions[0].type)] =
+      lambda_exprt(problem.synthesis_functions[0].parameters, p);
+  // check against counterexamples
+  if (counterexamples.size() == 0)
+  {
+    std::cout << "No counterexamples, returning candidate" << std::endl;
+    return true;
+  }
+  else if (cex_verifier(problem, last_solution, counterexamples) == mini_verifyt::resultt::PASS)
+  {
+    std::cout << "counterexample verifier passed " << std::endl;
+    return true;
+  }
+  else
+  {
+    std::cout << "counterexample verifier failed " << std::endl;
+  }
+  return false;
+}
+
 bottom_up_syntht::resultt bottom_up_syntht::operator()()
 {
-  std::cout << "starting enumeration" << std::endl;
+  initialise_program_pool();
+  for(const auto &p : (*current_pool)[grammar.start])
+  {
+    solutions_to_check.push_back(p);
+  }
+
   while (true)
   {
-    // maybe put this in a timeout
-    get_next_programs();
-
-    for (const auto &p : (*current_pool)[grammar.start])
+    // check solutions in the list
+     std::vector<exprt>::iterator iter = solutions_to_check.begin();
+    while(iter != solutions_to_check.end())
     {
-      std::cout << "Pool of solutions" << grammar.start << std::endl;
-      std::cout << expr2sygus(p) << std::endl;
-      last_solution.functions[symbol_exprt(problem.synthesis_functions[0].id,
-                                           problem.synthesis_functions[0].type)] =
-          lambda_exprt(problem.synthesis_functions[0].parameters, p);
-      // check against counterexamples
-      if (counterexamples.size() == 0)
+      if(verify_against_counterexamples(*iter))
       {
-        std::cout << "No counterexamples, returning candidate" << std::endl;
-        return CANDIDATE;
-      }
-      else if (cex_verifier(problem, last_solution, counterexamples) == mini_verifyt::resultt::PASS)
-      {
-        std::cout << "counterexample verifier passed " << std::endl;
-        return CANDIDATE;
+       iter = solutions_to_check.erase(iter); 
+       return CANDIDATE;
       }
       else
       {
-        std::cout << "counterexample verifier failed " << std::endl;
+        iter = solutions_to_check.erase(iter);
       }
+    }
+    // get the next programs
+    get_next_programs();
+
+    // remove equivalent programs
+
+    // add programs to the solution list
+    for(const auto &p : (*current_pool)[grammar.start])
+    {
+      solutions_to_check.push_back(p);
     }
   }
   return NO_SOLUTION;
