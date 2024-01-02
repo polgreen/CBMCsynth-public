@@ -11,6 +11,7 @@
 #include <util/suffix.h>
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
+#include "expr2sygus.h"
 
 #include <iostream>
 
@@ -41,6 +42,13 @@ void basic_simplify(exprt &expr)
   {
     if (expr.operands()[0] == expr.operands()[1])
       expr = false_exprt();
+  }
+  // make sure that the first operand is always the smaller one for commutative exprs
+  else if(expr.id()== ID_equal || expr.id()==ID_plus || expr.id() == ID_mult || 
+          expr.id()==ID_and || expr.id()==ID_or )
+  {
+    if(expr2sygus(expr.operands()[0]) > expr2sygus(expr.operands()[1]))
+      std::swap(expr.operands()[0], expr.operands()[1]);
   }
 
   for (auto &op : expr.operands())
