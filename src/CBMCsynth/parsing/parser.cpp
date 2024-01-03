@@ -473,7 +473,7 @@ void parsert::generate_inv_constraint()
   // make constraints
   // these currently expand the function applications
   sygus_problem.constraints.push_back(implies_exprt(pre_lambda.application(pre_arguments), inv_app));
-  sygus_problem.constraints.push_back(implies_exprt(and_exprt(inv, trans_lambda.application(trans_arguments)), invprime_app));
+  sygus_problem.constraints.push_back(implies_exprt(and_exprt(inv_app, trans_lambda.application(trans_arguments)), invprime_app));
   sygus_problem.constraints.push_back(implies_exprt(post_lambda.application(post_arguments), inv_app));
 
 }
