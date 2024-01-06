@@ -1,5 +1,7 @@
 #include "synth_td.h"
+#include "syntactic_feedback.h"
 #include "../utils/expr2sygus.h"
+#include "../utils/util.h"
 #include <util/arith_tools.h>
 #include <iostream>
 #include <util/mathematical_expr.h>
@@ -17,6 +19,7 @@ std::string print_sequence(std::vector<unsigned> &sequence)
   }
   return result;
 }
+
 
 top_down_syntht::enum_resultt top_down_syntht::replace_nts(exprt &expr, std::size_t &current_depth, std::vector<unsigned> &sequence)
 {
@@ -104,6 +107,7 @@ top_down_syntht::enum_resultt top_down_syntht::replace_nts(exprt &expr, std::siz
 
 void top_down_syntht::top_down_enumerate()
 {
+  syntactic_feedbackt feedback(problem, grammar);
   exprt current_program = symbol_exprt(grammar.start, grammar.start_type);
 
   // enumerate through the grammar until a complete program is found
@@ -111,6 +115,16 @@ void top_down_syntht::top_down_enumerate()
   bool no_solution=true;
   while (no_solution)
   {
+    if(count_symbol_occurrences(current_program, grammar.nt_ids)==1)
+    {
+      std::cout << "Partial prog: " << expr2sygus(current_program) << std::endl;
+      if(feedback.augment_grammar(current_program, problem))
+      {
+        create_distributions();
+        std::cout<<"augmented grammar: "<<grammar2sygus(grammar)<<std::endl;
+      }
+    }
+    
     std::size_t current_depth = 0;
     // if we didn't replace anything, we had a complete program. Exit the loop
     switch(replace_nts(current_program, current_depth, sequence))
@@ -120,6 +134,7 @@ void top_down_syntht::top_down_enumerate()
         sequence.clear();
         break;
       case enum_resultt::CHANGED:
+
         break;
       case enum_resultt::NO_CHANGE:
         prev_solutions.insert(sequence);

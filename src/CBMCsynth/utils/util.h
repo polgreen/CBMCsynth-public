@@ -44,4 +44,7 @@ void dnf(exprt &expr);
 // does some basic simplification of an expression
 void basic_simplify(exprt &expr);
 
+// counts the number of times any symbol in the ids vector occurs in the expression
+std::size_t count_symbol_occurrences(const exprt &expr , const std::vector<irep_idt> &ids);
+
 #endif //CBMCSMT_UTIL_H

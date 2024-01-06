@@ -1155,6 +1155,27 @@ std::string fun_def(const symbol_exprt &fun, const exprt &def)
   return result;
 }
 
+
+std::string grammar2sygus(const syntactic_templatet &grammar)
+{
+  std::string nts = "(";
+  std::string rules = "(";
+  // declare nonterminals
+  for (std::size_t i = 0; i < grammar.nt_ids.size(); i++)
+  {
+    auto &nt = grammar.nt_ids[i];
+    auto &rule = grammar.production_rules.at(nt);
+    nts += "(" + id2string(nt) + " " + type2sygus(rule[0].type()) + ")";
+    rules += "(" + id2string(nt) + " " + type2sygus(rule[0].type()) + " (";
+    for (const auto &r : rule)
+      rules += expr2sygus(r) + " ";
+    rules += "))\n";
+  }
+  nts += ")\n";
+  rules += ")\n";
+  return nts + rules;
+}
+
 std::string synth_fun_dec(const synth_funt &f)
 {
   std::string result = "(synth-fun " + clean_id(f.id);
@@ -1178,24 +1199,8 @@ std::string synth_fun_dec(const synth_funt &f)
   // grammar is empty
   if (f.grammar.nt_ids.size() == 0)
     return result += ")\n";
-
-  std::string nts = "(";
-  std::string rules = "(";
-  // declare nonterminals
-  for (std::size_t i = 0; i < f.grammar.nt_ids.size(); i++)
-  {
-    auto &nt = f.grammar.nt_ids[i];
-    auto &rule = f.grammar.production_rules.at(nt);
-    nts += "(" + id2string(nt) + " " + type2sygus(rule[0].type()) + ")";
-    rules += "(" + id2string(nt) + " " + type2sygus(rule[0].type()) + " (";
-    for (const auto &r : rule)
-      rules += expr2sygus(r) + " ";
-    rules += "))\n";
-  }
-  nts += ")\n";
-  rules += ")\n";
-  result += nts + rules + ")\n";
-  return result;
+  else
+    return result += grammar2sygus(f.grammar) +  ")\n";
 }
 
 std::string expr2sygus(const exprt &expr)

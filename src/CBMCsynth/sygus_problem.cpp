@@ -156,7 +156,7 @@ std::vector<exprt> sygus_problemt::nnf_constraints() const
   return result;
 }
 
-syntactic_templatet sygus_problemt::get_grammar() const
+syntactic_templatet& sygus_problemt::get_grammar()
 {
   PRECONDITION_WITH_DIAGNOSTICS(synthesis_functions.size() == 1, "only one synthesis function supported");
   if (synthesis_functions[0].grammar.nt_ids.size() == 0)

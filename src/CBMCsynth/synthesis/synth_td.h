@@ -52,7 +52,7 @@ protected:
   // we make a copy of this rather than using the one in the SyGuS problem
   // so we can change it if we need
   // TODO: make this a reference to the grammar in the sygus problem
-  syntactic_templatet grammar;
+  syntactic_templatet &grammar;
   // counterexamples
   std::vector<counterexamplet> counterexamples;
   // last solution we found

@@ -314,3 +314,29 @@ std::string replace_occurences(std::string str, const std::string &from, const s
     }
     return str;
 }
+
+
+void count_occurrences(const exprt &expr, const std::vector<irep_idt> &ids, std::size_t &count)
+{
+  if(expr.id()==ID_symbol)
+  {
+    for(const auto &id: ids)
+    {
+      if(to_symbol_expr(expr).get_identifier()==id)
+      {
+        count++;
+      }
+    }
+  }
+  for(const auto &op: expr.operands())
+  {
+    count_occurrences(op, ids, count);
+  }
+}
+
+std::size_t count_symbol_occurrences(const exprt &expr , const std::vector<irep_idt> &ids)
+{
+  std::size_t count = 0;
+  count_occurrences(expr, ids, count);
+  return count;
+}

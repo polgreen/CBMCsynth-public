@@ -49,8 +49,7 @@ public:
     irep_idt inv_id, pre_id, trans_id, post_id;
     std::string logic;
     std::vector<exprt> nnf_constraints() const;
-    syntactic_templatet get_grammar() const;
-
+    syntactic_templatet& get_grammar();
 };
 
 synth_funt copy_fun_add_grammar(const synth_funt &f);

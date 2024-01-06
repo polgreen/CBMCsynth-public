@@ -79,5 +79,7 @@ std::string build_sygus_query(const sygus_problemt &problem);
 
 std::string build_sygus_query(const sygus_problemt &problem, bool add_default_grammar);
 
+std::string grammar2sygus(const syntactic_templatet &grammar);
+
 
 #endif /* EMU_EXPR2SYGUS*/

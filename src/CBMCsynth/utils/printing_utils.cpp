@@ -93,6 +93,8 @@ void print_sygus_as_smt(const sygus_problemt &problem, std::ostream &out)
 
 
 
+
+
 void print_sygus_as_python(const sygus_problemt &problem, std::ostream &out, namespacet &ns)
 {
   for(const auto &f: problem.synthesis_functions)
@@ -111,10 +113,7 @@ void print_sygus_as_python(const sygus_problemt &problem, std::ostream &out, nam
 
   // put the constraints in as comments, similar to the human eval benchmark set
   out << "\"\"\"" << std::endl;
-  out << "Write a function which satisfies the following constraints\n" << std::endl;
-  for (const auto &c: problem.nnf_constraints())
-    out << "assert(" << expr2c(c, ns) << ") \n";
-   out << "\"\"\"" << std::endl; 
+
 }
 
 void print_sygus_problem(const sygus_problemt &problem, std::ostream &out)
