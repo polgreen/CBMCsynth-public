@@ -148,6 +148,7 @@ bool syntactic_feedbackt::augment_grammar(const exprt &partial_function,
               problem.get_grammar().production_rule_weights[rules.first].begin(),
             problem.get_grammar().production_rule_weights[rules.first].end());
             problem.get_grammar().production_rule_weights[rules.first].
+            // TODO: this is a heuristic to decide how likely it is that we pick the new production rules
             push_back(*max * 10);
             change=true;
           }

@@ -115,6 +115,7 @@ void top_down_syntht::top_down_enumerate()
   bool no_solution=true;
   while (no_solution)
   {
+    // if we only have one nonterminal, ask the LLM for guidance
     if(count_symbol_occurrences(current_program, grammar.nt_ids)==1)
     {
       std::cout << "Partial prog: " << expr2sygus(current_program) << std::endl;
@@ -122,10 +123,13 @@ void top_down_syntht::top_down_enumerate()
       {
         create_distributions();
         std::cout<<"augmented grammar: "<<grammar2sygus(grammar)<<std::endl;
+        // TODO: undo this if we don't want to keep the augmented grammar?
       }
     }
     
     std::size_t current_depth = 0;
+    // TODO: now we are counting the number of nonterminals, we can just exit
+    // if we find none.
     // if we didn't replace anything, we had a complete program. Exit the loop
     switch(replace_nts(current_program, current_depth, sequence))
     {
