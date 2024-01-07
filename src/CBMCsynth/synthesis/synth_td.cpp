@@ -115,17 +115,16 @@ void top_down_syntht::top_down_enumerate()
   bool no_solution=true;
   while (no_solution)
   {
+    std::cout<<"partial program: "<<expr2sygus(current_program)<<std::endl;
     std::size_t num_nonterminals = count_symbol_occurrences(current_program, grammar.nt_ids);
     // if we only have one nonterminal, ask the LLM for guidance
-    if(num_nonterminals==1 && use_syntactic_feedback && 
+    if(num_nonterminals>=1 && use_syntactic_feedback && 
       enumerations_since_LLM>frequency_of_LLM_calls)
     {
       enumerations_since_LLM=0;
-      std::cout << "Partial prog: " << expr2sygus(current_program) << std::endl;
       if(feedback.augment_grammar(current_program, problem))
       {
         create_distributions();
-        std::cout<<"augmented grammar: "<<grammar2sygus(grammar)<<std::endl;
         // TODO: undo this if we don't want to keep the augmented grammar?
       }
     }

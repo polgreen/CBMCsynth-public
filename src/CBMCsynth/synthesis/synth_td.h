@@ -64,12 +64,12 @@ protected:
   std::set<std::vector<unsigned>> prev_solutions;
  
   // depth we enumerate to
-  std::size_t program_size;
+  std::size_t program_size; // HEURISTIC
 
   // number of enumerations since the last LLM call
-  std::size_t enumerations_since_LLM;
+  std::size_t enumerations_since_LLM; // HEURISTIC
   // minimum number of enumerations between LLM calls
-  std::size_t frequency_of_LLM_calls = 5;
+  std::size_t frequency_of_LLM_calls = 5; // HEURISTIC
 
   // randomly chooses a production rule to apply whenever it finds
   // a non-terminal in the exprt. If it hits maximum depth, it replaces the non-terminal
