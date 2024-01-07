@@ -137,6 +137,19 @@ int sygus_frontend(const cmdlinet &cmdline)
     mini_verifyt mini_verify(ns, message_handler);
     top_down_syntht synth(message_handler, problem, mini_verify);
     synth.set_program_size(5);
+    synth.use_syntactic_feedback = false;
+    verifyt verify(ns, message_handler);
+    cegist cegis(synth, verify, problem, ns);
+    cegis.doit();
+    return 0;
+  }
+  if(cmdline.isset("LLM-cegis"))
+  {
+    message.status()<<"top down CEGIS with an LLM providing syntactic feedback"<<messaget::eom;
+    mini_verifyt mini_verify(ns, message_handler);
+    top_down_syntht synth(message_handler, problem, mini_verify);
+    synth.set_program_size(5);
+    synth.use_syntactic_feedback = true;
     verifyt verify(ns, message_handler);
     cegist cegis(synth, verify, problem, ns);
     cegis.doit();

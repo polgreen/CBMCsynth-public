@@ -19,7 +19,9 @@ public:
   message_handler(_ms),
                                                             problem(_problem),
                                                             cex_verifier(_cex_verifier),
-                                                            grammar(_problem.get_grammar()){
+                                                            grammar(_problem.get_grammar()),
+                                                            enumerations_since_LLM(0)
+                                                            {
                                                               create_distributions();
                                                             };
 
@@ -41,6 +43,8 @@ public:
 
   using enum_resultt = enum { CHANGED, NO_CHANGE, ABORT};
 
+  bool use_syntactic_feedback;
+
 protected:
   // used for printing. TODO: make all the printing use the message handlers correctly
   message_handlert &message_handler;
@@ -61,6 +65,11 @@ protected:
  
   // depth we enumerate to
   std::size_t program_size;
+
+  // number of enumerations since the last LLM call
+  std::size_t enumerations_since_LLM;
+  // minimum number of enumerations between LLM calls
+  std::size_t frequency_of_LLM_calls = 5;
 
   // randomly chooses a production rule to apply whenever it finds
   // a non-terminal in the exprt. If it hits maximum depth, it replaces the non-terminal

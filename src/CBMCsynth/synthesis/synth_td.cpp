@@ -115,9 +115,12 @@ void top_down_syntht::top_down_enumerate()
   bool no_solution=true;
   while (no_solution)
   {
+    std::size_t num_nonterminals = count_symbol_occurrences(current_program, grammar.nt_ids);
     // if we only have one nonterminal, ask the LLM for guidance
-    if(count_symbol_occurrences(current_program, grammar.nt_ids)==1)
+    if(num_nonterminals==1 && use_syntactic_feedback && 
+      enumerations_since_LLM>frequency_of_LLM_calls)
     {
+      enumerations_since_LLM=0;
       std::cout << "Partial prog: " << expr2sygus(current_program) << std::endl;
       if(feedback.augment_grammar(current_program, problem))
       {
@@ -126,7 +129,17 @@ void top_down_syntht::top_down_enumerate()
         // TODO: undo this if we don't want to keep the augmented grammar?
       }
     }
-    
+    else
+    {
+      enumerations_since_LLM++;
+    }
+    if(num_nonterminals==0)
+    {
+      prev_solutions.insert(sequence);
+      no_solution=false;
+      // we have a complete program
+      break;
+    }
     std::size_t current_depth = 0;
     // TODO: now we are counting the number of nonterminals, we can just exit
     // if we find none.
@@ -141,8 +154,8 @@ void top_down_syntht::top_down_enumerate()
 
         break;
       case enum_resultt::NO_CHANGE:
-        prev_solutions.insert(sequence);
-        no_solution=false;
+        // should never get here
+        throw "No change in top down enumeration";
         break;
     }
   }

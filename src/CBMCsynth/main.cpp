@@ -23,6 +23,7 @@
   "(cegis-bu)" \
   "(cegis-prob-bu)" \
   "(probs): " \
+  "(LLM-cegis) " \
 
 /// File ending of SMT2 files. Used to determine the language frontend that
 /// shall be used.
@@ -53,6 +54,7 @@ void help(std::ostream &out)
          "\n"
          "The following options are applicable to SyGuS problems:\n"
          "--cegis                          do CEGIS with the basic random top-down enumerator\n"
+         "--LLM-cegis                      do CEGIS with the basic random enumerator with LLM feedback\n"
          "--cegis-bu                       do CEGIS with bottom up enumerator (no probabilities)\n"
          "--cegis-prob-bu                  do CEGIS with bottom up enumerator with weights. \n"
          "                                 we enumerate programs with the highest weight first\n"
