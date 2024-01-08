@@ -157,31 +157,31 @@ void bottom_up_syntht::create_distributions()
 {
   if (grammar.production_rule_weights.size() == 0)
   {
-    std::cout << "adding default weights" << std::endl;
+    message.debug() << "adding default weights" << messaget::eom;
     add_grammar_weights(grammar);
   }
 }
 
 bool bottom_up_syntht::verify_against_counterexamples(const exprt &p)
 {
-  std::cout<<"checking solution "<< expr2sygus(p)<<std::endl;
+  message.debug()<<"checking solution "<< expr2sygus(p)<<messaget::eom;
   last_solution.functions[symbol_exprt(problem.synthesis_functions[0].id,
                                        problem.synthesis_functions[0].type)] =
       lambda_exprt(problem.synthesis_functions[0].parameters, p);
   // check against counterexamples
   if (counterexamples.size() == 0)
   {
-    std::cout << "No counterexamples, returning candidate" << std::endl;
+    message.debug() << "No counterexamples, returning candidate" << messaget::eom;
     return true;
   }
   else if (cex_verifier(problem, last_solution, counterexamples) == mini_verifyt::resultt::PASS)
   {
-    std::cout << "counterexample verifier passed " << std::endl;
+    message.debug() << "counterexample verifier passed " << messaget::eom;
     return true;
   }
   else
   {
-    std::cout << "counterexample verifier failed " << std::endl;
+    message.debug() << "counterexample verifier failed " << messaget::eom;
   }
   return false;
 }

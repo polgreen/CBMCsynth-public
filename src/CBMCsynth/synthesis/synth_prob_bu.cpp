@@ -128,7 +128,7 @@ prob_bu_syntht::resultt prob_bu_syntht::operator()()
       {
         break;
       }      
-      std::cout<<"candidate score is "<< program_score[iter->second]<<std::endl;
+      message.debug()<<"candidate score is "<< program_score[iter->second]<<messaget::eom;
       if(verify_against_counterexamples(iter->second))
       {
         iter = sorted_solutions_to_check.erase(iter); 
