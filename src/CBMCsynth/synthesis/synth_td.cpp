@@ -208,7 +208,7 @@ top_down_syntht::resultt top_down_syntht::operator()()
       message.debug()<<"No counterexamples, returning candidate"<<messaget::eom;
       return CANDIDATE;
     }
-    else if(cex_verifier(problem, last_solution, counterexamples)==mini_verifyt::resultt::PASS)
+    else if(cex_verifier(problem, last_solution, counterexamples)==counterexample_verifyt::resultt::PASS)
     {
       message.debug()<<"counterexample verifier passed "<<messaget::eom;
       return CANDIDATE;

@@ -134,7 +134,7 @@ int sygus_frontend(const cmdlinet &cmdline)
   if(cmdline.isset("cegis"))
   {
     message.status()<<"top down CEGIS"<<messaget::eom;
-    mini_verifyt mini_verify(ns, message_handler);
+    counterexample_verifyt mini_verify(ns, message_handler);
     top_down_syntht synth(message_handler, problem, mini_verify);
     synth.set_program_size(5);
     synth.use_syntactic_feedback = false;
@@ -146,7 +146,7 @@ int sygus_frontend(const cmdlinet &cmdline)
   if(cmdline.isset("LLM-cegis"))
   {
     message.status()<<"top down CEGIS with an LLM providing syntactic feedback"<<messaget::eom;
-    mini_verifyt mini_verify(ns, message_handler);
+    counterexample_verifyt mini_verify(ns, message_handler);
     top_down_syntht synth(message_handler, problem, mini_verify);
     synth.set_program_size(5);
     synth.use_syntactic_feedback = true;
@@ -158,7 +158,7 @@ int sygus_frontend(const cmdlinet &cmdline)
   else if(cmdline.isset("cegis-bu"))
   {
     message.status()<<"Basic bottom up CEGIS"<<messaget::eom;
-    mini_verifyt mini_verify(ns, message_handler);
+    counterexample_verifyt mini_verify(ns, message_handler);
     bottom_up_syntht synth(message_handler, problem, mini_verify);
     synth.set_program_size(5);
     verifyt verify(ns, message_handler);
@@ -168,7 +168,7 @@ int sygus_frontend(const cmdlinet &cmdline)
   else if(cmdline.isset("cegis-prob-bu"))
   {
     message.status()<<"probabilistic bottom up CEGIS"<<messaget::eom;
-    mini_verifyt mini_verify(ns, message_handler);
+    counterexample_verifyt mini_verify(ns, message_handler);
     prob_bu_syntht synth(message_handler, problem, mini_verify);
     synth.set_program_size(5);
     verifyt verify(ns, message_handler);

@@ -174,7 +174,7 @@ bool bottom_up_syntht::verify_against_counterexamples(const exprt &p)
     message.debug() << "No counterexamples, returning candidate" << messaget::eom;
     return true;
   }
-  else if (cex_verifier(problem, last_solution, counterexamples) == mini_verifyt::resultt::PASS)
+  else if (cex_verifier(problem, last_solution, counterexamples) == counterexample_verifyt::resultt::PASS)
   {
     message.debug() << "counterexample verifier passed " << messaget::eom;
     return true;

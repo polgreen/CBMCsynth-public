@@ -8,7 +8,7 @@
 class prob_bu_syntht : public bottom_up_syntht
 {
 public:
-  prob_bu_syntht(message_handlert &_ms, sygus_problemt &_problem, mini_verifyt &_cex_verifier) : 
+  prob_bu_syntht(message_handlert &_ms, sygus_problemt &_problem, counterexample_verifyt &_cex_verifier) : 
     bottom_up_syntht(_ms, _problem, _cex_verifier){};
 
 

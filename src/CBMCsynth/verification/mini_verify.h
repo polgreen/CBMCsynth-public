@@ -7,21 +7,21 @@
 #include <util/message.h>
 
 // Class for verifying whether a candidate solution works for a set of counterexamples
-class mini_verifyt
+class counterexample_verifyt
 {
  public:
   using resultt = enum { PASS, FAIL };
-  mini_verifyt(namespacet &_namespace, 
+  counterexample_verifyt(namespacet &_namespace, 
                 message_handlert &_ms) :
                 ns(_namespace),
-                log(_ms){};
+                message(_ms){};
 
   resultt operator()( sygus_problemt &problem,
     const solutiont &solution, const std::vector<counterexamplet> &cex);
   
   protected:
   namespacet ns;
-  messaget log;
+  messaget message;
   void add_problem(const sygus_problemt &problem, const solutiont &solution, const counterexamplet &cex, decision_proceduret &solver );
 
 };

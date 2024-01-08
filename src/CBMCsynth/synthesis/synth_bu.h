@@ -15,7 +15,7 @@
 class bottom_up_syntht : public syntht
 {
 public:
-  bottom_up_syntht(message_handlert &_ms, sygus_problemt &_problem, mini_verifyt &_cex_verifier) : 
+  bottom_up_syntht(message_handlert &_ms, sygus_problemt &_problem, counterexample_verifyt &_cex_verifier) : 
   message(_ms),
                                                             problem(_problem),
                                                             cex_verifier(_cex_verifier),
@@ -47,7 +47,7 @@ protected:
   // the problem to solve
   sygus_problemt &problem;
   // verifies candidates against the counterexamples
-  mini_verifyt &cex_verifier;
+  counterexample_verifyt &cex_verifier;
   // the grammar to enumerate
   // we make a copy of this rather than using the one in the SyGuS problem
   // so we can change it if we need
