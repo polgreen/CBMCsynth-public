@@ -16,11 +16,12 @@ class top_down_syntht : public syntht
 {
 public:
   top_down_syntht(message_handlert &_ms, sygus_problemt &_problem, mini_verifyt &_cex_verifier) : 
-  message_handler(_ms),
+  message(_ms),
                                                             problem(_problem),
                                                             cex_verifier(_cex_verifier),
                                                             grammar(_problem.get_grammar()),
-                                                            enumerations_since_LLM(0)
+                                                            enumerations_since_LLM(0),
+                                                            num_LLM_calls(0)
                                                             {
                                                               create_distributions();
                                                             };
@@ -47,7 +48,7 @@ public:
 
 protected:
   // used for printing. TODO: make all the printing use the message handlers correctly
-  message_handlert &message_handler;
+  messaget message;
   // the problem to solve
   sygus_problemt &problem;
   // verifies candidates against the counterexamples
@@ -70,6 +71,8 @@ protected:
   std::size_t enumerations_since_LLM; // HEURISTIC
   // minimum number of enumerations between LLM calls
   std::size_t frequency_of_LLM_calls = 5; // HEURISTIC
+  std::size_t max_LLM_calls=5; // HEURISTIC
+  std::size_t num_LLM_calls; // HEURISTIC
 
   // randomly chooses a production rule to apply whenever it finds
   // a non-terminal in the exprt. If it hits maximum depth, it replaces the non-terminal

@@ -333,6 +333,11 @@ void parsert::setup_commands()
   };
 }
 
+void parsert::add_defined_functions(const std::map<symbol_exprt, exprt> &defined_functions)
+{
+  for (const auto &pair : defined_functions)
+    add_unique_id(pair.first.get_identifier(), pair.second);
+}
 
 
 void parsert::build_smt_problem()

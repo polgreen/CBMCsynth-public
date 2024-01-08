@@ -59,10 +59,7 @@ std::string syntactic_feedbackt::build_smt_prompt(const exprt &partial_function)
 
   prompt+= "\n\n";
 
-// add section saying what the student previously did, and what it failed on
-  //prompt += "The student has tried the following functions, but they did not satisfy the constraints:\n";
-
-
+// TODO: add section saying what the student previously did, and what it failed on
   prompt+="Can you suggest some helper functions for the student to use to complete this code and replace the ??\n";
   prompt+="Print only the code and nothing else\n.";
   return prompt;
@@ -78,7 +75,16 @@ bool syntactic_feedbackt::augment_grammar(const exprt &partial_function,
 #else
   // generate openAI query
     openai::start(); // Will use the api key provided by `OPENAI_API_KEY` environment variable
-    std::string prompt = build_smt_prompt(partial_function);
+    replace_mapt replace_map;
+    for(const auto &rule: problem.get_grammar().production_rules)
+    {
+      replace_map[symbol_exprt(rule.first, rule.second[0].type())] = symbol_exprt("??", rule.second[0].type());
+    }
+    auto partial_function_copy = partial_function;
+    replace_expr(replace_map, partial_function_copy);
+
+    std::string prompt = build_smt_prompt(partial_function_copy);
+    message.debug()<<"prompt is "<<prompt<<messaget::eom;
 
     openai::Json messages;
     messages["role"] = "user";
@@ -86,10 +92,9 @@ bool syntactic_feedbackt::augment_grammar(const exprt &partial_function,
     openai::Json j;
     j["model"] = "gpt-3.5-turbo";
     j["messages"] = openai::Json::array({messages});
-    j["temperature"] = 0;
+    j["temperature"] = 0; // heuristic
 
     auto completion = openai::chat().create(j);
-    // std::cout << "completion text " << completion["choices"][0]["message"]["content"] << std::endl;
 
     // The following ugly code converts the json into a string, removes
     // extra stuff from the string and then pipes the string to an istream so the
@@ -110,9 +115,11 @@ bool syntactic_feedbackt::augment_grammar(const exprt &partial_function,
         i = response.find(substr))
         response.erase(i, n);
 #endif
-    std::cout<<response<<std::endl;
+    message.debug()<<"LLM response: " << response<<messaget::eom;
     std::istringstream str(response);
     parsert parser(str);
+    parser.add_defined_functions(problem.defined_functions);
+    // TODO: add defined functions to the parser id map
 
     try
     {
@@ -120,8 +127,8 @@ bool syntactic_feedbackt::augment_grammar(const exprt &partial_function,
     }
     catch (const parsert::smt2_errort &e)
     {
-      std::cerr << e.get_line_no() << ": "
-               << e.what() << std::endl;
+      message.debug() << "Error parsing LLM response: "<< e.get_line_no() << ": "
+               << e.what() << messaget::eom;
     }
 
  bool change=false;
@@ -130,7 +137,6 @@ bool syntactic_feedbackt::augment_grammar(const exprt &partial_function,
   {
     if(id.second.definition.is_not_nil())
     {
-      std::cout<<"adding function "<<id.first<<" with definition " << id.second.definition.pretty()<<std::endl;
       problem.defined_functions[symbol_exprt(id.first, id.second.type)] = id.second.definition;
  
       if(id.second.definition.id() == ID_lambda)
@@ -142,14 +148,15 @@ bool syntactic_feedbackt::augment_grammar(const exprt &partial_function,
         {
           if(rules.second[0].type() == codomain)
           {
-            std::cout<<"adding to rule for "<<id2string(rules.first)<<std::endl;
             problem.get_grammar().production_rules[rules.first].push_back(lambda.where());
             auto max = std::max_element(
               problem.get_grammar().production_rule_weights[rules.first].begin(),
             problem.get_grammar().production_rule_weights[rules.first].end());
-            problem.get_grammar().production_rule_weights[rules.first].
-            // TODO: this is a heuristic to decide how likely it is that we pick the new production rules
-            push_back(*max * 10);
+            // TODO: HEURISTIC this is a heuristic to decide how likely it is that we pick the new production rules
+            if(id.first == problem.synthesis_functions[0].id)
+              problem.get_grammar().production_rule_weights[rules.first].push_back(*max * 2);
+            else
+              problem.get_grammar().production_rule_weights[rules.first].push_back(*max);
             change=true;
           }
           }

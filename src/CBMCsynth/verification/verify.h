@@ -14,7 +14,7 @@ class verifyt
   verifyt(namespacet &_namespace, 
                 message_handlert &_ms) :
                 ns(_namespace),
-                log(_ms){};
+                message(_ms){};
 
   resultt operator()( sygus_problemt &problem,
     const solutiont &solution);
@@ -25,12 +25,14 @@ class verifyt
     decision_proceduret &solver);
   
   counterexamplet get_counterexample();
+  void display_solution(const solutiont &solution);
+  void display_cex(const counterexamplet &cex);
 
   protected:
   counterexamplet get_counterexample(
   const decision_proceduret &solver, const sygus_problemt &problem) const;
   namespacet ns;
-  messaget log;
+  messaget message;
   counterexamplet counterexample;
   void add_problem(const sygus_problemt &problem, const solutiont &solution, decision_proceduret &solver );
 

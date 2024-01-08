@@ -107,7 +107,7 @@ top_down_syntht::enum_resultt top_down_syntht::replace_nts(exprt &expr, std::siz
 
 void top_down_syntht::top_down_enumerate()
 {
-  syntactic_feedbackt feedback(problem, grammar);
+  syntactic_feedbackt feedback(problem, grammar, message.get_message_handler());
   exprt current_program = symbol_exprt(grammar.start, grammar.start_type);
 
   // enumerate through the grammar until a complete program is found
@@ -115,13 +115,14 @@ void top_down_syntht::top_down_enumerate()
   bool no_solution=true;
   while (no_solution)
   {
-    std::cout<<"partial program: "<<expr2sygus(current_program)<<std::endl;
+    message.debug()<<"partial program: "<<expr2sygus(current_program)<<messaget::eom;
     std::size_t num_nonterminals = count_symbol_occurrences(current_program, grammar.nt_ids);
     // if we only have one nonterminal, ask the LLM for guidance
     if(num_nonterminals>=1 && use_syntactic_feedback && 
-      enumerations_since_LLM>frequency_of_LLM_calls)
+      enumerations_since_LLM>frequency_of_LLM_calls && num_LLM_calls<max_LLM_calls)
     {
       enumerations_since_LLM=0;
+      num_LLM_calls++;
       if(feedback.augment_grammar(current_program, problem))
       {
         create_distributions();
@@ -158,7 +159,7 @@ void top_down_syntht::top_down_enumerate()
         break;
     }
   }
-  std::cout << "Complete prog: " << expr2sygus(current_program) << std::endl;
+  message.debug() << "Complete prog: " << expr2sygus(current_program) << messaget::eom;
 
   last_solution.functions[symbol_exprt(problem.synthesis_functions[0].id, 
   problem.synthesis_functions[0].type)] = 
@@ -184,19 +185,19 @@ void top_down_syntht::create_distributions()
 {
   if(grammar.production_rule_weights.size()==0)
   {
-    std::cout<<"adding default weights"<<std::endl;
+    message.debug()<<"adding default weights"<< messaget::eom;
     add_grammar_weights(grammar);
   }
   for (auto &nt : grammar.production_rule_weights)
   {
     distributions[nt.first] = std::discrete_distribution<int>(nt.second.begin(), nt.second.end());
-    std::cout<<"created distribution for "<<nt.first<<std::endl;
+    message.debug()<<"created distribution for "<<id2string(nt.first)<<messaget::eom;
   }
 }
 
 top_down_syntht::resultt top_down_syntht::operator()()
 {
-  std::cout<<"starting enumeration"<<std::endl;
+  message.status()<<"starting enumeration"<<messaget::eom;
   while(true)
   {
     // maybe put this in a timeout
@@ -204,17 +205,17 @@ top_down_syntht::resultt top_down_syntht::operator()()
     // check against counterexamples
     if(counterexamples.size()==0)
     {
-      std::cout<<"No counterexamples, returning candidate"<<std::endl;
+      message.debug()<<"No counterexamples, returning candidate"<<messaget::eom;
       return CANDIDATE;
     }
     else if(cex_verifier(problem, last_solution, counterexamples)==mini_verifyt::resultt::PASS)
     {
-      std::cout<<"counterexample verifier passed "<<std::endl;
+      message.debug()<<"counterexample verifier passed "<<messaget::eom;
       return CANDIDATE;
     }
     else
     {
-      std::cout<<"counterexample verifier failed "<<std::endl;
+      message.debug()<<"counterexample verifier failed "<<messaget::eom;
     }
   }
   return NO_SOLUTION;

@@ -34,6 +34,8 @@ public:
 
     smt_problemt get_smt_problem();
     sygus_problemt get_sygus_problem();
+    void add_defined_functions(const std::map<symbol_exprt, exprt> &defined_functions);
+
 
 protected:
     enum invariant_variablet { PRIMED, UNPRIMED };

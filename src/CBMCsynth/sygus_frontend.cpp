@@ -139,7 +139,7 @@ int sygus_frontend(const cmdlinet &cmdline)
     synth.set_program_size(5);
     synth.use_syntactic_feedback = false;
     verifyt verify(ns, message_handler);
-    cegist cegis(synth, verify, problem, ns);
+    cegist cegis(synth, verify, problem, ns, message_handler);
     cegis.doit();
     return 0;
   }
@@ -151,7 +151,7 @@ int sygus_frontend(const cmdlinet &cmdline)
     synth.set_program_size(5);
     synth.use_syntactic_feedback = true;
     verifyt verify(ns, message_handler);
-    cegist cegis(synth, verify, problem, ns);
+    cegist cegis(synth, verify, problem, ns, message_handler);
     cegis.doit();
     return 0;
   }
@@ -162,7 +162,7 @@ int sygus_frontend(const cmdlinet &cmdline)
     bottom_up_syntht synth(message_handler, problem, mini_verify);
     synth.set_program_size(5);
     verifyt verify(ns, message_handler);
-    cegist cegis(synth, verify, problem, ns);
+    cegist cegis(synth, verify, problem, ns, message_handler);
     cegis.doit();
   }
   else if(cmdline.isset("cegis-prob-bu"))
@@ -172,7 +172,7 @@ int sygus_frontend(const cmdlinet &cmdline)
     prob_bu_syntht synth(message_handler, problem, mini_verify);
     synth.set_program_size(5);
     verifyt verify(ns, message_handler);
-    cegist cegis(synth, verify, problem, ns);
+    cegist cegis(synth, verify, problem, ns, message_handler);
     cegis.doit();
   }
 

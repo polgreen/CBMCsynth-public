@@ -16,7 +16,7 @@ class bottom_up_syntht : public syntht
 {
 public:
   bottom_up_syntht(message_handlert &_ms, sygus_problemt &_problem, mini_verifyt &_cex_verifier) : 
-  message_handler(_ms),
+  message(_ms),
                                                             problem(_problem),
                                                             cex_verifier(_cex_verifier),
                                                             grammar(_problem.get_grammar()){
@@ -43,7 +43,7 @@ public:
 
 protected:
   // used for printing. TODO: make all the printing use the message handlers correctly
-  message_handlert &message_handler;
+  messaget message;
   // the problem to solve
   sygus_problemt &problem;
   // verifies candidates against the counterexamples

@@ -12,10 +12,16 @@ class cegist
 {
 public:
   cegist(
-    syntht &,
-    verifyt &,
-    sygus_problemt &,
-    namespacet &);
+    syntht &_synthesizer,
+    verifyt &_verify,
+    sygus_problemt &_problem,
+    namespacet &_ns,
+    message_handlert &_ms) : synthesizer(_synthesizer),
+                            verify(_verify),
+                            problem(_problem),
+                            ns(_ns),
+                            message(_ms)
+                            {};
 
   using resultt = decision_proceduret::resultt;
   resultt doit();
@@ -26,6 +32,7 @@ protected:
   sygus_problemt &problem;
   namespacet ns;
   solutiont solution;
+  messaget message;
 
 };
 #endif /* CEGIS_H_ */

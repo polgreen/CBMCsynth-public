@@ -2,13 +2,14 @@
 #define __SYNTACTIC_FEEDBACK_H_
 
 #include "../sygus_problem.h"
+#include <util/message.h>
 
 // give syntactic feedback partway through enumeration
 class syntactic_feedbackt
 {
   public:
-    syntactic_feedbackt(sygus_problemt &problem, const syntactic_templatet &grammar) 
-        : problem(problem), grammar(grammar)
+    syntactic_feedbackt(sygus_problemt &problem, const syntactic_templatet &grammar, message_handlert &ms) 
+        : problem(problem), grammar(grammar), message(ms)
     {
     // TODO Auto-generated constructor stub
     }
@@ -22,6 +23,7 @@ class syntactic_feedbackt
   private: 
     sygus_problemt problem;
     syntactic_templatet grammar;
+    messaget message;
 
 };
 
