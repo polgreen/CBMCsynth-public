@@ -16,23 +16,24 @@
 
 // adds the constraints to the solver
 void counterexample_verifyt::add_problem(const sygus_problemt &problem, const solutiont &solution, const counterexamplet &cex, decision_proceduret &solver)
-{ 
+{
   // expand function applications, and add to solver.
-  if(problem.assumptions.size() > 0)
-    UNEXPECTEDCASE( "Assumptions are not supported in mini_verify")
+  if (problem.assumptions.size() > 0)
+  {
+    UNEXPECTEDCASE("Assumptions are not supported in mini_verify");
+  }
 
-    exprt constraints = conjunction(problem.constraints);
-    expand_function_applications(constraints, solution.functions);
-    expand_function_applications(constraints, problem.defined_functions);
-    // expand again, incase the body of any defined functions contained the synth functions
-    expand_function_applications(constraints, solution.functions);
-    solver.set_to_false(constraints);
-    // add counterexample to solver
-    for(const auto & c: cex.assignment)
-    {
-      solver.set_to_true(equal_exprt(c.first, c.second));
-    }
-
+  exprt constraints = conjunction(problem.constraints);
+  expand_function_applications(constraints, solution.functions);
+  expand_function_applications(constraints, problem.defined_functions);
+  // expand again, incase the body of any defined functions contained the synth functions
+  expand_function_applications(constraints, solution.functions);
+  solver.set_to_false(constraints);
+  // add counterexample to solver
+  for (const auto &c : cex.assignment)
+  {
+    solver.set_to_true(equal_exprt(c.first, c.second));
+  }
 }
 
 // verifies whether a candidate solution works for a set of counterexamples
