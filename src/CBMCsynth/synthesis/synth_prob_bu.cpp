@@ -70,7 +70,7 @@ void prob_bu_syntht::get_next_programs()
       for (const auto &tuple : cartesian(sets_of_progs))
       {
         exprt new_expr = rule;
-        for (int i = 0; i < tuple.size(); i++)
+        for (unsigned i = 0; i < tuple.size(); i++)
         {
           replace_first_expr(nonterminals[i], tuple[i], new_expr);
         }
