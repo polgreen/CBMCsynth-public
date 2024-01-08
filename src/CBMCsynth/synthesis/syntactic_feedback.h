@@ -15,7 +15,7 @@ class syntactic_feedbackt
     }
 
     bool partial_evaluation(const exprt &expr, const counterexamplet &cex);
-    bool augment_grammar(const exprt &partial_function, sygus_problemt &problem);
+    std::size_t augment_grammar(const exprt &partial_function, sygus_problemt &problem);
     std::string build_prompt(const exprt &partial_function);
     std::string build_smt_prompt(const exprt &partial_function);
 

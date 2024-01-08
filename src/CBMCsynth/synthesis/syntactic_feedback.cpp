@@ -66,7 +66,7 @@ std::string syntactic_feedbackt::build_smt_prompt(const exprt &partial_function)
 }
 
 
-bool syntactic_feedbackt::augment_grammar(const exprt &partial_function, 
+std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function, 
   sygus_problemt &problem)
 {
   // debugs without calling openai
@@ -131,7 +131,7 @@ bool syntactic_feedbackt::augment_grammar(const exprt &partial_function,
                << e.what() << messaget::eom;
     }
 
- bool change=false;
+ std::size_t new_functions=0;
   // add the new functions to the problem
   for(auto &id: parser.id_map)
   {
@@ -157,11 +157,11 @@ bool syntactic_feedbackt::augment_grammar(const exprt &partial_function,
               problem.get_grammar().production_rule_weights[rules.first].push_back(*max * 2);
             else
               problem.get_grammar().production_rule_weights[rules.first].push_back(*max);
-            change=true;
+            new_functions++;
           }
           }
       }
     }
   }
-  return change;
+  return new_functions;;
 }

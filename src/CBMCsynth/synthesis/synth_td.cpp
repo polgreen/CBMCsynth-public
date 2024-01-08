@@ -121,11 +121,14 @@ void top_down_syntht::top_down_enumerate()
     if(num_nonterminals>=1 && use_syntactic_feedback && 
       enumerations_since_LLM>frequency_of_LLM_calls && num_LLM_calls<max_LLM_calls)
     {
+      message.status()<<"called LLM. "<<messaget::eom;
       enumerations_since_LLM=0;
       num_LLM_calls++;
-      if(feedback.augment_grammar(current_program, problem))
+      std::size_t new_funcs = feedback.augment_grammar(current_program, problem);
+      if(new_funcs>0)
       {
         create_distributions();
+        message.status()<<"got "<< new_funcs <<" functions from LLM."<<messaget::eom;
         // TODO: undo this if we don't want to keep the augmented grammar?
       }
     }
