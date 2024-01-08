@@ -1,3 +1,3 @@
 CPROVER_DIR ?= lib/cbmc
 CXXFLAGS+= -Wno-error=misleading-indentation -std=c++17 -Wno-error=overloaded-virtual
-LINKFLAGS+=-lcurl
+LINKFLAGS+=-lcurl -lcurlpp
