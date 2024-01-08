@@ -1,4 +1,4 @@
-#include "mini_verify.h"
+#include "counterexample_verify.h"
 #include "../utils/util.h"
 
 #include <solvers/smt2/smt2_dec.h>

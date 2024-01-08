@@ -2,7 +2,7 @@
 #define BU_SYNTH_H_
 
 #include "synth.h"
-#include "../verification/mini_verify.h"
+#include "../verification/counterexample_verify.h"
 #include "../sygus_problem.h"
 #include <solvers/decision_procedure.h>
 #include <util/namespace.h>

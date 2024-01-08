@@ -13,7 +13,7 @@
 #include "synthesis/synth_bu.h"
 #include "synthesis/synth_prob_bu.h"
 #include "verification/verify.h"
-#include "verification/mini_verify.h"
+#include "verification/counterexample_verify.h"
 #include "cegis.h"
 
 
@@ -134,8 +134,8 @@ int sygus_frontend(const cmdlinet &cmdline)
   if(cmdline.isset("cegis"))
   {
     message.status()<<"top down CEGIS"<<messaget::eom;
-    counterexample_verifyt mini_verify(ns, message_handler);
-    top_down_syntht synth(message_handler, problem, mini_verify);
+    counterexample_verifyt cex_verify(ns, message_handler);
+    top_down_syntht synth(message_handler, problem, cex_verify);
     synth.set_program_size(5);
     synth.use_syntactic_feedback = false;
     verifyt verify(ns, message_handler);
@@ -146,8 +146,8 @@ int sygus_frontend(const cmdlinet &cmdline)
   if(cmdline.isset("LLM-cegis"))
   {
     message.status()<<"top down CEGIS with an LLM providing syntactic feedback"<<messaget::eom;
-    counterexample_verifyt mini_verify(ns, message_handler);
-    top_down_syntht synth(message_handler, problem, mini_verify);
+    counterexample_verifyt cex_verify(ns, message_handler);
+    top_down_syntht synth(message_handler, problem, cex_verify);
     synth.set_program_size(5);
     synth.use_syntactic_feedback = true;
     verifyt verify(ns, message_handler);
@@ -158,8 +158,8 @@ int sygus_frontend(const cmdlinet &cmdline)
   else if(cmdline.isset("cegis-bu"))
   {
     message.status()<<"Basic bottom up CEGIS"<<messaget::eom;
-    counterexample_verifyt mini_verify(ns, message_handler);
-    bottom_up_syntht synth(message_handler, problem, mini_verify);
+    counterexample_verifyt cex_verify(ns, message_handler);
+    bottom_up_syntht synth(message_handler, problem, cex_verify);
     synth.set_program_size(5);
     verifyt verify(ns, message_handler);
     cegist cegis(synth, verify, problem, ns, message_handler);
@@ -168,8 +168,8 @@ int sygus_frontend(const cmdlinet &cmdline)
   else if(cmdline.isset("cegis-prob-bu"))
   {
     message.status()<<"probabilistic bottom up CEGIS"<<messaget::eom;
-    counterexample_verifyt mini_verify(ns, message_handler);
-    prob_bu_syntht synth(message_handler, problem, mini_verify);
+    counterexample_verifyt cex_verify(ns, message_handler);
+    prob_bu_syntht synth(message_handler, problem, cex_verify);
     synth.set_program_size(5);
     verifyt verify(ns, message_handler);
     cegist cegis(synth, verify, problem, ns, message_handler);
