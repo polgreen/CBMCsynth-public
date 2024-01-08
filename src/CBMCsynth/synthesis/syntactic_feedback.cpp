@@ -92,7 +92,7 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
     openai::Json j;
     j["model"] = "gpt-3.5-turbo";
     j["messages"] = openai::Json::array({messages});
-    j["temperature"] = 0; // heuristic
+    j["temperature"] = 0.5; // heuristic
 
     auto completion = openai::chat().create(j);
 
