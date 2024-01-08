@@ -155,7 +155,7 @@ const smt2_parsert::signature_with_parameter_idst &sig, const syntactic_template
   f.id = id;
   f.type = sig.type;
   auto &func_type = to_mathematical_function_type(sig.type);
-  for(int i=0; i<sig.parameters.size(); i++)
+  for(unsigned i=0; i<sig.parameters.size(); i++)
   {
     f.parameters.push_back(symbol_exprt(sig.parameters[i], func_type.domain()[i]));
   }

@@ -188,7 +188,7 @@ void parse_probs(std::string filename, sygus_problemt& problem)
 
     for(const auto &nt_id: grammar.nt_ids)
     {
-      for(int i=0; i<grammar.production_rules[nt_id].size(); i++)
+      for(unsigned i=0; i<grammar.production_rules[nt_id].size(); i++)
       {
         std::cout<<"adding weight "<<weights[count]<<" to "<<expr2sygus(grammar.production_rules[nt_id][i])<<std::endl;
         if(count>=weights.size())

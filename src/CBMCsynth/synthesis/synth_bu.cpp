@@ -37,7 +37,7 @@ bool replace_first_expr(const exprt &what, const exprt &by, exprt &dest)
 std::vector<std::vector<exprt>> cartesian(std::vector<std::vector<exprt>> &sets)
 {
   std::vector<std::vector<exprt>> temp(1, std::vector<exprt>());
-  for (int i = 0; i < sets.size(); i++)
+  for (unsigned i = 0; i < sets.size(); i++)
   {
     std::vector<std::vector<exprt>> newTemp;
     for (const std::vector<exprt> &product : temp)
@@ -126,7 +126,7 @@ void bottom_up_syntht::get_next_programs()
       for (const auto &tuple : cartesian(sets_of_progs))
       {
         exprt new_expr = rule;
-        for (int i = 0; i < tuple.size(); i++)
+        for (unsigned i = 0; i < tuple.size(); i++)
         {
           replace_first_expr(nonterminals[i], tuple[i], new_expr);
         }
