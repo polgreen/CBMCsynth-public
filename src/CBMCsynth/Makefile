@@ -5,6 +5,7 @@ parsing/parser.cpp utils/printing_utils.cpp utils/util.cpp \
  utils/cvc5_synth.cpp verification/verify.cpp verification/counterexample_verify.cpp \
  synthesis/synth_prob_bu.cpp synthesis/syntactic_feedback.cpp 
 
+
 OBJ+= ../../$(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \
       ../../$(CPROVER_DIR)/src/assembler/assembler$(LIBEXT) \
       ../../$(CPROVER_DIR)/src/linking/linking$(LIBEXT) \
@@ -20,7 +21,7 @@ OBJ+= ../../$(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \
 
 INCLUDES= -I ../../$(CPROVER_DIR)/src -I ..
 
-LIBS =
+LIBS = -lcurl
 
 include ../config.inc
 include ../../$(CPROVER_DIR)/src/config.inc
