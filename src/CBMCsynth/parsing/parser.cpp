@@ -437,49 +437,50 @@ void parsert::generate_inv_constraint()
   symbol_exprt inv(sygus_problem.inv_id, pre_lambda.type());
 
 
-  exprt::operandst pre_arguments;
+  exprt::operandst arguments;
+  exprt::operandst primed_arguments;
   unsigned int count_start_point = sygus_problem.free_var.size();
+  unsigned int count=count_start_point;
   for(const auto &v: pre_lambda.variables())
   {
-    pre_arguments.push_back(v);
+    arguments.push_back(v);
     sygus_problem.free_var.push_back(v);
-  }
-  
-
-  exprt::operandst post_arguments;
-  unsigned int count=count_start_point;
-  for(const auto &v: post_lambda.variables())
-  {
-    post_arguments.push_back(v);
-    if(sygus_problem.free_var[count]!=v)
+    if(post_lambda.variables()[count]!=v)
       throw error("variables used by pre and post condition must have same names");
     count++;
   }
+  
 
   exprt::operandst trans_arguments;
   count=count_start_point;
+  std::size_t count2=0;
   for(const auto &v: trans_lambda.variables())
   {
     trans_arguments.push_back(v);
-    if(count<post_arguments.size())
+
+    if(count2<arguments.size())
     {
       if(sygus_problem.free_var[count]!=v)
         throw error("variables used by pre and post condition must have same names");
     }
     else
+    {
       sygus_problem.free_var.push_back(v);
+      primed_arguments.push_back(v);
+    }
     count++;
+    count2++;
   }
 
   // invariant application:
-  function_application_exprt inv_app = function_application_exprt(inv, pre_arguments);
-  function_application_exprt invprime_app = function_application_exprt(inv, post_arguments);
+  function_application_exprt inv_app = function_application_exprt(inv, arguments);
+  function_application_exprt invprime_app = function_application_exprt(inv, primed_arguments);
 
   // make constraints
   // these currently expand the function applications
-  sygus_problem.constraints.push_back(implies_exprt(pre_lambda.application(pre_arguments), inv_app));
+  sygus_problem.constraints.push_back(implies_exprt(pre_lambda.application(arguments), inv_app));
   sygus_problem.constraints.push_back(implies_exprt(and_exprt(inv_app, trans_lambda.application(trans_arguments)), invprime_app));
-  sygus_problem.constraints.push_back(implies_exprt(post_lambda.application(post_arguments), inv_app));
+  sygus_problem.constraints.push_back(implies_exprt(inv_app, post_lambda.application(arguments)));
 
 }
 
