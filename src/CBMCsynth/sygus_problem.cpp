@@ -116,6 +116,21 @@ void add_grammar(synth_funt &f)
   f.grammar.start_type = func.codomain();
 }
 
+void subtract_bonus_weights(syntactic_templatet &g)
+{
+  std::cout<<"Resetting bonus weights"<<std::endl;
+  for (const auto &r: g.production_rules)
+  {
+    auto &weights = g.production_rule_weights[r.first];
+    auto &bonus = g.bonus_weights[r.first];
+    for(unsigned i=0; i<weights.size(); i++)
+    {
+      weights[i] -= bonus[i];
+      bonus[i] = 0;
+    }
+  }
+}
+
 void add_grammar_weights(syntactic_templatet &g)
 {
   g.production_rule_weights.clear();
@@ -128,6 +143,17 @@ void add_grammar_weights(syntactic_templatet &g)
     }
     g.production_rule_weights[r.first] = weights;
   }
+  g.bonus_weights.clear();
+  for (const auto &r : g.production_rules)
+  {
+    std::vector<unsigned> weights;
+    for (unsigned int i=0; i<r.second.size(); i++)
+    {
+      weights.push_back(0);
+    }
+    g.bonus_weights[r.first] = weights;
+  }
+
 }
 
 void add_grammar_to_problem(sygus_problemt &problem)

@@ -154,14 +154,37 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
             problem.get_grammar().production_rule_weights[rules.first].end());
             // TODO: HEURISTIC this is a heuristic to decide how likely it is that we pick the new production rules
             if(id.first == problem.synthesis_functions[0].id)
+            {
               problem.get_grammar().production_rule_weights[rules.first].push_back(*max * 2);
+              problem.get_grammar().bonus_weights[rules.first].push_back(*max);
+            }
             else
+            {
               problem.get_grammar().production_rule_weights[rules.first].push_back(*max);
+              problem.get_grammar().bonus_weights[rules.first].push_back(0);
+            }
             new_functions++;
           }
           }
       }
     }
   }
-  return new_functions;;
+  
+  if(update_grammar)
+  {
+  // update grammar weights
+  for(const auto &rules: problem.get_grammar().production_rules)
+  {
+    auto &weights = problem.get_grammar().production_rule_weights[rules.first];
+    for(unsigned i=0; i<rules.second.size(); i++)
+    {
+      if(parser.operator_counts.find(rules.second[i].id()) != parser.operator_counts.end())
+      {
+        weights[i] += parser.operator_counts[rules.second[i].id()];
+      }
+    }
+  }
+  }
+
+  return new_functions;
 }

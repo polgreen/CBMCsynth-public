@@ -186,7 +186,7 @@ bool bottom_up_syntht::verify_against_counterexamples(const exprt &p)
   return false;
 }
 
-bottom_up_syntht::resultt bottom_up_syntht::operator()()
+bottom_up_syntht::resultt bottom_up_syntht::operator()(std::size_t iteration)
 {
   initialise_program_pool();
   for(const auto &p : (*current_pool)[grammar.start])

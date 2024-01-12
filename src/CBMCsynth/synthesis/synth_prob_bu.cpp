@@ -103,7 +103,7 @@ void prob_bu_syntht::setup_rule_weights()
   }
 }
 
-prob_bu_syntht::resultt prob_bu_syntht::operator()()
+prob_bu_syntht::resultt prob_bu_syntht::operator()(std::size_t iteration)
 {
   setup_rule_weights();
   initialise_program_pool();

@@ -150,6 +150,8 @@ int sygus_frontend(const cmdlinet &cmdline)
     top_down_syntht synth(message_handler, problem, cex_verify);
     synth.set_program_size(5);
     synth.use_syntactic_feedback = true;
+    synth.use_bonus_weights = cmdline.isset("use-bonus-weights");
+    synth.update_grammar = cmdline.isset("update-grammar");
     verifyt verify(ns, message_handler);
     cegist cegis(synth, verify, problem, ns, message_handler);
     cegis.doit();

@@ -24,6 +24,8 @@
   "(cegis-prob-bu)" \
   "(probs): " \
   "(LLM-cegis) " \
+  "(use-bonus-weights)" \
+  "(update-grammar)" \
 
 /// File ending of SMT2 files. Used to determine the language frontend that
 /// shall be used.
@@ -55,6 +57,8 @@ void help(std::ostream &out)
          "The following options are applicable to SyGuS problems:\n"
          "--cegis                          do CEGIS with the basic random top-down enumerator\n"
          "--LLM-cegis                      do CEGIS with the basic random enumerator with LLM feedback\n"
+         "--use-bonus-weights              remove LLM grammar updates after 1 iteration\n"
+         "--update-grammar                 uses LLM feedback to update the grammar weights\n"
          "--cegis-bu                       do CEGIS with bottom up enumerator (no probabilities)\n"
          "--cegis-prob-bu                  do CEGIS with bottom up enumerator with weights. \n"
          "                                 we enumerate programs with the highest weight first\n"

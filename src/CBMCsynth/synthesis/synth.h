@@ -18,7 +18,7 @@ public:
 
   virtual solutiont get_solution() const = 0;
   virtual void set_program_size(std::size_t) = 0;
-  virtual resultt operator()() = 0;
+  virtual resultt operator()(std::size_t iteration) = 0;
   virtual void add_counterexample(const counterexamplet &cex) = 0;
   
 };

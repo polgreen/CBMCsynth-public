@@ -18,6 +18,7 @@ class syntactic_feedbackt
     std::size_t augment_grammar(const exprt &partial_function, sygus_problemt &problem);
     std::string build_prompt(const exprt &partial_function);
     std::string build_smt_prompt(const exprt &partial_function);
+    bool update_grammar;
 
 
   private: 

@@ -108,6 +108,7 @@ top_down_syntht::enum_resultt top_down_syntht::replace_nts(exprt &expr, std::siz
 void top_down_syntht::top_down_enumerate()
 {
   syntactic_feedbackt feedback(problem, grammar, message.get_message_handler());
+  feedback.update_grammar = update_grammar;
   exprt current_program = symbol_exprt(grammar.start, grammar.start_type);
 
   // enumerate through the grammar until a complete program is found
@@ -118,9 +119,11 @@ void top_down_syntht::top_down_enumerate()
     message.debug()<<"partial program: "<<expr2sygus(current_program)<<messaget::eom;
     std::size_t num_nonterminals = count_symbol_occurrences(current_program, grammar.nt_ids);
     // if we only have one nonterminal, ask the LLM for guidance
-    if(num_nonterminals>=1 && use_syntactic_feedback && 
-      enumerations_since_LLM>frequency_of_LLM_calls && num_LLM_calls<max_LLM_calls)
+    if(num_nonterminals>=1 && use_syntactic_feedback  &&
+      ((enumerations_since_LLM>frequency_of_LLM_calls && num_LLM_calls<max_LLM_calls) || 
+      (iter==0 && !called_LLM_this_iter)))
     {
+      called_LLM_this_iter=true;
       message.status()<<"called LLM. "<<messaget::eom;
       enumerations_since_LLM=0;
       num_LLM_calls++;
@@ -130,6 +133,8 @@ void top_down_syntht::top_down_enumerate()
         create_distributions();
         message.status()<<"got "<< new_funcs <<" functions from LLM."<<messaget::eom;
         // TODO: undo this if we don't want to keep the augmented grammar?
+        if(use_bonus_weights)
+          subtract_bonus_weights(grammar);
       }
     }
     else
@@ -184,6 +189,7 @@ void top_down_syntht::add_counterexample(const counterexamplet &cex)
   counterexamples.push_back(cex);
 }
 
+
 void top_down_syntht::create_distributions()
 {
   if(grammar.production_rule_weights.size()==0)
@@ -198,8 +204,10 @@ void top_down_syntht::create_distributions()
   }
 }
 
-top_down_syntht::resultt top_down_syntht::operator()()
+top_down_syntht::resultt top_down_syntht::operator()(std::size_t iteration)
 {
+  iter = iteration;
+  called_LLM_this_iter=false;
   message.status()<<"starting enumeration"<<messaget::eom;
   while(true)
   {

@@ -19,6 +19,7 @@ struct syntactic_templatet {
     std::vector<irep_idt> nt_ids;
     std::map<irep_idt, std::vector<exprt>> production_rules;
     std::map<irep_idt, std::vector<unsigned>> production_rule_weights;
+    std::map<irep_idt, std::vector<unsigned>> bonus_weights;
 };
 
 class synth_funt {
@@ -55,6 +56,7 @@ public:
 synth_funt copy_fun_add_grammar(const synth_funt &f);
 void add_grammar(synth_funt &f);
 void add_grammar_weights(syntactic_templatet &g);
+void subtract_bonus_weights(syntactic_templatet &g);
 void parse_probs(std::string filename, sygus_problemt& problem);
 
 class solutiont

@@ -37,7 +37,7 @@ public:
 
   // calls the enumerator and then checks the result against the counterexamples
   // returns when it has found a candidate that satisfies the counterexamples
-  resultt operator()() override;
+  resultt operator()(std::size_t) override;
 
   // adds a counterexample to the list
   void add_counterexample(const counterexamplet &cex) override;
@@ -45,6 +45,8 @@ public:
   using enum_resultt = enum { CHANGED, NO_CHANGE, ABORT};
 
   bool use_syntactic_feedback;
+  bool update_grammar;
+  bool use_bonus_weights;
 
 protected:
   // used for printing. TODO: make all the printing use the message handlers correctly
@@ -67,13 +69,16 @@ protected:
   // depth we enumerate to
   std::size_t program_size; // HEURISTIC
 
+  // iteration we are on
+  std::size_t iter;
+
   // number of enumerations since the last LLM call
   std::size_t enumerations_since_LLM; // HEURISTIC
   // minimum number of enumerations between LLM calls
   std::size_t frequency_of_LLM_calls = 5; // HEURISTIC
   std::size_t max_LLM_calls=5; // HEURISTIC
   std::size_t num_LLM_calls; // HEURISTIC
-
+  bool called_LLM_this_iter; // says if we have called the LLM this iteration
   // randomly chooses a production rule to apply whenever it finds
   // a non-terminal in the exprt. If it hits maximum depth, it replaces the non-terminal
   // with the first terminal in the production rules that it finds.

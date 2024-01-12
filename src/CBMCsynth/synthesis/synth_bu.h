@@ -36,7 +36,7 @@ public:
 
   // calls the enumerator and then checks the result against the counterexamples
   // returns when it has found a candidate that satisfies the counterexamples
-  resultt operator()() override;
+  resultt operator()(std::size_t iteration) override;
 
   // adds a counterexample to the list
   void add_counterexample(const counterexamplet &cex) override;
