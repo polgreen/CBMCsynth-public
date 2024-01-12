@@ -130,11 +130,22 @@ void top_down_syntht::top_down_enumerate()
       std::size_t new_funcs = feedback.augment_grammar(current_program, problem);
       if(new_funcs>0)
       {
+
         create_distributions();
         message.status()<<"got "<< new_funcs <<" functions from LLM."<<messaget::eom;
-        // TODO: undo this if we don't want to keep the augmented grammar?
+        // resets the bonus weights so the next time we create distributions the counts
+        // are reset
         if(use_bonus_weights)
           subtract_bonus_weights(grammar);
+
+        if(feedback.last_solution.id()!=ID_nil)
+        {
+          message.debug()<<"LLM gave us a candidate solution: "<<expr2sygus(feedback.last_solution)<<messaget::eom;
+          last_solution.functions[symbol_exprt(problem.synthesis_functions[0].id, 
+          problem.synthesis_functions[0].type)] = 
+          lambda_exprt(problem.synthesis_functions[0].parameters, feedback.last_solution);
+          return;
+        }
       }
     }
     else

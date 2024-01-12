@@ -339,6 +339,12 @@ void parsert::add_defined_functions(const std::map<symbol_exprt, exprt> &defined
     add_unique_id(pair.first.get_identifier(), pair.second);
 }
 
+void parsert::add_symbols(const std::vector<symbol_exprt> &symbols)
+{
+  for (const auto &symbol : symbols)
+    add_unique_id(symbol.get_identifier(), symbol);
+}
+
 
 void parsert::build_smt_problem()
 {
@@ -484,6 +490,18 @@ void parsert::generate_inv_constraint()
 
 }
 
+
+exprt parsert::parse_expression()
+{
+  if (smt2_tokenizer.peek() == smt2_tokenizert::END_OF_FILE)
+    throw error("first token was an end of file'");
+
+  if (next_token() != smt2_tokenizert::OPEN)
+    throw error("expression must start with '('");
+  exprt e = expression();
+
+  return e;
+}
 
 
 void parsert::parse_model()
