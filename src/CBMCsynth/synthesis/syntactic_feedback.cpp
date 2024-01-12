@@ -41,8 +41,6 @@ std::string syntactic_feedbackt::build_prompt(const exprt &partial_function)
   return prompt;
 }
 
-
-
 std::string syntactic_feedbackt::build_smt_prompt(const exprt &partial_function, const exprt &last_function)
 {
   std::string prompt = "You are teaching a student to write SMT-LIB. The student must write a function that satisfies the following constraints:\n";
@@ -51,17 +49,17 @@ std::string syntactic_feedbackt::build_smt_prompt(const exprt &partial_function,
     prompt += "(constraint (" + expr2sygus(c) + ")\n";
   }
 
-if(use_cex_in_prompt)
-{
-  prompt += "The last solution the student tried was this, but the teacher marked this solution incorrect:\n";
+  if (use_cex_in_prompt)
+  {
+    prompt += "The last solution the student tried was this, but the teacher marked this solution incorrect:\n";
 
-  prompt +=
-      fun_def(symbol_exprt(problem.synthesis_functions[0].id, problem.synthesis_functions[0].type),
-              lambda_exprt(problem.synthesis_functions[0].parameters, last_function));
-  prompt += "\nThis solution was incorrect and did not work for the following inputs:\n";
-  prompt += "The student is trying again."
-  
-}
+    prompt +=
+        fun_def(symbol_exprt(problem.synthesis_functions[0].id, problem.synthesis_functions[0].type),
+                lambda_exprt(problem.synthesis_functions[0].parameters, last_function));
+    prompt += "\nThis solution was incorrect and did not work for the following inputs:\n";
+
+    prompt += "The student is trying again."
+  }
   prompt += "\nSo far, the student has written this code:\n";
 
   prompt +=
@@ -69,7 +67,6 @@ if(use_cex_in_prompt)
               lambda_exprt(problem.synthesis_functions[0].parameters, partial_function));
 
   prompt += "\n\n";
-
 
   // TODO: add section saying what the student previously did, and what it failed on
   prompt += "Can you suggest some helper functions for the student to use to complete this code and replace the ??\n";
