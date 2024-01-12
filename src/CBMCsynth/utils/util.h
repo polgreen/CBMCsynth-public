@@ -32,6 +32,11 @@ void expand_let_expressions(exprt &expr);
 // expands function applications in an expression
 void expand_function_applications(exprt &expr, const std::map<symbol_exprt, exprt> &defined_functions);
 
+// // builds a list of functions used in expression that have definitions
+void get_defined_functions(
+    const exprt &expr, const std::map<symbol_exprt, exprt> &defined_functions,
+    std::set<symbol_exprt> &list);
+
 // Replaces all occurences of a string in a string with another string
 std::string replace_occurences(std::string str, const std::string &from, const std::string &to);
 

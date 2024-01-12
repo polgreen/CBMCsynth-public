@@ -1062,6 +1062,18 @@ std::string convert_expr(const exprt &expr)
     for (const auto &op : expr.operands())
       result += convert_expr(op);
   }
+  else if (expr.id()==ID_lambda)
+  {
+    result += "(lambda (";
+    for (const auto &v : to_lambda_expr(expr).variables())
+    {
+      result += "(";
+      result += convert_expr(v);
+      result += " ";
+      result += convert_type(v.type());
+      result += ") ";
+    }
+  }
   else
   {
     INVARIANT_WITH_DIAGNOSTICS(
@@ -1144,7 +1156,7 @@ std::string fun_def(const symbol_exprt &fun, const exprt &def)
   INVARIANT(fun.type().id() == ID_mathematical_function,
             "function symbol must have function type, got " + fun.type().id_string() + " for " + id2string(fun.get_identifier()));
   INVARIANT(def.id() == ID_lambda,
-            "function definition must be a lambda expression");
+            "function definition must be a lambda expression, got " + def.pretty());
   std::string result = "(define-fun " + clean_id(fun.get_identifier()) + " (";
   auto &fun_def = to_lambda_expr(def);
   for (const auto &v : fun_def.variables())

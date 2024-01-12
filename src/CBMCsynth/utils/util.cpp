@@ -57,6 +57,41 @@ void basic_simplify(exprt &expr)
   }
 }
 
+void get_defined_functions(
+    const exprt &expr, const std::map<symbol_exprt, exprt> &defined_functions,
+    std::set<symbol_exprt> &list)
+{
+  for (const exprt &op : expr.operands())
+  {
+    get_defined_functions(op, defined_functions, list);
+  }
+  if (expr.id() == ID_function_application)
+  {
+    auto &app = to_function_application_expr(expr);
+
+    if (app.function().id() == ID_symbol)
+    {
+      // look up the symbol
+      auto func = to_symbol_expr(app.function());
+      auto f_it = defined_functions.find(func);
+
+      if (f_it != defined_functions.end())
+      {
+        // Does it have a definition? It's otherwise uninterpreted.
+        if (!f_it->second.is_nil())
+        {
+          exprt body = f_it->second;
+          if (body.id() == ID_lambda)
+          {
+            body = to_lambda_expr(body).application(app.arguments());
+          }
+          list.insert(func);
+          get_defined_functions(body, defined_functions, list); // rec. call
+        }
+      }
+    }
+  }
+}
 
 void expand_function_applications(exprt &expr, const std::map<symbol_exprt, exprt> &defined_functions)
 {

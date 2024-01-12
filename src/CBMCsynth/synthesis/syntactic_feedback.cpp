@@ -41,24 +41,36 @@ std::string syntactic_feedbackt::build_prompt(const exprt &partial_function)
   return prompt;
 }
 
-std::string syntactic_feedbackt::build_smt_prompt(const exprt &partial_function, const exprt &last_function)
+
+std::string syntactic_feedbackt::build_smt_prompt(const exprt &partial_function)
 {
   std::string prompt = "You are teaching a student to write SMT-LIB. The student must write a function that satisfies the following constraints:\n";
-  for (const auto &c : problem.constraints)
-  {
-    prompt += "(constraint (" + expr2sygus(c) + ")\n";
-  }
 
-  if (use_cex_in_prompt)
+  std::set<symbol_exprt> defined_functions;
+  for(const auto &c: problem.constraints)
+    get_defined_functions(c, problem.defined_functions, defined_functions);
+
+  for(const auto & f: defined_functions)
+    prompt += fun_def(f, problem.defined_functions[f]) + "\n";
+
+
+  for(const auto &c: problem.constraints)
+    prompt += "(constraint (" + expr2sygus(c) + ")\n";
+
+  if (use_cex_in_prompt && last_cex.assignment.size() > 0)
   {
-    prompt += "The last solution the student tried was this, but the teacher marked this solution incorrect:\n";
+    prompt += "\nThe last solution the student tried was this, but the teacher marked this solution incorrect:\n";
 
     prompt +=
         fun_def(symbol_exprt(problem.synthesis_functions[0].id, problem.synthesis_functions[0].type),
-                lambda_exprt(problem.synthesis_functions[0].parameters, last_function));
-    prompt += "\nThis solution was incorrect and did not work for the following inputs:\n";
+                last_solution);
+    prompt += "\nThis solution was incorrect because it did not work for the following inputs:\n";
+    for(const auto & c: last_cex.assignment)
+    {
+      prompt +=expr2sygus(c.first) + "  =  " + expr2sygus(c.second)+ "\n";
+    }
 
-    prompt += "The student is trying again."
+    prompt += "\n\nThe student is trying again.";
   }
   prompt += "\nSo far, the student has written this code:\n";
 
@@ -68,9 +80,9 @@ std::string syntactic_feedbackt::build_smt_prompt(const exprt &partial_function,
 
   prompt += "\n\n";
 
-  // TODO: add section saying what the student previously did, and what it failed on
-  prompt += "Can you suggest some helper functions for the student to use to complete this code and replace the ??\n";
-  prompt += "Print only the code and nothing else.\n";
+  prompt += "Can you suggest some short helper functions for the student to use to complete this code and replace the ??\n";
+  prompt +="You must give the shortest functions possible.\n";
+  prompt += "\nYou must print only the code and nothing else.\n";
   return prompt;
 }
 
@@ -159,7 +171,6 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
   std::istringstream str(response);
   parsert parser(str);
   parser.add_defined_functions(problem.defined_functions);
-  std::size_t number_defined_functions = parser.id_map.size();
 
   // TODO: add defined functions to the parser id map
   last_solution = nil_exprt();
@@ -169,7 +180,6 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
     if (response.find("define-fun") == std::string::npos)
     {
       parser.add_symbols(problem.free_var);
-      number_defined_functions = parser.id_map.size();
       last_solution = parser.parse_expression();
       add_to_grammar(problem.synthesis_functions[0].id, last_solution);
       new_functions++;

@@ -107,10 +107,7 @@ top_down_syntht::enum_resultt top_down_syntht::replace_nts(exprt &expr, std::siz
 
 void top_down_syntht::top_down_enumerate()
 {
-  syntactic_feedbackt feedback(problem, grammar, message.get_message_handler());
-  feedback.update_grammar = update_grammar;
   exprt current_program = symbol_exprt(grammar.start, grammar.start_type);
-
   // enumerate through the grammar until a complete program is found
   std::vector<unsigned> sequence;
   bool no_solution=true;
@@ -140,7 +137,7 @@ void top_down_syntht::top_down_enumerate()
 
         if(feedback.last_solution.id()!=ID_nil)
         {
-          message.debug()<<"LLM gave us a candidate solution: "<<expr2sygus(feedback.last_solution)<<messaget::eom;
+          message.debug()<<"LLM gave us a candidate solution: "<<format(feedback.last_solution)<<messaget::eom;
           last_solution.functions[symbol_exprt(problem.synthesis_functions[0].id, 
           problem.synthesis_functions[0].type)] = 
           lambda_exprt(problem.synthesis_functions[0].parameters, feedback.last_solution);
@@ -237,6 +234,8 @@ top_down_syntht::resultt top_down_syntht::operator()(std::size_t iteration)
     }
     else
     {
+      feedback.last_cex = cex_verifier.get_failed_cex();
+      feedback.last_solution = last_solution.functions.begin()->second;  
       message.debug()<<"counterexample verifier failed "<<messaget::eom;
     }
   }

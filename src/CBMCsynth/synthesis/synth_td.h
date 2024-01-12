@@ -4,6 +4,7 @@
 #include "synth.h"
 #include "../verification/counterexample_verify.h"
 #include "../sygus_problem.h"
+#include "syntactic_feedback.h"
 #include <solvers/decision_procedure.h>
 #include <util/namespace.h>
 #include <util/message.h>
@@ -20,6 +21,7 @@ public:
                                                             problem(_problem),
                                                             cex_verifier(_cex_verifier),
                                                             grammar(_problem.get_grammar()),
+                                                            feedback(_problem, _ms),
                                                             enumerations_since_LLM(0),
                                                             num_LLM_calls(0)
                                                             {
@@ -45,8 +47,18 @@ public:
   using enum_resultt = enum { CHANGED, NO_CHANGE, ABORT};
 
   bool use_syntactic_feedback;
-  bool update_grammar;
   bool use_bonus_weights;
+
+  void set_feedback_parameters(bool _use_syntactic_feedback, 
+    bool _update_grammar, 
+    bool _use_bonus_weights, 
+    bool _use_cex_in_prompt)
+  {
+    use_syntactic_feedback = _use_syntactic_feedback;
+    feedback.update_grammar = _update_grammar;
+    use_bonus_weights = _use_bonus_weights;
+    feedback.use_cex_in_prompt = _use_cex_in_prompt;
+  }
 
 protected:
   // used for printing. TODO: make all the printing use the message handlers correctly
@@ -60,15 +72,17 @@ protected:
   // so we can change it if we need
   // TODO: make this a reference to the grammar in the sygus problem
   syntactic_templatet &grammar;
+  syntactic_feedbackt feedback;
   // counterexamples
   std::vector<counterexamplet> counterexamples;
+  // index of failed cex
+  std::size_t failed_cex;
   // last solution we found
   solutiont last_solution;
   std::set<std::vector<unsigned>> prev_solutions;
  
   // depth we enumerate to
   std::size_t program_size; // HEURISTIC
-
   // iteration we are on
   std::size_t iter;
 

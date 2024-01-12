@@ -149,9 +149,10 @@ int sygus_frontend(const cmdlinet &cmdline)
     counterexample_verifyt cex_verify(ns, message_handler);
     top_down_syntht synth(message_handler, problem, cex_verify);
     synth.set_program_size(5);
-    synth.use_syntactic_feedback = true;
-    synth.use_bonus_weights = cmdline.isset("use-bonus-weights");
-    synth.update_grammar = cmdline.isset("update-grammar");
+    synth.set_feedback_parameters(true,
+      cmdline.isset("update-grammar"),
+      cmdline.isset("use-bonus-weights"),
+      cmdline.isset("use-cex-in-prompt"));
     verifyt verify(ns, message_handler);
     cegist cegis(synth, verify, problem, ns, message_handler);
     cegis.doit();

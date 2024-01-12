@@ -19,9 +19,14 @@ class counterexample_verifyt
   resultt operator()( sygus_problemt &problem,
     const solutiont &solution, const std::vector<counterexamplet> &cex);
   
+  counterexamplet get_failed_cex();
+
+  
   protected:
   namespacet ns;
   messaget message;
+  counterexamplet failed_cex;
+  
   void add_problem(const sygus_problemt &problem, const solutiont &solution, const counterexamplet &cex, decision_proceduret &solver );
 
 };

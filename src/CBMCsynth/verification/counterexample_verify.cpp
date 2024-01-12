@@ -13,6 +13,9 @@
 #include <iostream>
 
 
+counterexamplet counterexample_verifyt::get_failed_cex(){
+  return failed_cex;
+}
 
 // adds the constraints to the solver
 void counterexample_verifyt::add_problem(const sygus_problemt &problem, const solutiont &solution, const counterexamplet &cex, decision_proceduret &solver)
@@ -41,7 +44,6 @@ void counterexample_verifyt::add_problem(const sygus_problemt &problem, const so
 counterexample_verifyt::resultt counterexample_verifyt::operator()(sygus_problemt &problem,
     const solutiont &solution,const std::vector<counterexamplet> &cex)
   {
-
     for (const auto &c : cex)
     {
       // get SMT solver
@@ -60,6 +62,7 @@ counterexample_verifyt::resultt counterexample_verifyt::operator()(sygus_problem
       {
       case decision_proceduret::resultt::D_SATISFIABLE:
       {
+        failed_cex = c;  
         // failed to satisfy a counterexample, return FAIL
         return counterexample_verifyt::resultt::FAIL;
       }
@@ -71,7 +74,7 @@ counterexample_verifyt::resultt counterexample_verifyt::operator()(sygus_problem
       case decision_proceduret::resultt::D_UNSATISFIABLE:
       default:
       {
-        // do nothing, we satisfied this counterexample
+        // do nothing
       }
       }
     }

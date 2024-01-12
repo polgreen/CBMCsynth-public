@@ -131,8 +131,11 @@ void subtract_bonus_weights(syntactic_templatet &g)
   }
 }
 
+
+
 void add_grammar_weights(syntactic_templatet &g)
 {
+  INVARIANT(g.production_rules.size() > 0, "grammar must have production rules");
   g.production_rule_weights.clear();
   for (const auto &r : g.production_rules)
   {
