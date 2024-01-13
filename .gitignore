@@ -33,3 +33,5 @@
 src/CBMC_smt/CBMC_smt
 src/CBMC_smt/endianness.h
 src/CBMC_smt/uuid_v4.h
+.vscode/settings.json
+src/CBMCsynth/CBMCsynth
