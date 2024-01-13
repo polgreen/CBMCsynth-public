@@ -1,12 +1,26 @@
 #include "cegis.h"
+#include "utils/util.h"
 #include "utils/expr2sygus.h"
 #include <iostream>
+
+void cegist::print_solution()
+{
+  message.status() << "Solution :" << messaget::eom;
+  std::set<symbol_exprt> dependencies;
+  for (auto &f : solution.functions)
+    get_defined_functions(f.second, problem.defined_functions, dependencies);
+
+  for (const auto &f : dependencies)
+    message.status() << fun_def(f, problem.defined_functions[f]) << messaget::eom;
+
+  for (const auto &f : solution.functions)
+    message.status() << fun_def(f.first, f.second) << messaget::eom;
+}
 
 // this function executes a basic counterexample guided inductive synthesis loop
 cegist::resultt cegist::doit()
 {
   std::size_t iteration = 0;
-  solutiont solution;
   while (true)
   {
     switch (synthesizer(iteration))
@@ -20,7 +34,7 @@ cegist::resultt cegist::doit()
     }
     iteration++;
 
-    solutiont solution = synthesizer.get_solution();
+    solution = synthesizer.get_solution();
     message.status() << "Candidate: ";
     for (const auto &f : solution.functions)
     {
@@ -31,7 +45,7 @@ cegist::resultt cegist::doit()
     {
     case verifyt::PASS:
       message.status() << "Verification passed" << messaget::eom;
-      // TODO: pretty print the solution
+      print_solution();
       return decision_proceduret::resultt::D_SATISFIABLE;
     case verifyt::FAIL:
       message.status() << "Verification failed" << messaget::eom;

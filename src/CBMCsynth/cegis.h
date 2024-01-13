@@ -33,6 +33,7 @@ protected:
   namespacet ns;
   solutiont solution;
   messaget message;
+  void print_solution();
 
 };
 #endif /* CEGIS_H_ */
