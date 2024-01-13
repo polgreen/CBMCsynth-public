@@ -152,7 +152,8 @@ int sygus_frontend(const cmdlinet &cmdline)
     synth.set_feedback_parameters(true,
       cmdline.isset("update-grammar"),
       cmdline.isset("use-bonus-weights"),
-      cmdline.isset("use-cex-in-prompt"));
+      cmdline.isset("use-cex-in-prompt"),
+      cmdline.isset("do-not-expand-fun-apps"));
     verifyt verify(ns, message_handler);
     cegist cegis(synth, verify, problem, ns, message_handler);
     cegis.doit();

@@ -27,6 +27,7 @@
   "(use-bonus-weights)" \
   "(update-grammar)" \
   "(use-cex-in-prompt)" \
+  "(do-not-expand-fun-apps)" \
 
 /// File ending of SMT2 files. Used to determine the language frontend that
 /// shall be used.
@@ -61,6 +62,7 @@ void help(std::ostream &out)
          "--use-bonus-weights              remove LLM grammar updates after 1 iteration\n"
          "--update-grammar                 uses LLM feedback to update the grammar weights\n"
          "--use-cex-in-prompt              use the most recent solution and counterexample in the prompt\n"
+         "do-not-expand-fun-apps          do not expand function applications in the prompt\n"
          "--cegis-bu                       do CEGIS with bottom up enumerator (no probabilities)\n"
          "--cegis-prob-bu                  do CEGIS with bottom up enumerator with weights. \n"
          "                                 we enumerate programs with the highest weight first\n"
