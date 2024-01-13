@@ -20,6 +20,7 @@ class syntactic_feedbackt
     std::string build_smt_prompt(const exprt &partial_function);
     bool update_grammar;
     bool use_cex_in_prompt;
+    bool expand_fun_apps;
     exprt last_solution;
     counterexamplet last_cex;
 

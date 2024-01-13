@@ -45,7 +45,17 @@ std::string syntactic_feedbackt::build_prompt(const exprt &partial_function)
 std::string syntactic_feedbackt::build_smt_prompt(const exprt &partial_function)
 {
   std::string prompt = "You are teaching a student to write SMT-LIB. The student must write a function that satisfies the following constraints:\n";
-
+  if(expand_fun_apps)
+  {
+    for(const auto &c: problem.constraints)
+    {
+      exprt expanded_c = c;
+      expand_function_applications(expanded_c, problem.defined_functions);
+      prompt += "(constraint (" + expr2sygus(expanded_c) + ")\n";
+    }
+  }
+  else
+  {
   std::set<symbol_exprt> defined_functions;
   for(const auto &c: problem.constraints)
     get_defined_functions(c, problem.defined_functions, defined_functions);
@@ -53,9 +63,9 @@ std::string syntactic_feedbackt::build_smt_prompt(const exprt &partial_function)
   for(const auto & f: defined_functions)
     prompt += fun_def(f, problem.defined_functions[f]) + "\n";
 
-
   for(const auto &c: problem.constraints)
     prompt += "(constraint (" + expr2sygus(c) + ")\n";
+  }
 
   if (use_cex_in_prompt && last_cex.assignment.size() > 0)
   {
@@ -81,7 +91,6 @@ std::string syntactic_feedbackt::build_smt_prompt(const exprt &partial_function)
   prompt += "\n\n";
 
   prompt += "Can you suggest some short helper functions for the student to use to complete this code and replace the ??\n";
-  prompt +="You must give the shortest functions possible.\n";
   prompt += "\nYou must print only the code and nothing else.\n";
   return prompt;
 }
@@ -166,13 +175,15 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
        i != std::string::npos;
        i = response.find(substr))
     response.erase(i, n);
+  
+  // erase all characters before the first "("
+  response.erase(0, response.find("("));
 #endif
   message.debug() << "LLM response: " << response << messaget::eom;
   std::istringstream str(response);
   parsert parser(str);
   parser.add_defined_functions(problem.defined_functions);
 
-  // TODO: add defined functions to the parser id map
   last_solution = nil_exprt();
   std::size_t new_functions = 0;
   try
@@ -195,8 +206,8 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
   // add the new functions to the problem
   for (auto &id : parser.id_map)
   {
-    std::cout << "Parsing id " << id.first << std::endl;
-    if (id.second.definition.is_not_nil())
+    if (id.second.definition.is_not_nil() && 
+      problem.defined_functions.find(symbol_exprt(id.first, id.second.type)) == problem.defined_functions.end())
     {
       problem.defined_functions[symbol_exprt(id.first, id.second.type)] = id.second.definition;
 
@@ -205,7 +216,9 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
         auto lambda = to_lambda_expr(id.second.definition);
         // insert into grammar (as a complete terminal expression)
         if (add_to_grammar(id.first, lambda.where()))
+        {
           new_functions++;
+        }
       }
     }
   }
