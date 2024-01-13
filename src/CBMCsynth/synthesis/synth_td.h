@@ -61,6 +61,7 @@ public:
     feedback.use_cex_in_prompt = _use_cex_in_prompt;
     feedback.expand_fun_apps = _expand_fun_apps;
   }
+  std::size_t frequency_of_LLM_calls = 10; // HEURISTIC
 
 protected:
   // used for printing. TODO: make all the printing use the message handlers correctly
@@ -91,8 +92,8 @@ protected:
   // number of enumerations since the last LLM call
   std::size_t enumerations_since_LLM; // HEURISTIC
   // minimum number of enumerations between LLM calls
-  std::size_t frequency_of_LLM_calls = 10; // HEURISTIC
-  std::size_t max_LLM_calls=20; // HEURISTIC
+
+  std::size_t max_LLM_calls=10; // HEURISTIC
   std::size_t num_LLM_calls; // HEURISTIC
   bool called_LLM_this_iter; // says if we have called the LLM this iteration
   // randomly chooses a production rule to apply whenever it finds

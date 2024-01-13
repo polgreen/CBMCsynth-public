@@ -28,6 +28,10 @@
   "(update-grammar)" \
   "(use-cex-in-prompt)" \
   "(do-not-expand-fun-apps)" \
+   "(program-depth): " \
+  "(frequency-of-LLM-calls): " \
+
+
 
 /// File ending of SMT2 files. Used to determine the language frontend that
 /// shall be used.

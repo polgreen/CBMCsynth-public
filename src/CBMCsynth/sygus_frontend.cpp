@@ -16,7 +16,6 @@
 #include "verification/counterexample_verify.h"
 #include "cegis.h"
 
-
 int sygus_frontend(const cmdlinet &cmdline)
 {
   // parse problem and get sygus problem
@@ -66,18 +65,17 @@ int sygus_frontend(const cmdlinet &cmdline)
     return 20;
   }
 
-  if(cmdline.isset("probs"))
+  if (cmdline.isset("probs"))
   {
-    message.status()<<"trying to parse prob file"<<messaget::eom;
+    message.status() << "trying to parse prob file" << messaget::eom;
     try
     {
       std::string filename = cmdline.get_value("probs");
       parse_probs(filename, problem);
-
     }
-    catch(const std::exception& e)
+    catch (const std::exception &e)
     {
-      message.error()<<"Failed to open probabilities file"<<messaget::eom;
+      message.error() << "Failed to open probabilities file" << messaget::eom;
       return 30;
     }
   }
@@ -87,7 +85,7 @@ int sygus_frontend(const cmdlinet &cmdline)
   {
     for (auto &f : problem.synthesis_functions)
     {
-      message.debug()<<"adding default grammars to sygus problems"<<messaget::eom;
+      message.debug() << "adding default grammars to sygus problems" << messaget::eom;
       add_grammar(f);
     }
     // replace all grammars in the sygus problem with default
@@ -96,20 +94,21 @@ int sygus_frontend(const cmdlinet &cmdline)
   if (cmdline.isset("dump-problem-as-smt"))
   {
     // dump the sygus problem as an smt problem
-    message.debug() << "Dumping problem as smt\n *************************\n" << messaget::eom;
+    message.debug() << "Dumping problem as smt\n *************************\n"
+                    << messaget::eom;
     print_sygus_as_smt(problem, message.status());
-    message.status()<<messaget::eom; //flush
+    message.status() << messaget::eom; // flush
   }
   if (cmdline.isset("dump-problem"))
   {
-    message.debug()<<"Dumping problem\n *************************\n "<<messaget::eom;
+    message.debug() << "Dumping problem\n *************************\n " << messaget::eom;
     print_sygus_problem(problem, message.status());
-    message.status()<<messaget::eom; //flush
+    message.status() << messaget::eom; // flush
     // just print the problem
   }
   if (cmdline.isset("solve-with-cvc5"))
   {
-    message.status()<<"Solving sygus problem with CVC5"<<messaget::eom;
+    message.status() << "Solving sygus problem with CVC5" << messaget::eom;
     // we solve with cvc5
     cvc5_syntht cvc5_synth(message.get_message_handler());
     decision_proceduret::resultt res = cvc5_synth(problem);
@@ -131,9 +130,9 @@ int sygus_frontend(const cmdlinet &cmdline)
       return 1;
     }
   }
-  if(cmdline.isset("cegis"))
+  if (cmdline.isset("cegis"))
   {
-    message.status()<<"top down CEGIS"<<messaget::eom;
+    message.status() << "top down CEGIS" << messaget::eom;
     counterexample_verifyt cex_verify(ns, message_handler);
     top_down_syntht synth(message_handler, problem, cex_verify);
     synth.set_program_size(5);
@@ -143,25 +142,31 @@ int sygus_frontend(const cmdlinet &cmdline)
     cegis.doit();
     return 0;
   }
-  if(cmdline.isset("LLM-cegis"))
+  if (cmdline.isset("LLM-cegis"))
   {
-    message.status()<<"top down CEGIS with an LLM providing syntactic feedback"<<messaget::eom;
+    message.status() << "top down CEGIS with an LLM providing syntactic feedback" << messaget::eom;
     counterexample_verifyt cex_verify(ns, message_handler);
     top_down_syntht synth(message_handler, problem, cex_verify);
-    synth.set_program_size(5);
+    if (cmdline.isset("program-depth"))
+      synth.set_program_size(std::stoi(cmdline.get_value("program-depth")));
+    else
+      synth.set_program_size(5);
+
     synth.set_feedback_parameters(true,
-      cmdline.isset("update-grammar"),
-      cmdline.isset("use-bonus-weights"),
-      cmdline.isset("use-cex-in-prompt"),
-      cmdline.isset("do-not-expand-fun-apps"));
+                                  cmdline.isset("update-grammar"),
+                                  cmdline.isset("use-bonus-weights"),
+                                  cmdline.isset("use-cex-in-prompt"),
+                                  !cmdline.isset("do-not-expand-fun-apps"));
+    if (cmdline.isset("frequency-of-LLM-calls"))
+      synth.frequency_of_LLM_calls = std::stoi(cmdline.get_value("frequency-of-LLM-calls"));
     verifyt verify(ns, message_handler);
     cegist cegis(synth, verify, problem, ns, message_handler);
     cegis.doit();
     return 0;
   }
-  else if(cmdline.isset("cegis-bu"))
+  else if (cmdline.isset("cegis-bu"))
   {
-    message.status()<<"Basic bottom up CEGIS"<<messaget::eom;
+    message.status() << "Basic bottom up CEGIS" << messaget::eom;
     counterexample_verifyt cex_verify(ns, message_handler);
     bottom_up_syntht synth(message_handler, problem, cex_verify);
     synth.set_program_size(5);
@@ -169,9 +174,9 @@ int sygus_frontend(const cmdlinet &cmdline)
     cegist cegis(synth, verify, problem, ns, message_handler);
     cegis.doit();
   }
-  else if(cmdline.isset("cegis-prob-bu"))
+  else if (cmdline.isset("cegis-prob-bu"))
   {
-    message.status()<<"probabilistic bottom up CEGIS"<<messaget::eom;
+    message.status() << "probabilistic bottom up CEGIS" << messaget::eom;
     counterexample_verifyt cex_verify(ns, message_handler);
     prob_bu_syntht synth(message_handler, problem, cex_verify);
     synth.set_program_size(5);
