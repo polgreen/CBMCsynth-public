@@ -111,6 +111,7 @@ void top_down_syntht::top_down_enumerate()
   // enumerate through the grammar until a complete program is found
   std::vector<unsigned> sequence;
   bool no_solution=true;
+  std::size_t current_depth = 0;
   while (no_solution)
   {
     message.debug()<<"partial program: "<<expr2sygus(current_program)<<messaget::eom;
@@ -156,7 +157,7 @@ void top_down_syntht::top_down_enumerate()
       // we have a complete program
       break;
     }
-    std::size_t current_depth = 0;
+
     // TODO: now we are counting the number of nonterminals, we can just exit
     // if we find none.
     // if we didn't replace anything, we had a complete program. Exit the loop

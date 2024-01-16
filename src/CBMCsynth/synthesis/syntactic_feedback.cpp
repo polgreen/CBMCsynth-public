@@ -90,7 +90,7 @@ std::string syntactic_feedbackt::build_smt_prompt(const exprt &partial_function)
 
   prompt += "\n\n";
 
-  prompt += "Can you suggest some short helper functions for the student to use to complete this code and replace the ??\n";
+  prompt += "Can you suggest some helper functions for the student to use to complete this code and replace the ??\n";
   prompt += "\nYou must print only the code and nothing else.\n";
   return prompt;
 }
