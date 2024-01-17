@@ -40,6 +40,9 @@ void get_defined_functions(
 // Replaces all occurences of a string in a string with another string
 std::string replace_occurences(std::string str, const std::string &from, const std::string &to);
 
+// replaces nth occurrence of what with by in dest
+bool replace_nth_occurrence(const exprt &what, const exprt &by, exprt &dest, const std::size_t &n);
+
 // converts a exprt to NNF form
 void nnf(exprt &expr, bool negate);
 

@@ -30,6 +30,7 @@
   "(do-not-expand-fun-apps)" \
    "(program-depth): " \
   "(frequency-of-LLM-calls): " \
+  "(astar)"                 \
 
 
 

@@ -323,6 +323,46 @@ void replace_local_var(exprt &expr, const irep_idt &target, exprt &replacement) 
     }
 }
 
+bool replace_nth_occurrence(const exprt &what, const exprt &by, exprt &dest,  std::size_t &count, const std::size_t &n)
+  {
+  INVARIANT(
+    what.type() == by.type(),
+    "types to be replaced should match. old type:\n" + what.type().pretty() +
+      "\nnew type:\n" + by.type().pretty());
+
+  bool no_change = true;
+
+  for(auto it = dest.depth_begin(), itend = dest.depth_end();
+      it != itend;) // no ++it
+  {
+    if (*it == what)
+    {
+      count++;
+      if (count == n)
+      {
+        it.mutate() = by;
+        no_change = false;
+        it.next_sibling_or_parent();
+      }
+      else
+        ++it;
+    }
+    else
+      ++it;
+  }
+
+  return no_change;
+}
+
+// returns true if no change
+bool replace_nth_occurrence(const exprt &what, const exprt &by, exprt &dest, const std::size_t &n)
+{
+  if(n<1)
+    return true;
+  std::size_t count = 0;
+  return replace_nth_occurrence(what, by, dest, count, n);
+}
+
 
 void expand_let_expressions(exprt &expr) {
     if (expr.id() == ID_let) {

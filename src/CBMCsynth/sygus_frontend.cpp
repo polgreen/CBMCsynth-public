@@ -8,6 +8,7 @@
 #include <util/std_expr.h>
 #include <util/cout_message.h>
 
+#include "synthesis/a_star.h"
 #include "synthesis/synth.h"
 #include "synthesis/synth_td.h"
 #include "synthesis/synth_bu.h"
@@ -179,6 +180,16 @@ int sygus_frontend(const cmdlinet &cmdline)
     message.status() << "probabilistic bottom up CEGIS" << messaget::eom;
     counterexample_verifyt cex_verify(ns, message_handler);
     prob_bu_syntht synth(message_handler, problem, cex_verify);
+    synth.set_program_size(5);
+    verifyt verify(ns, message_handler);
+    cegist cegis(synth, verify, problem, ns, message_handler);
+    cegis.doit();
+  }
+  else if(cmdline.isset("astar"))
+  {
+    message.status() << "A star search" << messaget::eom;
+    counterexample_verifyt cex_verify(ns, message_handler);
+    a_star_syntht synth(message_handler, problem, cex_verify);
     synth.set_program_size(5);
     verifyt verify(ns, message_handler);
     cegist cegis(synth, verify, problem, ns, message_handler);

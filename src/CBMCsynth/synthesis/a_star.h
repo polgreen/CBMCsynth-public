@@ -10,34 +10,45 @@
 #include <util/message.h>
 #include <set>
 #include <unordered_set>
+#include <queue>
+
+struct q_entry
+{
+  double cf;
+  double cg;
+  exprt expr;
+  bool operator<(const q_entry &o) const
+  {
+    return (cf + cg) > (o.cf + o.cg);
+  }
+  q_entry(double cf, double cg, exprt expr) : cf(cf), cg(cg), expr(expr) {}
+};
 
 class a_star_syntht : public syntht
 {
-  public:
-    a_star_syntht(message_handlert &_ms, sygus_problemt &_problem, counterexample_verifyt &_cex_verifier) : message(_ms),
-                                                                                                           problem(_problem),
-                                                                                                           cex_verifier(_cex_verifier),
-                                                                                                           grammar(_problem.get_grammar()),
-                                                                                                           feedback(_problem, _ms),
-    {
-      // create probabilities
-    };
+public:
+  a_star_syntht(message_handlert &_ms, sygus_problemt &_problem, counterexample_verifyt &_cex_verifier) : message(_ms),
+                                                                                                          problem(_problem),
+                                                                                                          cex_verifier(_cex_verifier),
+                                                                                                          grammar(_problem.get_grammar()),
+                                                                                                          feedback(_problem, _ms){
+                                                                                                              // create probabilities
+                                                                                                          };
 
-    solutiont get_solution() const override;
+  solutiont get_solution() const override;
 
+  // set maximum depth of enumeration
+  void set_program_size(std::size_t size) override;
 
-    // set maximum depth of enumeration
-    void set_program_size(std::size_t size) override;
+  // calls the enumerator and then checks the result against the counterexamples
+  // returns when it has found a candidate that satisfies the counterexamples
+  resultt operator()(std::size_t) override;
 
-    // calls the enumerator and then checks the result against the counterexamples
-    // returns when it has found a candidate that satisfies the counterexamples
-    resultt operator()(std::size_t) override;
+  // adds a counterexample to the list
+  void add_counterexample(const counterexamplet &cex) override;
 
-    // adds a counterexample to the list
-    void add_counterexample(const counterexamplet &cex) override;
-
-  protected:
-    // used for printing. TODO: make all the printing use the message handlers correctly
+protected:
+  // used for printing. TODO: make all the printing use the message handlers correctly
   messaget message;
   // the problem to solve
   sygus_problemt &problem;
@@ -58,13 +69,13 @@ class a_star_syntht : public syntht
   std::size_t program_size; // HEURISTIC
   void calculate_h_scores();
   void set_up_probabilities();
+  void replace_nonterminal(const exprt &expr, const double &cf);
+  std::priority_queue<q_entry> Q;
 
-  std::unordered_set<exprt> queue_of_progs;
+  std::unordered_set<exprt, irep_hash> queue_of_progs;
   double g(const exprt &partial_func);
   std::map<irep_idt, std::vector<double>> probabilities;
+  std::map<irep_idt, std::vector<double>> weights;
 };
-
-
-
 
 #endif /* A_STAR_H_ */
