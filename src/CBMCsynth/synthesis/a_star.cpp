@@ -117,6 +117,25 @@ void print_queue(std::priority_queue<q_entry> Q)
   }
 }
 
+bool a_star_syntht::get_LLM_feedback(const exprt &expr)
+{
+  std::size_t new_funcs = feedback.augment_grammar(expr, problem);
+  message.debug()<<"LLM added "<<new_funcs<<" new functions\n";
+  if (feedback.last_solution.id() != ID_nil)
+  {
+    message.debug() << "LLM gave us a candidate solution: " << format(feedback.last_solution) << messaget::eom;
+    last_solution.functions[symbol_exprt(problem.synthesis_functions[0].id,
+                                         problem.synthesis_functions[0].type)] =
+        lambda_exprt(problem.synthesis_functions[0].parameters, feedback.last_solution);
+    if(cex_verifier(problem, last_solution, counterexamples) == counterexample_verifyt::resultt::PASS)\
+      return true;
+  }
+  // update weights and h scores
+  set_up_probabilities();
+  calculate_h_scores();
+  return false;
+}
+
 a_star_syntht::resultt a_star_syntht::operator()(std::size_t iteration)
 {
   // calculate h scores
@@ -128,6 +147,11 @@ a_star_syntht::resultt a_star_syntht::operator()(std::size_t iteration)
     Q.push(q_entry(0.0, h_scores[grammar.start], symbol_exprt(grammar.start, grammar.start_type)));
   while (!Q.empty())
   {
+    if(Q.size()%10==0 && use_syntactic_feedback)
+    {
+      if(get_LLM_feedback(Q.top().expr))
+        return CANDIDATE;
+    }
     const double cf = Q.top().cf;
     const exprt partial_func = Q.top().expr;
     message.debug() << "top of queue " << expr2sygus(partial_func) << messaget::eom;
@@ -137,12 +161,7 @@ a_star_syntht::resultt a_star_syntht::operator()(std::size_t iteration)
       last_solution.functions[symbol_exprt(problem.synthesis_functions[0].id,
                                            problem.synthesis_functions[0].type)] =
           lambda_exprt(problem.synthesis_functions[0].parameters, partial_func);
-      if (counterexamples.size() == 0)
-      {
-        message.debug() << "no counterexamples to verify against" << messaget::eom;
-        return CANDIDATE;
-      }
-      else if (cex_verifier(problem, last_solution, counterexamples) == counterexample_verifyt::resultt::PASS) // verify against cex
+      if(cex_verifier(problem, last_solution, counterexamples) == counterexample_verifyt::resultt::PASS) // verify against cex
       {
         message.debug() << "counterexample verifier passed " << messaget::eom;
         return CANDIDATE;

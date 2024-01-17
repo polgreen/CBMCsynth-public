@@ -46,6 +46,17 @@ public:
 
   // adds a counterexample to the list
   void add_counterexample(const counterexamplet &cex) override;
+  bool use_syntactic_feedback;
+  void set_feedback_parameters(bool _use_syntactic_feedback,
+                               bool _update_grammar,
+                               bool _use_cex_in_prompt,
+                               bool _expand_fun_apps = true)
+  {
+    use_syntactic_feedback = _use_syntactic_feedback;
+    feedback.update_grammar = _update_grammar;
+    feedback.use_cex_in_prompt = _use_cex_in_prompt;
+    feedback.expand_fun_apps = _expand_fun_apps;
+  }
 
 protected:
   // used for printing. TODO: make all the printing use the message handlers correctly
@@ -70,6 +81,7 @@ protected:
   void calculate_h_scores();
   void set_up_probabilities();
   void replace_nonterminal(const exprt &expr, const double &cf);
+  bool get_LLM_feedback(const exprt &expr);
   std::priority_queue<q_entry> Q;
 
   std::unordered_set<exprt, irep_hash> queue_of_progs;

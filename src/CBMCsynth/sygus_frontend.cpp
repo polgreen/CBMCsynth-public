@@ -191,6 +191,10 @@ int sygus_frontend(const cmdlinet &cmdline)
     counterexample_verifyt cex_verify(ns, message_handler);
     a_star_syntht synth(message_handler, problem, cex_verify);
     synth.set_program_size(5);
+    synth.set_feedback_parameters(cmdline.isset("use-LLM"),
+                                  cmdline.isset("update-grammar"),
+                                  cmdline.isset("use-cex-in-prompt"),
+                                  !cmdline.isset("do-not-expand-fun-apps"));
     verifyt verify(ns, message_handler);
     cegist cegis(synth, verify, problem, ns, message_handler);
     cegis.doit();
