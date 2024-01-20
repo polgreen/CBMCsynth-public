@@ -56,12 +56,12 @@ std::string syntactic_feedbackt::build_smt_prompt(const exprt &partial_function)
   }
   else
   {
-  std::set<symbol_exprt> defined_functions;
-  for(const auto &c: problem.constraints)
-    get_defined_functions(c, problem.defined_functions, defined_functions);
+  // std::set<symbol_exprt> defined_functions;
+  // for(const auto &c: problem.constraints)
+  //   get_defined_functions(c, problem.defined_functions, defined_functions);
 
-  for(const auto & f: defined_functions)
-    prompt += fun_def(f, problem.defined_functions[f]) + "\n";
+  // for(const auto & f: defined_functions)
+  //   prompt += fun_def(f, problem.defined_functions[f]) + "\n";
 
   for(const auto &c: problem.constraints)
     prompt += "(constraint (" + expr2sygus(c) + ")\n";
@@ -153,7 +153,7 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
   openai::Json j;
   j["model"] = "gpt-3.5-turbo";
   j["messages"] = openai::Json::array({messages});
-  j["temperature"] = 0.5; // heuristic
+  // j["temperature"] = 0.5; // heuristic
 
   auto completion = openai::chat().create(j);
 
@@ -206,8 +206,8 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
   // add the new functions to the problem
   for (auto &id : parser.id_map)
   {
-    if (id.second.definition.is_not_nil() && 
-      problem.defined_functions.find(symbol_exprt(id.first, id.second.type)) == problem.defined_functions.end())
+    if (id.second.definition.is_not_nil()) 
+    //&&   problem.defined_functions.find(symbol_exprt(id.first, id.second.type)) == problem.defined_functions.end())
     {
       problem.defined_functions[symbol_exprt(id.first, id.second.type)] = id.second.definition;
 

@@ -141,17 +141,28 @@ a_star_syntht::resultt a_star_syntht::operator()(std::size_t iteration)
   // calculate h scores
   set_up_probabilities();
   calculate_h_scores();
+  std::size_t iter = 0;
   message.status() << "starting enumeration" << messaget::eom;
   // tuple of cf, cg, expr
   if(Q.empty())
     Q.push(q_entry(0.0, h_scores[grammar.start], symbol_exprt(grammar.start, grammar.start_type)));
+  bool call_LLM=false;
   while (!Q.empty())
   {
-    if(Q.size()%10==0 && use_syntactic_feedback)
+    message.debug()<<"iteration "<<iter<<", queue size "<<Q.size()<<messaget::eom;
+    if((iter==0 || Q.size()%10==0) && use_syntactic_feedback)
     {
+      message.debug()<<"calling LLM\n";
+      call_LLM=true;
+    }
+    if(call_LLM && count_nonterminals(Q.top().expr, grammar)!=0)
+    {
+      call_LLM=false;
       if(get_LLM_feedback(Q.top().expr))
         return CANDIDATE;
     }
+    iter++;
+
     const double cf = Q.top().cf;
     const exprt partial_func = Q.top().expr;
     message.debug() << "top of queue " << expr2sygus(partial_func) << messaget::eom;
