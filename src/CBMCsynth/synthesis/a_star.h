@@ -31,7 +31,9 @@ public:
                                                                                                           problem(_problem),
                                                                                                           cex_verifier(_cex_verifier),
                                                                                                           grammar(_problem.get_grammar()),
-                                                                                                          feedback(_problem, _ms){
+                                                                                                          feedback(_problem, _ms),
+                                                                                                          LLM_calls(0),
+                                                                                                          maxLLM_calls(10){
                                                                                                               // create probabilities
                                                                                                           };
 
@@ -71,6 +73,8 @@ protected:
   // TODO: make this a reference to the grammar in the sygus problem
   syntactic_templatet &grammar;
   syntactic_feedbackt feedback;
+  std::size_t LLM_calls;
+  std::size_t maxLLM_calls;
   // counterexamples
   std::vector<counterexamplet> counterexamples;
   std::map<irep_idt, double> h_scores;

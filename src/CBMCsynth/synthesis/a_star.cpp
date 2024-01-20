@@ -119,6 +119,7 @@ void print_queue(std::priority_queue<q_entry> Q)
 
 bool a_star_syntht::get_LLM_feedback(const exprt &expr)
 {
+  LLM_calls++;
   std::size_t new_funcs = feedback.augment_grammar(expr, problem);
   message.debug()<<"LLM added "<<new_funcs<<" new functions\n";
   if (feedback.last_solution.id() != ID_nil)
@@ -150,7 +151,7 @@ a_star_syntht::resultt a_star_syntht::operator()(std::size_t iteration)
   while (!Q.empty())
   {
     message.debug()<<"iteration "<<iter<<", queue size "<<Q.size()<<messaget::eom;
-    if((iter==0 || Q.size()%10==0) && use_syntactic_feedback)
+    if((iter==0 || Q.size()%10==0) && use_syntactic_feedback && LLM_calls < maxLLM_calls)
     {
       message.debug()<<"calling LLM\n";
       call_LLM=true;
