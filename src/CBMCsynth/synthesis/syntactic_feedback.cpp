@@ -41,21 +41,21 @@ std::string syntactic_feedbackt::build_prompt(const exprt &partial_function)
   return prompt;
 }
 
-
-//iter = 0: don't expand functions,don't give defs, no cex
-// iter = 1: expanded functions, no cex
-// iter = 2: expanded functions, cex
-//iter = 3: don't expand functions, do give defs, no cex
-//iter = 4: don't expand functions, don't give defs, cex
-//iter = 5: don't expand functions, do give defs, cex
+// iter = 0: don't expand functions,don't give defs, no cex
+//  iter = 1: expanded functions, no cex
+//  iter = 2: expanded functions, cex
+// iter = 3: don't expand functions, do give defs, no cex
+// iter = 4: don't expand functions, don't give defs, cex
+// iter = 5: don't expand functions, do give defs, cex
 
 std::string syntactic_feedbackt::build_smt_prompt(const exprt &partial_function)
 {
+  message.debug() << "iter is " << iter << messaget::eom;
   std::string prompt = "You are teaching a student to write SMT-LIB. ";
-  if(iter==1 || iter==2)
+  if (iter == 1 || iter == 2)
   {
-    prompt +="The student must write a function that satisfies the following constraints:\n";
-    for(const auto &c: problem.constraints)
+    prompt += "The student must write a function that satisfies the following constraints:\n";
+    for (const auto &c : problem.constraints)
     {
       exprt expanded_c = c;
       expand_function_applications(expanded_c, problem.defined_functions);
@@ -75,12 +75,12 @@ std::string syntactic_feedbackt::build_smt_prompt(const exprt &partial_function)
         prompt += fun_def(f, problem.defined_functions[f]) + "\n";
     }
 
-    prompt +="The student must write a function that satisfies the following constraints:\n";
+    prompt += "The student must write a function that satisfies the following constraints:\n";
     for (const auto &c : problem.constraints)
       prompt += "(constraint (" + expr2sygus(c) + ")\n";
   }
 
-  if ((iter==2 || iter==4 || iter==5) && last_cex.assignment.size() > 0)
+  if ((iter == 2 || iter == 4 || iter == 5) && last_cex.assignment.size() > 0)
   {
     prompt += "\nThe last solution the student tried was this, but the teacher marked this solution incorrect:\n";
 
@@ -88,9 +88,9 @@ std::string syntactic_feedbackt::build_smt_prompt(const exprt &partial_function)
         fun_def(symbol_exprt(problem.synthesis_functions[0].id, problem.synthesis_functions[0].type),
                 last_solution);
     prompt += "\nThis solution was incorrect because it did not work for the following inputs:\n";
-    for(const auto & c: last_cex.assignment)
+    for (const auto &c : last_cex.assignment)
     {
-      prompt +=expr2sygus(c.first) + "  =  " + expr2sygus(c.second)+ "\n";
+      prompt += expr2sygus(c.first) + "  =  " + expr2sygus(c.second) + "\n";
     }
 
     prompt += "\n\nThe student is trying again.";
@@ -106,8 +106,8 @@ std::string syntactic_feedbackt::build_smt_prompt(const exprt &partial_function)
   prompt += "Can you suggest some helper functions for the student to use to complete this code and replace the ??\n";
   prompt += "\nYou must print only the code and nothing else.\n";
   iter++;
-  if(iter==6)
-    iter=0;
+  if (iter == 6)
+    iter = 0;
   return prompt;
 }
 
@@ -122,19 +122,23 @@ bool syntactic_feedbackt::add_to_grammar(const irep_idt &id, const exprt &expr)
     if (rules.second[0].type() == type)
     {
       problem.get_grammar().production_rules[rules.first].push_back(expr);
-      auto max = std::max_element(
-          problem.get_grammar().production_rule_weights[rules.first].begin(),
-          problem.get_grammar().production_rule_weights[rules.first].end());
+      // auto max = std::max_element(
+      //     problem.get_grammar().production_rule_weights[rules.first].begin(),
+      //     problem.get_grammar().production_rule_weights[rules.first].end());
+      double avg = 0;
+      for (const auto &w : problem.get_grammar().production_rule_weights[rules.first])
+        avg += w;
+      avg = avg / problem.get_grammar().production_rule_weights[rules.first].size();
       // TODO: HEURISTIC this is a heuristic to decide how likely it is that we pick the new production rules
       if (id == problem.synthesis_functions[0].id)
       {
         last_solution = expr;
-        problem.get_grammar().production_rule_weights[rules.first].push_back(*max * 5);
-        problem.get_grammar().bonus_weights[rules.first].push_back(*max * 4);
+        problem.get_grammar().production_rule_weights[rules.first].push_back(avg);
+        problem.get_grammar().bonus_weights[rules.first].push_back(avg - 1);
       }
       else
       {
-        problem.get_grammar().production_rule_weights[rules.first].push_back(*max);
+        problem.get_grammar().production_rule_weights[rules.first].push_back(avg);
         problem.get_grammar().bonus_weights[rules.first].push_back(0);
       }
       added = true;
@@ -148,7 +152,7 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
 {
   // debugs without calling openai
 #ifdef DEBUG
-  std::string response = "(define-fun max ((x Int) (y Int)) Int (ite (> x y) x y))";
+  std::string response = "(define-fun bvashr4 ((x (_ BitVec 4)) (y (_ BitVec 4))) (_ BitVec 4) (bvashr x y))2. Helper function for bvuge:   (define-fun bvuge4 ((x (_ BitVec 4)) (y (_ BitVec 4))) Bool     (bvuge x y))Using these helper functions, the student can replace the ?? in their code with the following:(define-fun fn0 ((vr0 (_ BitVec 4))(vr1 (_ BitVec 4))) Bool (not (or (bvuge4 (bvashr4 (_ bv0 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv1 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv2 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv3 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv4 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv5 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv6 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv7 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv8 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv9 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv10 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv11 4) vr0) vr1)         ";
 #else
   // generate openAI query
   openai::start(); // Will use the api key provided by `OPENAI_API_KEY` environment variable
@@ -191,20 +195,21 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
        i != std::string::npos;
        i = response.find(substr))
     response.erase(i, n);
-  
+
   // erase all characters before the first "("
   response.erase(0, response.find("("));
 #endif
   message.debug() << "LLM response: " << response << messaget::eom;
   std::istringstream str(response);
-  parsert parser(str);
-  parser.add_defined_functions(problem.defined_functions);
-  parser.add_symbols(problem.free_var);
-
-  last_solution = nil_exprt();
   std::size_t new_functions = 0;
   try
   {
+    parsert parser(str);
+    parser.add_defined_functions(problem.defined_functions);
+    parser.add_symbols(problem.free_var);
+
+    last_solution = nil_exprt();
+
     if (response.find("define-fun") == std::string::npos)
     {
       parser.add_symbols(problem.free_var);
@@ -214,51 +219,52 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
     }
     else
       parser.parse();
+
+    // add the new functions to the problem
+    for (auto &id : parser.id_map)
+    {
+      if (id.second.definition.is_not_nil())
+      //&&   problem.defined_functions.find(symbol_exprt(id.first, id.second.type)) == problem.defined_functions.end())
+      {
+        problem.defined_functions[symbol_exprt(id.first, id.second.type)] = id.second.definition;
+
+        if (id.second.definition.id() == ID_lambda)
+        {
+          auto lambda = to_lambda_expr(id.second.definition);
+          // insert into grammar (as a complete terminal expression)
+          if (add_to_grammar(id.first, lambda.where()))
+          {
+            new_functions++;
+          }
+        }
+      }
+    }
+
+    if (update_grammar)
+    {
+      // update grammar weights
+      message.debug() << "Updating grammar weights with new functions" << messaget::eom;
+      for (const auto &rules : problem.get_grammar().production_rules)
+      {
+        message.debug() << id2string(rules.first) << " : " << messaget::eom;
+        auto &weights = problem.get_grammar().production_rule_weights[rules.first];
+        for (unsigned i = 0; i < rules.second.size(); i++)
+        {
+          message.debug() << " " << expr2sygus(rules.second[i]) << ":";
+          if (parser.operator_counts.find(rules.second[i].id()) != parser.operator_counts.end())
+          {
+            weights[i] += parser.operator_counts[rules.second[i].id()];
+          }
+          message.debug() << weights[i] << "\n";
+        }
+        message.debug() << messaget::eom;
+      }
+    }
   }
   catch (const parsert::smt2_errort &e)
   {
     message.debug() << "Error parsing LLM response: " << e.get_line_no() << ": "
                     << e.what() << messaget::eom;
-  }
-  // add the new functions to the problem
-  for (auto &id : parser.id_map)
-  {
-    if (id.second.definition.is_not_nil()) 
-    //&&   problem.defined_functions.find(symbol_exprt(id.first, id.second.type)) == problem.defined_functions.end())
-    {
-      problem.defined_functions[symbol_exprt(id.first, id.second.type)] = id.second.definition;
-
-      if (id.second.definition.id() == ID_lambda)
-      {
-        auto lambda = to_lambda_expr(id.second.definition);
-        // insert into grammar (as a complete terminal expression)
-        if (add_to_grammar(id.first, lambda.where()))
-        {
-          new_functions++;
-        }
-      }
-    }
-  }
-
-  if (update_grammar)
-  {
-    // update grammar weights
-    message.debug() << "Updating grammar weights with new functions" << messaget::eom;
-    for (const auto &rules : problem.get_grammar().production_rules)
-    {
-      message.debug() << id2string(rules.first) << " : " << messaget::eom;
-      auto &weights = problem.get_grammar().production_rule_weights[rules.first];
-      for (unsigned i = 0; i < rules.second.size(); i++)
-      {
-        message.debug() << " " << expr2sygus(rules.second[i]) << ":";
-        if (parser.operator_counts.find(rules.second[i].id()) != parser.operator_counts.end())
-        {
-          weights[i] += parser.operator_counts[rules.second[i].id()];
-        }
-        message.debug() << weights[i] << "\n";
-      }
-      message.debug() << messaget::eom;
-    }
   }
 
   return new_functions;
