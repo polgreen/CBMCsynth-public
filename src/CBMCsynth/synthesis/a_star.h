@@ -88,7 +88,7 @@ protected:
   bool get_LLM_feedback(const exprt &expr);
   std::priority_queue<q_entry> Q;
 
-  std::unordered_set<exprt, irep_hash> queue_of_progs;
+  std::unordered_map<exprt, double, irep_hash> queue_of_progs;
   double g(const exprt &partial_func);
   std::map<irep_idt, std::vector<double>> probabilities;
   std::map<irep_idt, std::vector<double>> weights;

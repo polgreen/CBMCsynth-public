@@ -9,7 +9,7 @@ class syntactic_feedbackt
 {
   public:
     syntactic_feedbackt(sygus_problemt &problem, message_handlert &ms) 
-        : problem(problem), message(ms)
+        : problem(problem), message(ms), iter(0)
     {
       last_solution = nil_exprt();
     }
@@ -29,6 +29,7 @@ class syntactic_feedbackt
   private: 
     sygus_problemt &problem;
     messaget message;
+    std::size_t iter;
     bool add_to_grammar(const irep_idt &id, const exprt &expr);
 
 };

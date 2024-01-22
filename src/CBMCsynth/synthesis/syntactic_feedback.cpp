@@ -42,11 +42,19 @@ std::string syntactic_feedbackt::build_prompt(const exprt &partial_function)
 }
 
 
+//iter = 0: don't expand functions,don't give defs, no cex
+// iter = 1: expanded functions, no cex
+// iter = 2: expanded functions, cex
+//iter = 3: don't expand functions, do give defs, no cex
+//iter = 4: don't expand functions, don't give defs, cex
+//iter = 5: don't expand functions, do give defs, cex
+
 std::string syntactic_feedbackt::build_smt_prompt(const exprt &partial_function)
 {
-  std::string prompt = "You are teaching a student to write SMT-LIB. The student must write a function that satisfies the following constraints:\n";
-  if(expand_fun_apps)
+  std::string prompt = "You are teaching a student to write SMT-LIB. ";
+  if(iter==1 || iter==2)
   {
+    prompt +="The student must write a function that satisfies the following constraints:\n";
     for(const auto &c: problem.constraints)
     {
       exprt expanded_c = c;
@@ -56,18 +64,23 @@ std::string syntactic_feedbackt::build_smt_prompt(const exprt &partial_function)
   }
   else
   {
-  // std::set<symbol_exprt> defined_functions;
-  // for(const auto &c: problem.constraints)
-  //   get_defined_functions(c, problem.defined_functions, defined_functions);
+    if (iter == 3 || iter == 5)
+    {
+      prompt += "The student may find the following functions useful:\n";
+      std::set<symbol_exprt> defined_functions;
+      for (const auto &c : problem.constraints)
+        get_defined_functions(c, problem.defined_functions, defined_functions);
 
-  // for(const auto & f: defined_functions)
-  //   prompt += fun_def(f, problem.defined_functions[f]) + "\n";
+      for (const auto &f : defined_functions)
+        prompt += fun_def(f, problem.defined_functions[f]) + "\n";
+    }
 
-  for(const auto &c: problem.constraints)
-    prompt += "(constraint (" + expr2sygus(c) + ")\n";
+    prompt +="The student must write a function that satisfies the following constraints:\n";
+    for (const auto &c : problem.constraints)
+      prompt += "(constraint (" + expr2sygus(c) + ")\n";
   }
 
-  if (use_cex_in_prompt && last_cex.assignment.size() > 0)
+  if ((iter==2 || iter==4 || iter==5) && last_cex.assignment.size() > 0)
   {
     prompt += "\nThe last solution the student tried was this, but the teacher marked this solution incorrect:\n";
 
@@ -92,6 +105,9 @@ std::string syntactic_feedbackt::build_smt_prompt(const exprt &partial_function)
 
   prompt += "Can you suggest some helper functions for the student to use to complete this code and replace the ??\n";
   prompt += "\nYou must print only the code and nothing else.\n";
+  iter++;
+  if(iter==6)
+    iter=0;
   return prompt;
 }
 
@@ -183,6 +199,7 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
   std::istringstream str(response);
   parsert parser(str);
   parser.add_defined_functions(problem.defined_functions);
+  parser.add_symbols(problem.free_var);
 
   last_solution = nil_exprt();
   std::size_t new_functions = 0;

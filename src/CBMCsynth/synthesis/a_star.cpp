@@ -128,8 +128,15 @@ bool a_star_syntht::get_LLM_feedback(const exprt &expr)
     last_solution.functions[symbol_exprt(problem.synthesis_functions[0].id,
                                          problem.synthesis_functions[0].type)] =
         lambda_exprt(problem.synthesis_functions[0].parameters, feedback.last_solution);
-    if(cex_verifier(problem, last_solution, counterexamples) == counterexample_verifyt::resultt::PASS)\
-      return true;
+
+    try{
+      if(cex_verifier(problem, last_solution, counterexamples) == counterexample_verifyt::resultt::PASS)\
+        return true;
+    }
+    catch(const std::exception &e)
+    {
+      message.debug()<<"Exception in cex verifier: "<<e.what()<<messaget::eom;
+    }
   }
   // update weights and h scores
   set_up_probabilities();
@@ -151,7 +158,7 @@ a_star_syntht::resultt a_star_syntht::operator()(std::size_t iteration)
   while (!Q.empty())
   {
     message.debug()<<"iteration "<<iter<<", queue size "<<Q.size()<<messaget::eom;
-    if((iter==0 || Q.size()%10==0) && use_syntactic_feedback && LLM_calls < maxLLM_calls)
+    if((iter==0 || Q.size()%50==0) && use_syntactic_feedback && LLM_calls < maxLLM_calls)
     {
       message.debug()<<"calling LLM\n";
       call_LLM=true;
@@ -192,19 +199,28 @@ a_star_syntht::resultt a_star_syntht::operator()(std::size_t iteration)
       const auto &nt_symbol = symbol_exprt(nt, grammar.production_rules[nt][0].type());
       for (unsigned i = 0; i < rules.size(); i++)
       {
-        for (std::size_t j = 1; j <= nt_counts.at(nt); j++)
+    //    for (std::size_t j = 1; j <= nt_counts.at(nt); j++)
         {
           exprt copy = partial_func;
-          replace_nth_occurrence(nt_symbol, rules[i], copy, j);
-
-          if (queue_of_progs.find(copy) != queue_of_progs.end())
-            continue;
-
-          queue_of_progs.insert(copy);
+          replace_nth_occurrence(nt_symbol, rules[i], copy, 1);
           double new_cf = cf + w[i];
           double new_cg = g(copy);
-          message.debug() << "adding " << expr2sygus(copy) << " to queue with score " << new_cf << ", " << new_cg << messaget::eom;
-          Q.push(q_entry(new_cf, new_cg, copy));
+
+          if (queue_of_progs.find(copy) != queue_of_progs.end())
+          {
+            if(queue_of_progs[copy] > new_cf+new_cg)
+              {
+                queue_of_progs[copy] = new_cf+new_cg;
+                message.debug() << "updating " << expr2sygus(copy) << " in queue with score " << new_cf << ", " << new_cg << messaget::eom;
+                Q.push(q_entry(new_cf, new_cg, copy));
+              }
+          }
+          else
+          {
+            queue_of_progs[copy] = new_cf+new_cg;
+            message.debug() << "adding " << expr2sygus(copy) << " to queue with score " << new_cf << ", " << new_cg << messaget::eom;
+            Q.push(q_entry(new_cf, new_cg, copy));
+          }
         }
       }
     }
