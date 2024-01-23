@@ -11,7 +11,7 @@
 #include <istream>
 
 // define debug to avoid calling openai
- // #define DEBUG
+// #define DEBUG
 
 // takes in a partial candidate
 // returns false if there is no valid solution that can be made from this candidate
@@ -205,7 +205,7 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
   parsert parser(str);
   try
   {
-    parser.parse_generously = true;
+    parser.set_parse_generously(true);
     parser.add_defined_functions(problem.defined_functions);
     parser.add_symbols(problem.free_var);
 
@@ -219,59 +219,62 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
     }
     else
       parser.parse();
-
-    // add the new functions to the problem
-    for (auto &id : parser.id_map)
-    {
-      if (id.second.definition.is_not_nil())
-      //&&   problem.defined_functions.find(symbol_exprt(id.first, id.second.type)) == problem.defined_functions.end())
-      {
-        problem.defined_functions[symbol_exprt(id.first, id.second.type)] = id.second.definition;
-
-        if (id.second.definition.id() == ID_lambda)
-        {
-          auto lambda = to_lambda_expr(id.second.definition);
-          // insert into grammar (as a complete terminal expression)
-          if (add_to_grammar(id.first, lambda.where()))
-          {
-            new_functions++;
-          }
-        }
-      }
-    }
-
-    if (update_grammar)
-    {
-      update_grammar_weights(parser);
-    }
   }
   catch (const parsert::smt2_errort &e)
   {
     message.debug() << "Error parsing LLM response: " << e.get_line_no() << ": "
                     << e.what() << messaget::eom;
-    update_grammar_weights(parser);
   }
+  new_functions+=add_functions(parser, problem);
+  update_grammar_weights(parser);
 
   return new_functions;
 }
 
-void syntactic_feedbackt::update_grammar_weights(parsert & parser)
+std::size_t syntactic_feedbackt::add_functions(const parsert &parser, sygus_problemt &problem)
 {
-        // update grammar weights
-      message.debug() << "Updating grammar weights with new functions" << messaget::eom;
-      for (const auto &rules : problem.get_grammar().production_rules)
+  std::size_t new_functions = 0;
+  // add the new functions to the problem
+  for (auto &id : parser.id_map)
+  {
+    if (id.second.definition.is_not_nil())
+    //&&   problem.defined_functions.find(symbol_exprt(id.first, id.second.type)) == problem.defined_functions.end())
+    {
+      problem.defined_functions[symbol_exprt(id.first, id.second.type)] = id.second.definition;
+
+      if (id.second.definition.id() == ID_lambda)
       {
-        message.debug() << id2string(rules.first) << " : " << messaget::eom;
-        auto &weights = problem.get_grammar().production_rule_weights[rules.first];
-        for (unsigned i = 0; i < rules.second.size(); i++)
+        auto lambda = to_lambda_expr(id.second.definition);
+        // insert into grammar (as a complete terminal expression)
+        if (add_to_grammar(id.first, lambda.where()))
         {
-          message.debug() << " " << expr2sygus(rules.second[i]) << ":";
-          if (parser.operator_counts.find(rules.second[i].id()) != parser.operator_counts.end())
-          {
-            weights[i] += parser.operator_counts[rules.second[i].id()];
-          }
-          message.debug() << weights[i] << "\n";
+          new_functions++;
         }
-        message.debug() << messaget::eom;
       }
+    }
+  }
+  return new_functions;
+}
+
+void syntactic_feedbackt::update_grammar_weights(parsert &parser)
+{
+  if (!update_grammar)
+    return;
+  // update grammar weights
+  message.debug() << "Updating grammar weights with new functions" << messaget::eom;
+  for (const auto &rules : problem.get_grammar().production_rules)
+  {
+    message.debug() << id2string(rules.first) << " : " << messaget::eom;
+    auto &weights = problem.get_grammar().production_rule_weights[rules.first];
+    for (unsigned i = 0; i < rules.second.size(); i++)
+    {
+      message.debug() << " " << expr2sygus(rules.second[i]) << ":";
+      if (parser.operator_counts.find(rules.second[i].id()) != parser.operator_counts.end())
+      {
+        weights[i] += parser.operator_counts[rules.second[i].id()];
+      }
+      message.debug() << weights[i] << "\n";
+    }
+    message.debug() << messaget::eom;
+  }
 }

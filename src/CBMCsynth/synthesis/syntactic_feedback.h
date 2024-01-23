@@ -33,6 +33,8 @@ class syntactic_feedbackt
     std::size_t iter;
     bool add_to_grammar(const irep_idt &id, const exprt &expr);
     void update_grammar_weights(parsert& parser);
+    std::size_t add_functions(const parsert & parser, sygus_problemt& problem);
+
 };
 
 
