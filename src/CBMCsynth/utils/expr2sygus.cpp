@@ -163,6 +163,7 @@ std::string convert_expr(const exprt &expr)
            expr.id() == ID_bitand ||
            expr.id() == ID_bitor ||
            expr.id() == ID_bitxor ||
+           expr.id() == ID_bitxnor ||
            expr.id() == ID_bitnand ||
            expr.id() == ID_bitnor)
   {
@@ -181,6 +182,8 @@ std::string convert_expr(const exprt &expr)
       result += "bvor";
     else if (expr.id() == ID_bitxor)
       result += "bvxor";
+    else if (expr.id() == ID_bitxnor)
+      result += "bvxnor";
     else if (expr.id() == ID_bitnand)
       result += "bvnand";
     else if (expr.id() == ID_bitnor)

@@ -199,7 +199,7 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
   // erase all characters before the first "("
   response.erase(0, response.find("("));
 #endif
-  message.debug() << "LLM response: " << response << messaget::eom;
+  message.status() << "LLM response: " << response << messaget::eom;
   std::istringstream str(response);
   std::size_t new_functions = 0;
   parsert parser(str);
@@ -222,7 +222,7 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
   }
   catch (const parsert::smt2_errort &e)
   {
-    message.debug() << "Error parsing LLM response: " << e.get_line_no() << ": "
+    message.status() << "Error parsing LLM response: " << e.get_line_no() << ": "
                     << e.what() << messaget::eom;
   }
   new_functions+=add_functions(parser, problem);

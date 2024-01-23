@@ -11,7 +11,6 @@ std::mt19937 rng(rand());
 
 llm_syntht::enum_resultt llm_syntht::replace_nts(exprt &expr, std::size_t &current_depth, std::vector<unsigned> &sequence)
 {
-  std::cout<<"depth "<<current_depth<<" and prog " << expr2sygus(expr) <<std::endl;
 
   enum_resultt result = enum_resultt::NO_CHANGE;
   if (expr.id() == ID_symbol)
@@ -129,7 +128,7 @@ void llm_syntht::top_down_enumerate()
 
         if(feedback.last_solution.id()!=ID_nil)
         {
-          message.debug()<<"LLM gave us a candidate solution: "<<format(feedback.last_solution)<<messaget::eom;
+          message.status()<<"LLM gave us a candidate solution: "<<format(feedback.last_solution)<<messaget::eom;
           last_solution.functions[symbol_exprt(problem.synthesis_functions[0].id, 
           problem.synthesis_functions[0].type)] = 
           lambda_exprt(problem.synthesis_functions[0].parameters, feedback.last_solution);
@@ -216,19 +215,19 @@ llm_syntht::resultt llm_syntht::operator()(std::size_t iteration)
     // check against counterexamples
     if(counterexamples.size()==0)
     {
-      message.debug()<<"No counterexamples, returning candidate"<<messaget::eom;
+      message.status()<<"No counterexamples, returning candidate"<<messaget::eom;
       return CANDIDATE;
     }
     else if(cex_verifier(problem, last_solution, counterexamples)==counterexample_verifyt::resultt::PASS)
     {
-      message.debug()<<"counterexample verifier passed "<<messaget::eom;
+      message.status()<<"counterexample verifier passed "<<messaget::eom;
       return CANDIDATE;
     }
     else
     {
       feedback.last_cex = cex_verifier.get_failed_cex();
       feedback.last_solution = last_solution.functions.begin()->second;  
-      message.debug()<<"counterexample verifier failed "<<messaget::eom;
+      message.status()<<"counterexample verifier failed "<<messaget::eom;
     }
   }
   return NO_SOLUTION;
