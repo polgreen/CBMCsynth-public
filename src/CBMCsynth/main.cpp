@@ -32,6 +32,7 @@
   "(frequency-of-LLM-calls): " \
   "(astar)"                 \
   "(use-LLM)" \
+  "(program-depth):" \
 
 
 
