@@ -101,9 +101,10 @@ void llm_syntht::top_down_enumerate()
   // enumerate through the grammar until a complete program is found
   std::vector<unsigned> sequence;
   bool no_solution=true;
-  std::size_t current_depth = 0;
+
   while (no_solution)
   {
+    std::size_t current_depth = 0;
     message.debug()<<"partial program: "<<expr2sygus(current_program)<<messaget::eom;
     std::size_t num_nonterminals = count_symbol_occurrences(current_program, grammar.nt_ids);
     // if we only have one nonterminal, ask the LLM for guidance
