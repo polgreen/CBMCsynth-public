@@ -58,6 +58,11 @@ void add_grammar(synth_funt &f);
 void add_grammar_weights(syntactic_templatet &g);
 void subtract_bonus_weights(syntactic_templatet &g);
 void parse_probs(std::string filename, sygus_problemt& problem);
+bool contains_nonterminal(const exprt &expr, const syntactic_templatet& grammar);
+std::size_t count_nonterminals(const exprt &expr, const syntactic_templatet& grammar);
+std::vector<symbol_exprt> list_nonterminals(const exprt &expr, const syntactic_templatet& grammar);
+std::unordered_map<irep_idt, unsigned> get_nonterminal_counts(const exprt &expr, const syntactic_templatet& grammar);
+
 
 class solutiont
 {

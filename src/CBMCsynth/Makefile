@@ -3,7 +3,7 @@ parsing/parser.cpp utils/printing_utils.cpp utils/util.cpp \
  sygus_problem.cpp synthesis/synth_td.cpp synthesis/synth_bu.cpp \
  smt_problem.cpp utils/expr2sygus.cpp utils/expr2python.cpp cegis.cpp synthesis/synth.cpp \
  utils/cvc5_synth.cpp verification/verify.cpp verification/counterexample_verify.cpp \
- synthesis/synth_prob_bu.cpp synthesis/syntactic_feedback.cpp synthesis/a_star.cpp \
+ synthesis/synth_prob_bu.cpp synthesis/syntactic_feedback.cpp synthesis/a_star.cpp synthesis/synth_LLM.cpp \
 
 
 OBJ+= ../../$(CPROVER_DIR)/src/ansi-c/ansi-c$(LIBEXT) \

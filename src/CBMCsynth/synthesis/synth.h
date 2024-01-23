@@ -7,7 +7,6 @@
 #include <util/message.h>
 #include <random>
 
-
 // base class for synthesis phase of CEGIS.
 //  any synthesiser must implement these functions
 class syntht
@@ -23,10 +22,6 @@ public:
   
 };
 
-bool contains_nonterminal(const exprt &expr, const syntactic_templatet& grammar);
-std::size_t count_nonterminals(const exprt &expr, const syntactic_templatet& grammar);
-std::vector<symbol_exprt> list_nonterminals(const exprt &expr, const syntactic_templatet& grammar);
-std::unordered_map<irep_idt, unsigned> get_nonterminal_counts(const exprt &expr, const syntactic_templatet& grammar);
-
+std::string print_sequence(std::vector<unsigned> &sequence);
 
 #endif /* SYNTH_H_ */

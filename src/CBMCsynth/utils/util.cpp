@@ -12,9 +12,54 @@
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
 #include "expr2sygus.h"
+#include "../sygus_problem.h"
 
 #include <iostream>
 
+
+void basic_simplify(exprt &expr, const syntactic_templatet& grammar)
+{
+  if (expr.id() == ID_if)
+  {
+    if (to_if_expr(expr).true_case() == to_if_expr(expr).false_case())
+    {
+      if(!contains_nonterminal(to_if_expr(expr).true_case(), grammar))
+          expr = to_if_expr(expr).true_case();
+    }
+    else if (to_if_expr(expr).cond() == true_exprt())
+    {
+      expr = to_if_expr(expr).true_case();
+    }
+    else if (to_if_expr(expr).cond() == false_exprt())
+    {
+      expr = to_if_expr(expr).false_case();
+    }
+  }
+  else if (expr.id() == ID_equal || expr.id() == ID_le || expr.id() == ID_ge)
+  {
+    if (expr.operands()[0] == expr.operands()[1])
+      if(!contains_nonterminal(expr.operands()[0], grammar))
+          expr = true_exprt();
+  }
+  else if (expr.id() == ID_lt || expr.id() == ID_gt)
+  {
+    if (expr.operands()[0] == expr.operands()[1])
+      if(!contains_nonterminal(expr.operands()[0], grammar))
+        expr = false_exprt();
+  }
+  // make sure that the first operand is always the smaller one for commutative exprs
+  else if(expr.id()== ID_equal || expr.id()==ID_plus || expr.id() == ID_mult || 
+          expr.id()==ID_and || expr.id()==ID_or )
+  {
+    if(expr2sygus(expr.operands()[0]) > expr2sygus(expr.operands()[1]))
+      std::swap(expr.operands()[0], expr.operands()[1]);
+  }
+
+  for (auto &op : expr.operands())
+  {
+    basic_simplify(op);
+  }
+}
 
 void basic_simplify(exprt &expr)
 {

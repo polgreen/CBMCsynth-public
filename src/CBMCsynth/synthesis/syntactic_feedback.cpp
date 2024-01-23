@@ -4,7 +4,6 @@
 #include "../utils/expr2sygus.h"
 #include "../utils/util.h"
 #include "../openai/openai.hpp"
-#include "../parsing/parser.h"
 
 #include <util/replace_expr.h>
 #include <util/mathematical_expr.h>
@@ -12,7 +11,7 @@
 #include <istream>
 
 // define debug to avoid calling openai
-// #define DEBUG
+  #define DEBUG
 
 // takes in a partial candidate
 // returns false if there is no valid solution that can be made from this candidate
@@ -152,7 +151,8 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
 {
   // debugs without calling openai
 #ifdef DEBUG
-  std::string response = "(define-fun bvashr4 ((x (_ BitVec 4)) (y (_ BitVec 4))) (_ BitVec 4) (bvashr x y))2. Helper function for bvuge:   (define-fun bvuge4 ((x (_ BitVec 4)) (y (_ BitVec 4))) Bool     (bvuge x y))Using these helper functions, the student can replace the ?? in their code with the following:(define-fun fn0 ((vr0 (_ BitVec 4))(vr1 (_ BitVec 4))) Bool (not (or (bvuge4 (bvashr4 (_ bv0 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv1 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv2 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv3 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv4 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv5 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv6 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv7 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv8 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv9 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv10 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv11 4) vr0) vr1)         ";
+  std::string response = " (define-fun in-range ((v Int) (lower Int) (upper Int)) Bool  (and (> v lower) (< v upper)))(define-fun inv-f ((x Int) (z Int)) Bool  (=> (and (in-range x (- 0 100) 200) (in-range z 100 200))      (and (in-range x (- 0 100) 200) (in-range z 100 200))))(define-fun inv-f-extended ((x Int) (z Int) (x! Int) (z! Int)) Bool  (=> (and (in-range x (- 0 100) 200) (in-range z 100 200))      (or (and (in-range x (- 0 100) 100) (> z 100))          (or (>= x 100) (<= z 100)))))The completed code would look like this:(define-fun in-range ((v Int) (lower Int) (upper Int)) Bool  (and (> v lower) (< v upper)))(define-fun inv-f ((x Int) (z Int)) Bool  (=> (and (in-range x (- 0 100) 200) (in-range z 100 200))      (and (in-range x (- 0 100) 200) (in-range z 100 200))))(define-fun inv-f-extended ((x Int) (z Int) (x! Int) (z! Int)) Bool  (=> (and (in-range x (- 0 100) 200) (in-range z 100 200))      (or (and (in-range x (- 0 100) 100) (> z 100))          (or (>= x 100) (<= z 100)))))";
+  //   "(define-fun bvashr4 ((x (_ BitVec 4)) (y (_ BitVec 4))) (_ BitVec 4) (bvashr x y))2. Helper function for bvuge:   (define-fun bvuge4 ((x (_ BitVec 4)) (y (_ BitVec 4))) Bool     (bvuge x y))Using these helper functions, the student can replace the ?? in their code with the following:(define-fun fn0 ((vr0 (_ BitVec 4))(vr1 (_ BitVec 4))) Bool (not (or (bvuge4 (bvashr4 (_ bv0 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv1 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv2 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv3 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv4 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv5 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv6 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv7 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv8 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv9 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv10 4) vr0) vr1)          (bvuge4 (bvashr4 (_ bv11 4) vr0) vr1)         ";
 #else
   // generate openAI query
   openai::start(); // Will use the api key provided by `OPENAI_API_KEY` environment variable
@@ -202,9 +202,10 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
   message.debug() << "LLM response: " << response << messaget::eom;
   std::istringstream str(response);
   std::size_t new_functions = 0;
+  parsert parser(str);
   try
   {
-    parsert parser(str);
+    parser.parse_generously = true;
     parser.add_defined_functions(problem.defined_functions);
     parser.add_symbols(problem.free_var);
 
@@ -212,7 +213,6 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
 
     if (response.find("define-fun") == std::string::npos)
     {
-      parser.add_symbols(problem.free_var);
       last_solution = parser.parse_expression();
       add_to_grammar(problem.synthesis_functions[0].id, last_solution);
       new_functions++;
@@ -242,7 +242,22 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
 
     if (update_grammar)
     {
-      // update grammar weights
+      update_grammar_weights(parser);
+    }
+  }
+  catch (const parsert::smt2_errort &e)
+  {
+    message.debug() << "Error parsing LLM response: " << e.get_line_no() << ": "
+                    << e.what() << messaget::eom;
+    update_grammar_weights(parser);
+  }
+
+  return new_functions;
+}
+
+void syntactic_feedbackt::update_grammar_weights(parsert & parser)
+{
+        // update grammar weights
       message.debug() << "Updating grammar weights with new functions" << messaget::eom;
       for (const auto &rules : problem.get_grammar().production_rules)
       {
@@ -259,13 +274,4 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
         }
         message.debug() << messaget::eom;
       }
-    }
-  }
-  catch (const parsert::smt2_errort &e)
-  {
-    message.debug() << "Error parsing LLM response: " << e.get_line_no() << ": "
-                    << e.what() << messaget::eom;
-  }
-
-  return new_functions;
 }

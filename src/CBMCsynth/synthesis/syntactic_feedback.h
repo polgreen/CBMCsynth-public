@@ -3,6 +3,7 @@
 
 #include "../sygus_problem.h"
 #include <util/message.h>
+#include "../parsing/parser.h"
 
 // give syntactic feedback partway through enumeration
 class syntactic_feedbackt
@@ -31,7 +32,7 @@ class syntactic_feedbackt
     messaget message;
     std::size_t iter;
     bool add_to_grammar(const irep_idt &id, const exprt &expr);
-
+    void update_grammar_weights(parsert& parser);
 };
 
 

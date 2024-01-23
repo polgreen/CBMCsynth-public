@@ -20,6 +20,7 @@
 #include <util/mathematical_expr.h>
 
 #include "../constants.h"
+#include "../sygus_problem.h"
 
 
 // creates a function application exprt, given the function name, operands, and codomain
@@ -51,6 +52,9 @@ void dnf(exprt &expr);
 
 // does some basic simplification of an expression
 void basic_simplify(exprt &expr);
+
+// does some basic simplification of an expression
+void basic_simplify(exprt &expr, const syntactic_templatet & grammar);
 
 // counts the number of times any symbol in the ids vector occurs in the expression
 std::size_t count_symbol_occurrences(const exprt &expr , const std::vector<irep_idt> &ids);

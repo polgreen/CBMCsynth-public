@@ -11,6 +11,7 @@
 #include "synthesis/a_star.h"
 #include "synthesis/synth.h"
 #include "synthesis/synth_td.h"
+#include "synthesis/synth_LLM.h"
 #include "synthesis/synth_bu.h"
 #include "synthesis/synth_prob_bu.h"
 #include "verification/verify.h"
@@ -136,7 +137,10 @@ int sygus_frontend(const cmdlinet &cmdline)
     message.status() << "top down CEGIS" << messaget::eom;
     counterexample_verifyt cex_verify(ns, message_handler);
     top_down_syntht synth(message_handler, problem, cex_verify);
-    synth.set_program_size(5);
+    if (cmdline.isset("program-depth"))
+      synth.set_program_size(std::stoi(cmdline.get_value("program-depth")));
+    else
+      synth.set_program_size(5);
     synth.use_syntactic_feedback = false;
     verifyt verify(ns, message_handler);
     cegist cegis(synth, verify, problem, ns, message_handler);
@@ -147,13 +151,13 @@ int sygus_frontend(const cmdlinet &cmdline)
   {
     message.status() << "top down CEGIS with an LLM providing syntactic feedback" << messaget::eom;
     counterexample_verifyt cex_verify(ns, message_handler);
-    top_down_syntht synth(message_handler, problem, cex_verify);
+    llm_syntht synth(message_handler, problem, cex_verify);
     if (cmdline.isset("program-depth"))
       synth.set_program_size(std::stoi(cmdline.get_value("program-depth")));
     else
       synth.set_program_size(5);
 
-    synth.set_feedback_parameters(true,
+    synth.set_feedback_parameters(cmdline.isset("use-LLM"),
                                   cmdline.isset("update-grammar"),
                                   cmdline.isset("use-bonus-weights"),
                                   cmdline.isset("use-cex-in-prompt"),
