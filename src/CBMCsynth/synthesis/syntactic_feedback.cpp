@@ -11,7 +11,7 @@
 #include <istream>
 
 // define debug to avoid calling openai
-  #define DEBUG
+ // #define DEBUG
 
 // takes in a partial candidate
 // returns false if there is no valid solution that can be made from this candidate
