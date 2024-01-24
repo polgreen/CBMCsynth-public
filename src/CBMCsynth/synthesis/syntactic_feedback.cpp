@@ -168,7 +168,7 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
 
   std::string prompt = build_smt_prompt(partial_function_copy);
   message.debug() << "prompt is " << prompt << messaget::eom;
-
+  std::string response;
   try{
   openai::Json messages;
   messages["role"] = "user";
@@ -185,7 +185,7 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
   // parser can parse it.
   std::ostringstream oss;
   oss << completion["choices"][0]["message"]["content"];
-  std::string response = oss.str();
+  response = oss.str();
   }
   catch(const std::exception& e){
     message.debug() << "Error calling openAI: " << e.what() << messaget::eom;
