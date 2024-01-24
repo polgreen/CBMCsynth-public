@@ -158,7 +158,7 @@ a_star_syntht::resultt a_star_syntht::operator()(std::size_t iteration)
   while (!Q.empty())
   {
     message.debug()<<"iteration "<<iter<<", queue size "<<Q.size()<<messaget::eom;
-    if((iter==0 || Q.size()%50==0) && use_syntactic_feedback && LLM_calls < maxLLM_calls)
+    if((iter==0 || iter%15==0) && use_syntactic_feedback && LLM_calls < maxLLM_calls)
     {
       message.debug()<<"calling LLM\n";
       call_LLM=true;
