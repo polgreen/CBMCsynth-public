@@ -24,6 +24,7 @@ class syntactic_feedbackt
     bool expand_fun_apps;
     exprt last_solution;
     counterexamplet last_cex;
+    double temperature;
 
 
 

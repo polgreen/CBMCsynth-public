@@ -60,6 +60,11 @@ public:
     feedback.expand_fun_apps = _expand_fun_apps;
   }
 
+  void set_temperature(double _temperature)
+  {
+    feedback.temperature = _temperature;
+  }
+
 protected:
   // used for printing. TODO: make all the printing use the message handlers correctly
   messaget message;

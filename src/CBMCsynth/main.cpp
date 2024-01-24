@@ -33,6 +33,7 @@
   "(astar)"                 \
   "(use-LLM)" \
   "(program-depth):" \
+  "(temperature):" \
 
 
 

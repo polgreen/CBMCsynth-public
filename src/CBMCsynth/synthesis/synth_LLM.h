@@ -49,6 +49,11 @@ public:
   bool use_syntactic_feedback;
   bool use_bonus_weights;
 
+  void set_temperature(double _temperature)
+  {
+    feedback.temperature = _temperature;
+  }
+
   void set_feedback_parameters(bool _use_syntactic_feedback, 
     bool _update_grammar, 
     bool _use_bonus_weights, 

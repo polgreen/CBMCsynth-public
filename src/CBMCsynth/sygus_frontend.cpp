@@ -157,6 +157,11 @@ int sygus_frontend(const cmdlinet &cmdline)
     else
       synth.set_program_size(5);
 
+    if (cmdline.isset("temperature"))
+      synth.set_temperature(std::stod(cmdline.get_value("temperature")));
+    else
+      synth.set_temperature(0.5);
+
     synth.set_feedback_parameters(cmdline.isset("use-LLM"),
                                   cmdline.isset("update-grammar"),
                                   cmdline.isset("use-bonus-weights"),
@@ -199,6 +204,11 @@ int sygus_frontend(const cmdlinet &cmdline)
                                   cmdline.isset("update-grammar"),
                                   cmdline.isset("use-cex-in-prompt"),
                                   !cmdline.isset("do-not-expand-fun-apps"));
+                                
+    if (cmdline.isset("temperature"))
+      synth.set_temperature(std::stod(cmdline.get_value("temperature")));
+    else
+      synth.set_temperature(0.5);
     verifyt verify(ns, message_handler);
     cegist cegis(synth, verify, problem, ns, message_handler);
     cegis.doit();
