@@ -185,13 +185,12 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
   // parser can parse it.
   std::ostringstream oss;
   oss << completion["choices"][0]["message"]["content"];
+  std::string response = oss.str();
   }
   catch(const std::exception& e){
     message.debug() << "Error calling openAI: " << e.what() << messaget::eom;
     return 0;
   }
-
-  std::string response = oss.str();
   response.erase(std::remove(response.begin(), response.end(), '\"'),
                  response.end());
 
