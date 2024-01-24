@@ -79,7 +79,7 @@ std::string syntactic_feedbackt::build_smt_prompt(const exprt &partial_function)
       prompt += "(constraint (" + expr2sygus(c) + ")\n";
   }
 
-  if ((iter == 2 || iter == 4 || iter == 5) && last_cex.assignment.size() > 0)
+  if ((iter == 2 || iter == 4 || iter == 5) && last_cex.assignment.size() > 0 && last_solution.is_not_nil())
   {
     prompt += "\nThe last solution the student tried was this, but the teacher marked this solution incorrect:\n";
 
