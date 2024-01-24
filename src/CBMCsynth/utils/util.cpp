@@ -102,6 +102,26 @@ void basic_simplify(exprt &expr)
   }
 }
 
+bool contains_function_call(irep_idt f_name, const exprt &expr)
+{
+  if(expr.id()==ID_function_application)
+  {
+    auto app = to_function_application_expr(expr);
+    if(app.function().id()==ID_symbol)
+    {
+      auto sym = to_symbol_expr(app.function());
+      if(sym.get_identifier()==f_name)
+        return true;
+    }
+  }
+  for(const auto &op : expr.operands())
+  {
+    if(contains_function_call(f_name, op))
+      return true;
+  }
+  return false;
+}
+
 void get_defined_functions(
     const exprt &expr, const std::map<symbol_exprt, exprt> &defined_functions,
     std::set<symbol_exprt> &list)

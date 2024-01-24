@@ -38,6 +38,9 @@ void get_defined_functions(
     const exprt &expr, const std::map<symbol_exprt, exprt> &defined_functions,
     std::set<symbol_exprt> &list);
 
+// returns true if expr contains a call to function of f_name
+bool contains_function_call(irep_idt f_name, const exprt &expr);
+
 // Replaces all occurences of a string in a string with another string
 std::string replace_occurences(std::string str, const std::string &from, const std::string &to);
 

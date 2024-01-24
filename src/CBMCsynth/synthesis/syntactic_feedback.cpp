@@ -112,6 +112,8 @@ std::string syntactic_feedbackt::build_smt_prompt(const exprt &partial_function)
 
 bool syntactic_feedbackt::add_to_grammar(const irep_idt &id, const exprt &expr)
 {
+  if(contains_function_call(problem.synthesis_functions[0].id, expr))
+    return false;
   auto &type = expr.type();
   bool added = false;
   for (const auto &rules : problem.get_grammar().production_rules)
