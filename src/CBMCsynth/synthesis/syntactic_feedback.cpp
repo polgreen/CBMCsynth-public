@@ -112,6 +112,13 @@ std::string syntactic_feedbackt::build_smt_prompt(const exprt &partial_function)
 
 bool syntactic_feedbackt::add_to_grammar(const irep_idt &id, const exprt &expr)
 {
+  try{
+    std::string str = expr2sygus(expr);
+  }
+  catch(const std::exception& e){
+    message.status() << "LLM gave expression we can't convert to sygus: " << e.what() << messaget::eom;
+    return false;
+  }
   if(contains_function_call(problem.synthesis_functions[0].id, expr))
     return false;
   auto &type = expr.type();
@@ -168,6 +175,7 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
 
   std::string prompt = build_smt_prompt(partial_function_copy);
   message.debug() << "prompt is " << prompt << messaget::eom;
+  message.debug() << "temperature " << temperature << messaget::eom;
   std::string response;
   try{
   openai::Json messages;
@@ -188,7 +196,7 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
   response = oss.str();
   }
   catch(const std::exception& e){
-    message.debug() << "Error calling openAI: " << e.what() << messaget::eom;
+    message.status() << "Error calling openAI: " << e.what() << messaget::eom;
     return 0;
   }
   response.erase(std::remove(response.begin(), response.end(), '\"'),
