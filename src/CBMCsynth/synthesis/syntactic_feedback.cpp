@@ -169,13 +169,14 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
   std::string prompt = build_smt_prompt(partial_function_copy);
   message.debug() << "prompt is " << prompt << messaget::eom;
 
+  try{
   openai::Json messages;
   messages["role"] = "user";
   messages["content"] = prompt;
   openai::Json j;
   j["model"] = "gpt-3.5-turbo";
   j["messages"] = openai::Json::array({messages});
-  // j["temperature"] = 0.5; // heuristic
+  j["temperature"] = temperature; // heuristic
 
   auto completion = openai::chat().create(j);
 
@@ -184,6 +185,11 @@ std::size_t syntactic_feedbackt::augment_grammar(const exprt &partial_function,
   // parser can parse it.
   std::ostringstream oss;
   oss << completion["choices"][0]["message"]["content"];
+  }
+  catch(const std::exception& e){
+    message.debug() << "Error calling openAI: " << e.what() << messaget::eom;
+    return 0;
+  }
 
   std::string response = oss.str();
   response.erase(std::remove(response.begin(), response.end(), '\"'),
