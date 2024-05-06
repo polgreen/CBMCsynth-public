@@ -160,10 +160,6 @@ void get_defined_functions(
 
 void expand_function_applications(exprt &expr, const std::map<symbol_exprt, exprt> &defined_functions)
 {
-  for (exprt &op : expr.operands())
-  {
-    expand_function_applications(op, defined_functions);
-  }
   if (expr.id() == ID_function_application)
   {
     auto &app = to_function_application_expr(expr);
@@ -183,7 +179,10 @@ void expand_function_applications(exprt &expr, const std::map<symbol_exprt, expr
 
           if (body.id() == ID_lambda)
           {
-            body = to_lambda_expr(body).application(app.arguments());
+            if(app.arguments().size()==0)
+              body = to_lambda_expr(body).where();
+            else
+              body = to_lambda_expr(body).application(app.arguments());
           }
           expand_function_applications(body, defined_functions); // rec. call
           expr = body;
@@ -191,8 +190,11 @@ void expand_function_applications(exprt &expr, const std::map<symbol_exprt, expr
       }
     }
   }
+  for(exprt &op : expr.operands())
+  {
+    expand_function_applications(op, defined_functions);
+  }
 }
-
 
 
 void dnf(exprt &expr)
