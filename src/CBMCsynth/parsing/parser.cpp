@@ -388,7 +388,7 @@ sygus_problemt parsert::get_sygus_problem()
 
 void parsert::build_sygus_problem()
 {
-  std::cout<<"building sygus problem"<<std::endl;
+  // std::cout<<"building sygus problem"<<std::endl;
   if (synthesis_functions.size() == 0)
     throw error("SyGuS problem has no synthesis functions");
 

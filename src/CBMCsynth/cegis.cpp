@@ -11,10 +11,10 @@ void cegist::print_solution()
     get_defined_functions(f.second, problem.defined_functions, dependencies);
 
   for (const auto &f : dependencies)
-    message.status() << fun_def(f, problem.defined_functions[f]) << messaget::eom;
+    std::cout << fun_def(f, problem.defined_functions[f]) << std::endl;
 
   for (const auto &f : solution.functions)
-    message.status() << fun_def(f.first, f.second) << messaget::eom;
+    std::cout << fun_def(f.first, f.second) << std::endl;
 }
 
 // this function executes a basic counterexample guided inductive synthesis loop
