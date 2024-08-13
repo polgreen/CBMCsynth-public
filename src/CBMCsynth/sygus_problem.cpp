@@ -190,7 +190,7 @@ syntactic_templatet& sygus_problemt::get_grammar()
   PRECONDITION_WITH_DIAGNOSTICS(synthesis_functions.size() == 1, "only one synthesis function supported");
   if (synthesis_functions[0].grammar.nt_ids.size() == 0)
   {
-    std::cout << "No grammar found, adding a default grammar" << std::endl;
+    // std::cout << "No grammar found, adding a default grammar" << std::endl;
     add_grammar_to_problem(const_cast<sygus_problemt &>(*this));
   }
   return synthesis_functions[0].grammar;
