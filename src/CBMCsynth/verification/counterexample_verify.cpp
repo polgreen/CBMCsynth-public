@@ -23,7 +23,11 @@ void counterexample_verifyt::add_problem(const sygus_problemt &problem, const so
   // expand function applications, and add to solver.
   if (problem.assumptions.size() > 0)
   {
-    UNEXPECTEDCASE("Assumptions are not supported in mini_verify");
+    exprt assumptions = conjunction(problem.assumptions);
+    expand_function_applications(assumptions, solution.functions);
+    expand_function_applications(assumptions, problem.defined_functions);
+    expand_function_applications(assumptions, solution.functions);
+    solver.set_to_true(assumptions);
   }
 
   exprt constraints = conjunction(problem.constraints);

@@ -36,7 +36,14 @@ void verifyt::display_cex(const counterexamplet &cex)
 void verifyt::add_problem(const sygus_problemt &problem, const solutiont &solution, decision_proceduret &solver)
 {   
  if(problem.assumptions.size() > 0)
-    UNEXPECTEDCASE( "Assumptions are not supported in verify yet")
+ {
+  exprt assumptions = conjunction(problem.assumptions);
+  expand_function_applications(assumptions, solution.functions);
+  expand_function_applications(assumptions, problem.defined_functions);
+  expand_function_applications(assumptions, solution.functions);
+  solver.set_to_true(assumptions);
+
+ }
   // expand function applications, and add to solver.
   exprt constraints = conjunction(problem.constraints);
   expand_function_applications(constraints, solution.functions);
