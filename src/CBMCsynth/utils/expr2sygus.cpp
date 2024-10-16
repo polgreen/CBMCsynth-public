@@ -1194,7 +1194,6 @@ std::string grammar2sygus(const syntactic_templatet &grammar)
 std::string synth_fun_dec(const synth_funt &f)
 {
   std::string result = "(synth-fun " + clean_id(f.id);
-  std::cout << "f type is " << f.type.pretty() << std::endl;
 
   if (f.type.id() != ID_mathematical_function)
   {
