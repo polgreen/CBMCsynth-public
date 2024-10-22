@@ -28,6 +28,7 @@ make
 
 The binary is found at `CBMCsynth/src/CBMCsynth/CBMCsynth`. 
 
+### Running
 
 To run CBMCsynth on a SyGuS file and do A* search, guided by a set of weights on each production rule:
 ~~~
