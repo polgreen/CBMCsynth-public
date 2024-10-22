@@ -65,12 +65,10 @@ void help(std::ostream &out)
          " --verbosity N                   increase verbosity (10 gives maximum verbosity)\n"
          "\n"
          "The following options select the basic algorithm used for solving a CEGIS problem:\n"
-         "--cegis                          CEGIS with the most basic random top-down enumerator\n"
-         "                                 If no weights are given for the grammar, equal weights are used.\n"
          "--astar                          CEGIS with the a* enumerator. If the --use-LLM option is\n" 
          "                                 also specified, this CEGIS supports integrated calls to LLM\n"
          "                                 If no weights are given for the grammar, equal weights are used.\n"
-         "--top-down-cegis                      CEGIS with the top-down random enumerator. If the --use-LLM option is\n" 
+         "--top-down-cegis                 CEGIS with the top-down random enumerator. If the --use-LLM option is\n" 
          "                                 also specified, this CEGIS supports integrated calls to LLM\n"
          
          "\nThe following options are configurations for the LLM calls\n"
