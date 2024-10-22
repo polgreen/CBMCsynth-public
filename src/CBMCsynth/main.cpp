@@ -23,7 +23,7 @@
   "(cegis-bu)" \
   "(cegis-prob-bu)" \
   "(probs): " \
-  "(LLM-cegis) " \
+  "(top-down-cegis) " \
   "(use-bonus-weights)" \
   "(update-grammar)" \
   "(use-cex-in-prompt)" \
@@ -70,7 +70,7 @@ void help(std::ostream &out)
          "--astar                          CEGIS with the a* enumerator. If the --use-LLM option is\n" 
          "                                 also specified, this CEGIS supports integrated calls to LLM\n"
          "                                 If no weights are given for the grammar, equal weights are used.\n"
-         "--LLM-cegis                      CEGIS with the top-down random enumerator. If the --use-LLM option is\n" 
+         "--top-down-cegis                      CEGIS with the top-down random enumerator. If the --use-LLM option is\n" 
          "                                 also specified, this CEGIS supports integrated calls to LLM\n"
          
          "\nThe following options are configurations for the LLM calls\n"

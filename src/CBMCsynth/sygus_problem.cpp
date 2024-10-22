@@ -206,13 +206,13 @@ void parse_probs(std::string filename, sygus_problemt& problem)
      weights.push_back(weight);
    }
    if(weights.size()==0)
-      UNEXPECTEDCASE("no weights in probability file or file not found");
+      UNEXPECTEDCASE("ERROR: no weights in probability file or file not found");
 
    if(problem.synthesis_functions.size()!=1)
-     UNEXPECTEDCASE("only one synthesis function supported, if probability file is given");
+     UNEXPECTEDCASE("ERROR: only one synthesis function supported, if probability file is given");
   
     auto &grammar = problem.synthesis_functions[0].grammar;
-    // TODO: parse into weights
+
     std::size_t count=0;
 
     for(const auto &nt_id: grammar.nt_ids)
@@ -221,11 +221,13 @@ void parse_probs(std::string filename, sygus_problemt& problem)
       {
         std::cout<<"adding weight "<<weights[count]<<" to "<<expr2sygus(grammar.production_rules[nt_id][i])<<std::endl;
         if(count>=weights.size())
-          UNEXPECTEDCASE("not enough weights in probability file");
+          UNEXPECTEDCASE("ERROR: not enough weights in probability file");
         grammar.production_rule_weights[nt_id].push_back(weights[count]);
         count++;
       }
     }
+    if(count!=weights.size())
+      UNEXPECTEDCASE("ERROR: too many weights in probability file");
 }
 
 bool contains_nonterminal(const exprt &expr, const syntactic_templatet& grammar)

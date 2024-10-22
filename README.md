@@ -1,6 +1,8 @@
 # CBMCsynth
 
-Basic synthesizer using CBMC datatypes
+CBMCsynth is a synthesizer using the CBMC datatypes. It implements a number of prototype research algorithms including a top-down search and A* search, both of which can be guided by a probabilistic grammar, and can make calls to an LLM during the synthesis process in order to update this grammar.
+
+Note that this is a prototype!
 
 ### Building
 Prerequisites: All prerequisties for CBMC must be installed (https://github.com/diffblue/cbmc/blob/develop/COMPILING.md). Plus Z3 must be added to $PATH.  
@@ -26,9 +28,16 @@ make
 
 The binary is found at `CBMCsynth/src/CBMCsynth/CBMCsynth`. 
 
-To run CBMCsynth on a SyGuS file and do basic cegis:
+
+To run CBMCsynth on a SyGuS file and do A* search, guided by a set of weights on each production rule:
 ~~~
-CBMCsynth file.sl --cegis
+CBMCsynth max2.sl --astar --probs maxprobs.txt
+~~~
+The file maxprobs.txt should contain a single integer for each proudction rule in the grammar. Each integer should be on a new line.
+
+To run CBMCsynth on a SyGuS file and do top-down search, guided by a probabilities file:
+~~~
+CBMCsynth max2.sl --top-down-cegis --probs maxprobs.txt
 ~~~
 
-
+To add calls to the LLM during the synthesis phase, the command line option `--use-LLM' can be added. You will need to have an openai key stored in your `OPENAI_API_KEY` environment variable.

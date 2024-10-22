@@ -69,15 +69,16 @@ int sygus_frontend(const cmdlinet &cmdline)
 
   if (cmdline.isset("probs"))
   {
-    message.status() << "trying to parse prob file" << messaget::eom;
     try
     {
+      message.status() << "Parsing probabilities file" << messaget::eom;
       std::string filename = cmdline.get_value("probs");
       parse_probs(filename, problem);
+
     }
     catch (const std::exception &e)
     {
-      message.error() << "Failed to open probabilities file" << messaget::eom;
+      message.error() << "Failed to parse probabilities file" << messaget::eom;
       return 30;
     }
   }
@@ -147,7 +148,7 @@ int sygus_frontend(const cmdlinet &cmdline)
     cegis.doit();
     return 0;
   }
-  if (cmdline.isset("LLM-cegis"))
+  if (cmdline.isset("top-down-cegis"))
   {
     message.status() << "top down CEGIS with an LLM providing syntactic feedback" << messaget::eom;
     counterexample_verifyt cex_verify(ns, message_handler);
