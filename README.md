@@ -33,7 +33,7 @@ To run CBMCsynth on a SyGuS file and do A* search, guided by a set of weights on
 ~~~
 CBMCsynth max2.sl --astar --probs maxprobs.txt
 ~~~
-The file maxprobs.txt should contain a single integer for each proudction rule in the grammar. Each integer should be on a new line.
+The file maxprobs.txt should contain a single integer for each proudction rule in the grammar. Each integer should be on a new line. You can find max2.sl and maxprobs.txt at the top level of this git repository.
 
 To run CBMCsynth on a SyGuS file and do top-down search, guided by a probabilities file:
 ~~~
